@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Character Prompt Forge</title>
+  <style>
+    :root {
+      --bg: #050712;
+      --accent: #ff7b3f;
+      --accent-soft: rgba(255, 123, 63, 0.25);
+      --text-main: #f7f7ff;
+      --text-muted: #a0a4c2;
+      --border: #292b40;
+      --success: #4caf50;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 32px;
+      background: radial-gradient(circle at top, #252956 0, #050712 60%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .mode-link {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #ff9d4d, #ff3b6a);
+      color: #080710;
+      text-decoration: none;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(255, 90, 90, 0.4);
+      transition: all 0.2s ease;
+    }
+    .mode-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255, 90, 90, 0.6);
+    }
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(145deg, #0b0d1a, #14172a);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02);
+      padding: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 26px;
+    }
+    @media (max-width: 900px) {
+      body { padding: 16px; }
+      .app {
+        grid-template-columns: 1fr;
+        padding: 20px 18px;
+      }
+      .mode-link {
+        top: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      margin-bottom: 18px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .panel {
+      background: radial-gradient(circle at top left, #1d2040 0, #090a14 55%);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -120px;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+    .group-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      margin-top: 14px;
+    }
+    .group-title:first-of-type {
+      margin-top: 0;
+    }
+    .slider-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .slider-label {
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .slider-label span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      border-radius: 999px;
+      background: #1f2136;
+      outline: none;
+      transition: background 0.2s ease;
+    }
+    input[type="range"]:hover {
+      background: #282a42;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      cursor: pointer;
+      border: 0;
+      transition: all 0.2s ease;
+    }
+    input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    .value-pill {
+      justify-self: end;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+    .controls {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 10px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.02em;
+      transition: all 0.2s ease;
+    }
+    button:active {
+      transform: translateY(0) !important;
+    }
+    .primary {
+      background: linear-gradient(135deg, #ff9d4d, #ff3b6a);
+      color: #080710;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(255, 90, 90, 0.45);
+    }
+    .primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(255, 90, 90, 0.6);
+    }
+    .secondary {
+      background: rgba(16, 19, 40, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+    }
+    .secondary:hover {
+      background: rgba(26, 29, 50, 0.9);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-main);
+    }
+    .prompt-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+    #promptOutput {
+      font-size: 13px;
+      line-height: 1.57;
+      background: radial-gradient(circle at top left, #25284a 0, #050612 60%);
+      padding: 12px;
+      border-radius: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      min-height: 140px;
+      white-space: pre-wrap;
+      width: 100%;
+      resize: vertical;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+    .copy-btn {
+      margin-top: 8px;
+      width: 100%;
+      background: rgba(255, 123, 63, 0.1);
+      border: 1px solid rgba(255, 123, 63, 0.3);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 123, 63, 0.2);
+      border-color: rgba(255, 123, 63, 0.5);
+    }
+    .copy-btn.copied {
+      background: rgba(76, 175, 80, 0.2);
+      border-color: rgba(76, 175, 80, 0.5);
+      color: var(--success);
+    }
+    .chips {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+    .chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+    }
+    .chip span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 3px;
+    }
+    .section-header {
+      font-size: 12px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+    .small-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .preset-btn {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent);
+      color: var(--text-main);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <a href="#" class="mode-link" id="switchMode">👤 Switch to Fashion Model</a>
+
+  <div class="app">
+    <div class="panel">
+      <div class="panel-inner">
+        <h1>Character Prompt Forge</h1>
+        <div class="subtitle">
+          Mix fantasy styles like ornate emperors, cosmic monks, biomech creatures, and crystal insects.
+        </div>
+
+```
+    <div class="group-title">Core silhouette</div>
+    <div class="slider-row">
+      <label class="slider-label">Body archetype<span>Creature ←→ Human</span></label>
+      <div class="value-pill" id="valArchetype">Hybrid-human</div>
+    </div>
+    <input id="archetype" type="range" min="0" max="3" step="1" value="2" />
+
+    <div class="slider-row">
+      <label class="slider-label">Proportions<span>Tiny ←→ Tall imposing</span></label>
+      <div class="value-pill" id="valProportions">Mid</div>
+    </div>
+    <input id="proportions" type="range" min="0" max="3" step="1" value="2" />
+
+    <div class="slider-row">
+      <label class="slider-label">Stance & energy<span>Playful ←→ Menacing</span></label>
+      <div class="value-pill" id="valEnergy">Balanced</div>
+    </div>
+    <input id="energy" type="range" min="0" max="3" step="1" value="2" />
+
+    <div class="group-title">Style blend</div>
+    <div class="slider-row">
+      <label class="slider-label">Cultural vs alien<span>Traditional ←→ Alien</span></label>
+      <div class="value-pill" id="valCulture">Traditional</div>
+    </div>
+    <input id="culture" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Material palette<span>Organic ←→ Metal/crystal</span></label>
+      <div class="value-pill" id="valMaterial">Textile</div>
+    </div>
+    <input id="material" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Detail density<span>Minimal ←→ Hyper-ornate</span></label>
+      <div class="value-pill" id="valDetail">Ornate</div>
+    </div>
+    <input id="detail" type="range" min="0" max="3" step="1" value="3" />
+
+    <div class="group-title">Environment & mood</div>
+    <div class="slider-row">
+      <label class="slider-label">World type<span>Urban ←→ Natural/ethereal</span></label>
+      <div class="value-pill" id="valWorld">Balanced</div>
+    </div>
+    <input id="world" type="range" min="0" max="3" step="1" value="2" />
+
+    <div class="slider-row">
+      <label class="slider-label">Atmosphere<span>Soft/dreamy ←→ Dark/cinematic</span></label>
+      <div class="value-pill" id="valAtmos">Cinematic</div>
+    </div>
+    <input id="atmos" type="range" min="0" max="3" step="1" value="3" />
+
+    <div class="slider-row">
+      <label class="slider-label">Color palette<span>Monochrome ←→ Pastel</span></label>
+      <div class="value-pill" id="valColor">Earthy</div>
+    </div>
+    <input id="color" type="range" min="0" max="3" step="1" value="2" />
+
+    <div class="group-title">Character traits</div>
+    <div class="slider-row">
+      <label class="slider-label">Age & wear<span>Ancient ←→ Pristine</span></label>
+      <div class="value-pill" id="valAge">Weathered</div>
+    </div>
+    <input id="age" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Fashion aesthetic<span>Optional style</span></label>
+      <div class="value-pill" id="valFashion">None</div>
+    </div>
+    <input id="fashion" type="range" min="0" max="10" step="1" value="0" />
+
+    <div class="controls">
+      <button class="primary" id="btnGenerate">⚡ Generate character</button>
+      <button class="secondary" id="btnRandomize">🎲 Shuffle sliders</button>
+    </div>
+    <div class="small-text">
+      Tip: Adjust sliders to craft your vision, then copy the prompt to Midjourney, Stable Diffusion, or other AI tools.
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-inner">
+    <div class="prompt-label">Generated prompt</div>
+    <textarea id="promptOutput" spellcheck="false" readonly></textarea>
+    <button class="copy-btn" id="btnCopy">📋 Copy to clipboard</button>
+
+    <div class="section-header">Active attributes</div>
+    <div class="chips" id="chips"></div>
+
+    <div class="section-header">Quick presets</div>
+    <div class="preset-grid">
+      <button class="preset-btn" data-preset="emperor">👑 Emperor</button>
+      <button class="preset-btn" data-preset="biomech">🦾 Biomech</button>
+      <button class="preset-btn" data-preset="monk">🧘 Monk</button>
+      <button class="preset-btn" data-preset="creature">🦖 Creature</button>
+      <button class="preset-btn" data-preset="insect">🪲 Insect</button>
+      <button class="preset-btn" data-preset="golem">🗿 Golem</button>
+    </div>
+
+    <div class="section-header">Inspiration examples</div>
+    <div class="small-text">
+      Ornate masked emperors, biomechanical raven knights, levitating crystal astronaut monks, floating balloon T-Rex, coral golems, translucent cyber beetles, bipedal snow-leopard avatars, macro cinematic dragonflies.
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <script>
+    const data = {
+      archetype: [
+        { l: "Creature", c: "creature-forward silhouette" },
+        { l: "Hybrid-creature", c: "creature-leaning hybrid" },
+        { l: "Hybrid-human", c: "humanoid-leaning hybrid" },
+        { l: "Human", c: "human silhouette" }
+      ],
+      proportions: [
+        { l: "Tiny", c: "tiny adorable proportions" },
+        { l: "Compact", c: "compact mascot body" },
+        { l: "Mid", c: "balanced proportions" },
+        { l: "Tall", c: "tall imposing proportions" }
+      ],
+      energy: [
+        { l: "Whimsical", c: "whimsical ethereal energy" },
+        { l: "Playful", c: "playful weightless energy" },
+        { l: "Balanced", c: "calm poised stance" },
+        { l: "Menacing", c: "menacing grounded stance" }
+      ],
+      culture: [
+        { l: "Ancient", c: "ancient ceremonial aesthetics" },
+        { l: "Traditional", c: "ceremonial clothing" },
+        { l: "Hybrid", c: "cultural-alien fusion" },
+        { l: "Alien", c: "otherworldly design" }
+      ],
+      material: [
+        { l: "Organic", c: "bone, wood, skin" },
+        { l: "Textile", c: "fabric, leather textures" },
+        { l: "Mixed", c: "cloth, metal, organic mix" },
+        { l: "Crystal", c: "metal, crystal, glass" }
+      ],
+      detail: [
+        { l: "Ultra-min", c: "ultra-clean abstract" },
+        { l: "Minimal", c: "minimal details" },
+        { l: "Medium", c: "moderate detailing" },
+        { l: "Ornate", c: "intricate ornamentation" }
+      ],
+      world: [
+        { l: "Dystopian", c: "dystopian wasteland" },
+        { l: "Urban", c: "abandoned industrial" },
+        { l: "Balanced", c: "man-made & natural blend" },
+        { l: "Ethereal", c: "mystical natural environment" }
+      ],
+      atmos: [
+        { l: "Glow", c: "ethereal glowing atmosphere" },
+        { l: "Dreamy", c: "soft dreamy lighting" },
+        { l: "Hybrid", c: "dreamy-cinematic mix" },
+        { l: "Cinematic", c: "moody cinematic lighting" }
+      ],
+      color: [
+        { l: "Mono", c: "black and white" },
+        { l: "Neon", c: "bold neon colors" },
+        { l: "Earthy", c: "earthy muted tones" },
+        { l: "Pastel", c: "soft pastels" }
+      ],
+      age: [
+        { l: "Ancient", c: "heavily weathered crumbling" },
+        { l: "Weathered", c: "worn battle-scarred" },
+        { l: "Balanced", c: "lived-in appearance" },
+        { l: "Pristine", c: "freshly crafted" }
+      ],
+      fashion: [
+        { l: "None", c: null, d: null },
+        { l: "Pirate", c: "Piratecore", d: "nautical tricorn hats, flowing coats, weathered leather, gold accents" },
+        { l: "Fairy", c: "Fairycore", d: "ethereal soft colors, flowing fabrics, whimsical wings, nature motifs" },
+        { l: "Mermaid", c: "Mermaidcore", d: "iridescent colors, seashells, shimmering fabrics, underwater glamour" },
+        { l: "Academia", c: "Dark Academia", d: "tweed blazers, dark palette, gothic architecture inspiration" },
+        { l: "Goth", c: "Goth", d: "all-black clothing, dark makeup, chains, PVC elements" },
+        { l: "Y2K", c: "Y2K", d: "crop tops, wide-leg jeans, shiny textures, 2000s nostalgia" },
+        { l: "Clean", c: "Clean Girl", d: "minimalist polished look, sleek styling, gold hoops" },
+        { l: "Barbie", c: "Barbiecore", d: "hot pink, glitter, glamorous feminine style" },
+        { l: "Cowgirl", c: "Coastal Cowgirl", d: "cowboy boots, denim, crochet tops, bohemian blend" },
+        { l: "Grunge", c: "Grunge", d: "distressed fabrics, oversized flannels, combat boots" }
+      ]
+    };
+
+    const presets = {
+      emperor: { archetype: 3, proportions: 3, energy: 2, culture: 1, material: 1, detail: 3, world: 2, atmos: 3, color: 2, age: 1, fashion: 0 },
+      biomech: { archetype: 0, proportions: 3, energy: 3, culture: 3, material: 3, detail: 3, world: 0, atmos: 3, color: 1, age: 2, fashion: 0 },
+      monk: { archetype: 3, proportions: 2, energy: 0, culture: 2, material: 2, detail: 2, world: 3, atmos: 0, color: 3, age: 1, fashion: 0 },
+      creature: { archetype: 0, proportions: 1, energy: 1, culture: 3, material: 0, detail: 2, world: 3, atmos: 1, color: 2, age: 2, fashion: 0 },
+      insect: { archetype: 0, proportions: 0, energy: 2, culture: 3, material: 3, detail: 3, world: 3, atmos: 2, color: 1, age: 3, fashion: 0 },
+      golem: { archetype: 0, proportions: 3, energy: 3, culture: 2, material: 2, detail: 2, world: 3, atmos: 3, color: 2, age: 0, fashion: 0 }
+    };
+
+    const sliders = ['archetype', 'proportions', 'energy', 'culture', 'material', 'detail', 'world', 'atmos', 'color', 'age', 'fashion'];
+
+    function update() {
+      const chips = document.getElementById('chips');
+      chips.innerHTML = '';
+      sliders.forEach(id => {
+        const val = Number(document.getElementById(id).value);
+        const info = data[id][val];
+        document.getElementById('val' + id.charAt(0).toUpperCase() + id.slice(1)).textContent = info.l;
+        if (info.c) {
+          const chip = document.createElement('div');
+          chip.className = 'chip';
+          chip.innerHTML = '<span>●</span>' + info.c;
+          chips.appendChild(chip);
+        }
+      });
+    }
+
+    function generate() {
+      const v = {};
+      sliders.forEach(id => v[id] = data[id][Number(document.getElementById(id).value)]);
+
+      const subject = v.archetype.l === 'Creature' ? 'A fantastical creature hero' :
+                      v.archetype.l === 'Human' ? 'A masked humanoid character' :
+                      v.archetype.l === 'Hybrid-creature' ? 'A creature-dominant hybrid' : 'A humanoid-dominant hybrid';
+
+      const prompt = `${subject}, ${v.proportions.c}.
+${v.culture.l === 'Ancient' ? 'Ancient ceremonial aesthetics with timeless traditional elements.' :
+  v.culture.l === 'Traditional' ? 'Silhouette inspired by ceremonial imperial robes and traditional costume masks.' :
+  v.culture.l === 'Alien' ? 'Fully alien armor and mask design with no cultural reference.' :
+  'Hybrid of ceremonial clothing, sci-fi space suit panels, and alien ornament.'}
+Color: ${v.color.c}. Age: ${v.age.c}.${v.fashion.d ? '\nFashion: ' + v.fashion.d + '.' : ''}
+Materials: ${v.material.c}. Pose: ${v.energy.c}.
+Environment: ${v.world.l === 'Dystopian' ? 'dystopian industrial wasteland with rusted machinery' :
+              v.world.l === 'Urban' ? 'vast abandoned warehouse with broken windows' :
+              v.world.l === 'Ethereal' ? 'luminous otherworldly natural landscape' :
+              'softly lit abstract environment'}.
+Lighting: ${v.atmos.c}. Detail: ${v.detail.c}.
+Ultra-sharp focus, 8K render, cinematic composition.`;
+
+      document.getElementById('promptOutput').value = prompt;
+      update();
+    }
+
+    function randomize() {
+      sliders.forEach(id => {
+        const max = data[id].length - 1;
+        document.getElementById(id).value = Math.floor(Math.random() * (max + 1));
+      });
+      generate();
+    }
+
+    function setPreset(name) {
+      const p = presets[name];
+      Object.keys(p).forEach(k => document.getElementById(k).value = p[k]);
+      generate();
+    }
+
+    async function copy() {
+      const btn = document.getElementById('btnCopy');
+      try {
+        await navigator.clipboard.writeText(document.getElementById('promptOutput').value);
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Copy to clipboard';
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch (e) {
+        btn.textContent = '❌ Failed';
+        setTimeout(() => btn.textContent = '📋 Copy to clipboard', 2000);
+      }
+    }
+
+    document.getElementById('btnGenerate').addEventListener('click', generate);
+    document.getElementById('btnRandomize').addEventListener('click', randomize);
+    document.getElementById('btnCopy').addEventListener('click', copy);
+    document.querySelectorAll('.preset-btn').forEach(b => {
+      b.addEventListener('click', () => setPreset(b.dataset.preset));
+    });
+    sliders.forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    // Note: Link to switch between modes - you'll need to handle navigation
+    document.getElementById('switchMode').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Please create a second HTML file for the Fashion Model generator and link them together!');
+    });
+
+    update();
+    generate();
+  </script>
+
+</body>
+</html>
