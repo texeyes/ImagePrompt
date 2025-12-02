@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fashion Model Prompt Forge</title>
+  <style>
+    :root {
+      --bg: #050712;
+      --accent: #ff7b3f;
+      --accent-soft: rgba(255, 123, 63, 0.25);
+      --text-main: #f7f7ff;
+      --text-muted: #a0a4c2;
+      --border: #292b40;
+      --success: #4caf50;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 32px;
+      background: radial-gradient(circle at top, #252956 0, #050712 60%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .mode-link {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #ff9d4d, #ff3b6a);
+      color: #080710;
+      text-decoration: none;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(255, 90, 90, 0.4);
+      transition: all 0.2s ease;
+    }
+    .mode-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255, 90, 90, 0.6);
+    }
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(145deg, #0b0d1a, #14172a);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02);
+      padding: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 26px;
+    }
+    @media (max-width: 900px) {
+      body { padding: 16px; }
+      .app {
+        grid-template-columns: 1fr;
+        padding: 20px 18px;
+      }
+      .mode-link {
+        top: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      margin-bottom: 18px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .panel {
+      background: radial-gradient(circle at top left, #1d2040 0, #090a14 55%);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -120px;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+    .group-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      margin-top: 14px;
+    }
+    .group-title:first-of-type {
+      margin-top: 0;
+    }
+    .slider-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .slider-label {
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .slider-label span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      border-radius: 999px;
+      background: #1f2136;
+      outline: none;
+      transition: background 0.2s ease;
+    }
+    input[type="range"]:hover {
+      background: #282a42;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      cursor: pointer;
+      border: 0;
+      transition: all 0.2s ease;
+    }
+    input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    .value-pill {
+      justify-self: end;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+    .controls {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 10px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.02em;
+      transition: all 0.2s ease;
+    }
+    button:active {
+      transform: translateY(0) !important;
+    }
+    .primary {
+      background: linear-gradient(135deg, #ff9d4d, #ff3b6a);
+      color: #080710;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(255, 90, 90, 0.45);
+    }
+    .primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(255, 90, 90, 0.6);
+    }
+    .secondary {
+      background: rgba(16, 19, 40, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+    }
+    .secondary:hover {
+      background: rgba(26, 29, 50, 0.9);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-main);
+    }
+    .prompt-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+    #promptOutput {
+      font-size: 13px;
+      line-height: 1.57;
+      background: radial-gradient(circle at top left, #25284a 0, #050612 60%);
+      padding: 12px;
+      border-radius: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      min-height: 140px;
+      white-space: pre-wrap;
+      width: 100%;
+      resize: vertical;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+    .copy-btn {
+      margin-top: 8px;
+      width: 100%;
+      background: rgba(255, 123, 63, 0.1);
+      border: 1px solid rgba(255, 123, 63, 0.3);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 123, 63, 0.2);
+      border-color: rgba(255, 123, 63, 0.5);
+    }
+    .copy-btn.copied {
+      background: rgba(76, 175, 80, 0.2);
+      border-color: rgba(76, 175, 80, 0.5);
+      color: var(--success);
+    }
+    .chips {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+    .chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+    }
+    .chip span {
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 3px;
+    }
+    .section-header {
+      font-size: 12px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+    .small-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .preset-btn {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent);
+      color: var(--text-main);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <a href="#" class="mode-link" id="switchMode">🎭 Switch to Character</a>
+
+  <div class="app">
+    <div class="panel">
+      <div class="panel-inner">
+        <h1>Fashion Model Prompt Forge</h1>
+        <div class="subtitle">
+          Create detailed prompts for realistic fashion model photography with precise control.
+        </div>
+
+```
+    <div class="group-title">Model basics</div>
+    <div class="slider-row">
+      <label class="slider-label">Model type<span>Editorial ←→ Street style</span></label>
+      <div class="value-pill" id="valModelType">Editorial</div>
+    </div>
+    <input id="modelType" type="range" min="0" max="3" step="1" value="0" />
+
+    <div class="slider-row">
+      <label class="slider-label">Age range<span>Teen ←→ Distinguished</span></label>
+      <div class="value-pill" id="valAgeRange">Young</div>
+    </div>
+    <input id="ageRange" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Body type<span>Petite ←→ Plus-size</span></label>
+      <div class="value-pill" id="valBodyType">Athletic</div>
+    </div>
+    <input id="bodyType" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="group-title">Pose & expression</div>
+    <div class="slider-row">
+      <label class="slider-label">Pose style<span>Dynamic ←→ Seated elegant</span></label>
+      <div class="value-pill" id="valPoseStyle">Power</div>
+    </div>
+    <input id="poseStyle" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Facial expression<span>Intense ←→ Mysterious</span></label>
+      <div class="value-pill" id="valExpression">Serene</div>
+    </div>
+    <input id="expression" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="group-title">Styling</div>
+    <div class="slider-row">
+      <label class="slider-label">Hair style<span>Short pixie ←→ Updo/styled</span></label>
+      <div class="value-pill" id="valHairStyle">Shoulder</div>
+    </div>
+    <input id="hairStyle" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Makeup intensity<span>Natural ←→ Avant-garde</span></label>
+      <div class="value-pill" id="valMakeup">Soft</div>
+    </div>
+    <input id="makeup" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Outfit formality<span>Casual ←→ Haute couture</span></label>
+      <div class="value-pill" id="valOutfit">Smart</div>
+    </div>
+    <input id="outfit" type="range" min="0" max="3" step="1" value="1" />
+
+    <div class="slider-row">
+      <label class="slider-label">Fashion aesthetic<span>Optional style</span></label>
+      <div class="value-pill" id="valFashion">None</div>
+    </div>
+    <input id="fashion" type="range" min="0" max="10" step="1" value="0" />
+
+    <div class="group-title">Photography</div>
+    <div class="slider-row">
+      <label class="slider-label">Setting/Background<span>Studio ←→ Luxury interior</span></label>
+      <div class="value-pill" id="valSetting">Studio</div>
+    </div>
+    <input id="setting" type="range" min="0" max="3" step="1" value="0" />
+
+    <div class="slider-row">
+      <label class="slider-label">Lighting style<span>Soft ←→ High contrast</span></label>
+      <div class="value-pill" id="valLighting">Soft</div>
+    </div>
+    <input id="lighting" type="range" min="0" max="3" step="1" value="0" />
+
+    <div class="slider-row">
+      <label class="slider-label">Shot composition<span>Full body ←→ Wide environmental</span></label>
+      <div class="value-pill" id="valComposition">Full</div>
+    </div>
+    <input id="composition" type="range" min="0" max="3" step="1" value="0" />
+
+    <div class="controls">
+      <button class="primary" id="btnGenerate">⚡ Generate model</button>
+      <button class="secondary" id="btnRandomize">🎲 Shuffle sliders</button>
+    </div>
+    <div class="small-text">
+      Tip: Adjust sliders to craft your ideal fashion photography prompt, then copy to your AI image generator.
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-inner">
+    <div class="prompt-label">Generated prompt</div>
+    <textarea id="promptOutput" spellcheck="false" readonly></textarea>
+    <button class="copy-btn" id="btnCopy">📋 Copy to clipboard</button>
+
+    <div class="section-header">Active attributes</div>
+    <div class="chips" id="chips"></div>
+
+    <div class="section-header">Quick presets</div>
+    <div class="preset-grid">
+      <button class="preset-btn" data-preset="editorial">📸 Editorial</button>
+      <button class="preset-btn" data-preset="commercial">🛍️ Commercial</button>
+      <button class="preset-btn" data-preset="runway">👗 Runway</button>
+      <button class="preset-btn" data-preset="street">🌆 Street</button>
+      <button class="preset-btn" data-preset="glamour">✨ Glamour</button>
+      <button class="preset-btn" data-preset="casual">👕 Casual</button>
+    </div>
+
+    <div class="section-header">Use cases</div>
+    <div class="small-text">
+      Perfect for creating: high fashion editorial spreads, commercial catalog photography, runway show compositions, street style lookbooks, beauty campaigns, lifestyle brand imagery, and professional portfolio pieces.
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <script>
+    const data = {
+      modelType: [
+        { l: "Editorial", c: "high fashion editorial model" },
+        { l: "Commercial", c: "commercial catalog model" },
+        { l: "Runway", c: "runway haute couture model" },
+        { l: "Street", c: "street style casual model" }
+      ],
+      ageRange: [
+        { l: "Teen", c: "teen model (16-19 years)" },
+        { l: "Young", c: "young adult (20s)" },
+        { l: "Mature", c: "mature model (30s-40s)" },
+        { l: "Distinguished", c: "distinguished (50+)" }
+      ],
+      bodyType: [
+        { l: "Petite", c: "petite frame" },
+        { l: "Athletic", c: "athletic build" },
+        { l: "Curvy", c: "curvy physique" },
+        { l: "Plus", c: "plus-size model" }
+      ],
+      poseStyle: [
+        { l: "Dynamic", c: "dynamic action pose" },
+        { l: "Power", c: "confident power pose" },
+        { l: "Relaxed", c: "relaxed casual stance" },
+        { l: "Seated", c: "seated elegant pose" }
+      ],
+      expression: [
+        { l: "Intense", c: "intense fierce expression" },
+        { l: "Serene", c: "serene peaceful expression" },
+        { l: "Joyful", c: "joyful smiling expression" },
+        { l: "Sultry", c: "mysterious sultry expression" }
+      ],
+      hairStyle: [
+        { l: "Pixie", c: "short pixie cut" },
+        { l: "Shoulder", c: "shoulder-length hair" },
+        { l: "Long", c: "long flowing hair" },
+        { l: "Updo", c: "styled updo" }
+      ],
+      makeup: [
+        { l: "Natural", c: "natural minimal makeup" },
+        { l: "Soft", c: "soft glam makeup" },
+        { l: "Bold", c: "bold editorial makeup" },
+        { l: "Avant-garde", c: "avant-garde makeup" }
+      ],
+      outfit: [
+        { l: "Casual", c: "casual streetwear" },
+        { l: "Smart", c: "smart casual attire" },
+        { l: "Formal", c: "formal evening wear" },
+        { l: "Couture", c: "high fashion couture" }
+      ],
+      fashion: [
+        { l: "None", c: null, d: null },
+        { l: "Pirate", c: "Piratecore", d: "nautical tricorn hats, flowing coats, weathered leather, gold accents" },
+        { l: "Fairy", c: "Fairycore", d: "ethereal soft colors, flowing fabrics, whimsical accessories" },
+        { l: "Mermaid", c: "Mermaidcore", d: "iridescent colors, seashells, shimmering fabrics" },
+        { l: "Academia", c: "Dark Academia", d: "tweed blazers, dark palette, scholarly aesthetic" },
+        { l: "Goth", c: "Goth", d: "all-black clothing, dark makeup, chains, edgy aesthetic" },
+        { l: "Y2K", c: "Y2K", d: "crop tops, wide-leg jeans, shiny textures, 2000s nostalgia" },
+        { l: "Clean", c: "Clean Girl", d: "minimalist polished look, sleek styling" },
+        { l: "Barbie", c: "Barbiecore", d: "hot pink, glitter, glamorous feminine style" },
+        { l: "Cowgirl", c: "Coastal Cowgirl", d: "cowboy boots, denim, crochet tops, bohemian" },
+        { l: "Grunge", c: "Grunge", d: "distressed fabrics, oversized flannels, combat boots" }
+      ],
+      setting: [
+        { l: "Studio", c: "studio white backdrop" },
+        { l: "Urban", c: "urban city street setting" },
+        { l: "Natural", c: "natural outdoor environment" },
+        { l: "Luxury", c: "luxury interior setting" }
+      ],
+      lighting: [
+        { l: "Soft", c: "soft natural light" },
+        { l: "Dramatic", c: "dramatic studio lighting" },
+        { l: "Golden", c: "golden hour lighting" },
+        { l: "Contrast", c: "high contrast fashion lighting" }
+      ],
+      composition: [
+        { l: "Full", c: "full body shot" },
+        { l: "Three-quarter", c: "three-quarter length" },
+        { l: "Portrait", c: "headshot portrait" },
+        { l: "Wide", c: "wide environmental shot" }
+      ]
+    };
+
+    const presets = {
+      editorial: { modelType: 0, ageRange: 1, bodyType: 1, poseStyle: 1, expression: 0, hairStyle: 3, makeup: 3, outfit: 3, fashion: 0, setting: 0, lighting: 1, composition: 0 },
+      commercial: { modelType: 1, ageRange: 1, bodyType: 1, poseStyle: 2, expression: 2, hairStyle: 1, makeup: 1, outfit: 1, fashion: 0, setting: 1, lighting: 0, composition: 0 },
+      runway: { modelType: 2, ageRange: 1, bodyType: 0, poseStyle: 0, expression: 0, hairStyle: 3, makeup: 2, outfit: 3, fashion: 0, setting: 0, lighting: 1, composition: 0 },
+      street: { modelType: 3, ageRange: 1, bodyType: 1, poseStyle: 2, expression: 2, hairStyle: 2, makeup: 0, outfit: 0, fashion: 6, setting: 1, lighting: 2, composition: 3 },
+      glamour: { modelType: 0, ageRange: 2, bodyType: 2, poseStyle: 3, expression: 3, hairStyle: 2, makeup: 2, outfit: 2, fashion: 0, setting: 3, lighting: 2, composition: 2 },
+      casual: { modelType: 3, ageRange: 1, bodyType: 1, poseStyle: 2, expression: 2, hairStyle: 1, makeup: 0, outfit: 0, fashion: 7, setting: 2, lighting: 0, composition: 1 }
+    };
+
+    const sliders = ['modelType', 'ageRange', 'bodyType', 'poseStyle', 'expression', 'hairStyle', 'makeup', 'outfit', 'fashion', 'setting', 'lighting', 'composition'];
+
+    function update() {
+      const chips = document.getElementById('chips');
+      chips.innerHTML = '';
+      sliders.forEach(id => {
+        const val = Number(document.getElementById(id).value);
+        const info = data[id][val];
+        document.getElementById('val' + id.charAt(0).toUpperCase() + id.slice(1)).textContent = info.l;
+        if (info.c) {
+          const chip = document.createElement('div');
+          chip.className = 'chip';
+          chip.innerHTML = '<span>●</span>' + info.c;
+          chips.appendChild(chip);
+        }
+      });
+    }
+
+    function generate() {
+      const v = {};
+      sliders.forEach(id => v[id] = data[id][Number(document.getElementById(id).value)]);
+
+      const prompt = `Professional fashion photography: ${v.modelType.c}, ${v.ageRange.c}, ${v.bodyType.c}.
+Pose: ${v.poseStyle.c} with ${v.expression.c}.
+Styling: ${v.hairStyle.c}, ${v.makeup.c}, ${v.outfit.c}.${v.fashion.d ? '\nFashion aesthetic: ' + v.fashion.d + '.' : ''}
+Setting: ${v.setting.c} with ${v.lighting.c}.
+Composition: ${v.composition.c}.
+Shot on medium format camera, professional fashion photography, high-end editorial quality, sharp focus, professional color grading, clean retouch, Vogue magazine style, 8K resolution.`;
+
+      document.getElementById('promptOutput').value = prompt;
+      update();
+    }
+
+    function randomize() {
+      sliders.forEach(id => {
+        const max = data[id].length - 1;
+        document.getElementById(id).value = Math.floor(Math.random() * (max + 1));
+      });
+      generate();
+    }
+
+    function setPreset(name) {
+      const p = presets[name];
+      Object.keys(p).forEach(k => document.getElementById(k).value = p[k]);
+      generate();
+    }
+
+    async function copy() {
+      const btn = document.getElementById('btnCopy');
+      try {
+        await navigator.clipboard.writeText(document.getElementById('promptOutput').value);
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Copy to clipboard';
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch (e) {
+        btn.textContent = '❌ Failed';
+        setTimeout(() => btn.textContent = '📋 Copy to clipboard', 2000);
+      }
+    }
+
+    document.getElementById('btnGenerate').addEventListener('click', generate);
+    document.getElementById('btnRandomize').addEventListener('click', randomize);
+    document.getElementById('btnCopy').addEventListener('click', copy);
+    document.querySelectorAll('.preset-btn').forEach(b => {
+      b.addEventListener('click', () => setPreset(b.dataset.preset));
+    });
+    sliders.forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    // Note: Link to switch between modes - you'll need to handle navigation
+    document.getElementById('switchMode').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Please save both HTML files and link them together for navigation!');
+    });
+
+    update();
+    generate();
+  </script>
+
+</body>
+</html>
