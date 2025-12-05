@@ -15,7 +15,7 @@
 ```
     body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background: linear-gradient(135deg, #1e293b 0%, #7e22ce 50%, #1e293b 100%);
+        background: #1a0b2e;
         min-height: 100vh;
         padding: 2rem 1rem;
     }
@@ -28,27 +28,31 @@
     .header {
         text-align: center;
         margin-bottom: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 1rem;
     }
 
     .header h1 {
-        color: white;
+        color: #ffffff;
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
     .header p {
-        color: #e9d5ff;
+        color: #f0e7ff;
         font-size: 1.125rem;
     }
 
     .prompt-box {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: #2d1b4e;
+        border: 2px solid #764ba2;
         border-radius: 1rem;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
 
     .prompt-header {
@@ -56,76 +60,83 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .prompt-header h2 {
-        color: white;
-        font-size: 1.125rem;
+        color: #ffffff;
+        font-size: 1.25rem;
         font-weight: 600;
     }
 
     .button-group {
         display: flex;
         gap: 0.5rem;
+        flex-wrap: wrap;
     }
 
     .icon-btn {
-        padding: 0.5rem;
+        padding: 0.75rem 1rem;
         border: none;
         border-radius: 0.5rem;
         cursor: pointer;
         transition: all 0.2s;
         font-size: 0.875rem;
-        font-weight: 500;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .icon-btn:hover {
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .btn-randomize {
-        background: #9333ea;
+        background: #667eea;
         color: white;
     }
 
     .btn-randomize:hover {
-        background: #7e22ce;
+        background: #5568d3;
     }
 
     .btn-clear {
-        background: #dc2626;
+        background: #e53e3e;
         color: white;
     }
 
     .btn-clear:hover {
-        background: #b91c1c;
+        background: #c53030;
     }
 
     .btn-copy {
-        background: #16a34a;
+        background: #38a169;
         color: white;
     }
 
     .btn-copy:hover {
-        background: #15803d;
+        background: #2f855a;
     }
 
     .prompt-display {
-        background: rgba(15, 23, 42, 0.5);
+        background: #1a0b2e;
+        border: 2px solid #764ba2;
         border-radius: 0.5rem;
-        padding: 1rem;
+        padding: 1.5rem;
         min-height: 6rem;
-        color: #e9d5ff;
+        color: #f0e7ff;
         font-family: 'Courier New', monospace;
-        font-size: 0.875rem;
-        line-height: 1.6;
+        font-size: 1rem;
+        line-height: 1.8;
     }
 
     .copy-alert {
         margin-top: 0.75rem;
         text-align: center;
-        color: #4ade80;
-        font-size: 0.875rem;
+        color: #68d391;
+        font-size: 1rem;
+        font-weight: bold;
         animation: pulse 1s infinite;
     }
 
@@ -138,6 +149,7 @@
         display: grid;
         grid-template-columns: 1fr;
         gap: 1.5rem;
+        margin-bottom: 2rem;
     }
 
     @media (min-width: 768px) {
@@ -147,15 +159,15 @@
     }
 
     .filter-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: #2d1b4e;
+        border: 2px solid #764ba2;
         border-radius: 1rem;
         padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
 
     .filter-card h3 {
-        color: white;
+        color: #ffffff;
         font-size: 1.25rem;
         font-weight: 600;
         margin-bottom: 1rem;
@@ -165,11 +177,12 @@
     }
 
     .selected-badge {
-        background: #9333ea;
+        background: #667eea;
         color: white;
         font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
+        padding: 0.25rem 0.75rem;
         border-radius: 9999px;
+        font-weight: bold;
     }
 
     .options-container {
@@ -179,33 +192,39 @@
     }
 
     .option-btn {
-        padding: 0.5rem 1rem;
-        border: none;
+        padding: 0.75rem 1rem;
+        border: 2px solid #764ba2;
         border-radius: 0.5rem;
         font-size: 0.875rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
-        background: rgba(255, 255, 255, 0.1);
-        color: #e9d5ff;
+        background: #1a0b2e;
+        color: #f0e7ff;
     }
 
     .option-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: #3d2463;
+        border-color: #9f7aea;
     }
 
     .option-btn.selected {
-        background: #9333ea;
+        background: #667eea;
         color: white;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
         transform: scale(1.05);
+        font-weight: bold;
     }
 
     .footer {
         text-align: center;
         margin-top: 2rem;
-        color: #e9d5ff;
-        font-size: 0.875rem;
+        padding: 1.5rem;
+        background: #2d1b4e;
+        border-radius: 1rem;
+        color: #f0e7ff;
+        font-size: 1rem;
+        border: 2px solid #764ba2;
     }
 
     .hidden {
@@ -218,32 +237,32 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>AI Image Prompt Generator</h1>
+            <h1>🎨 AI Image Prompt Generator</h1>
             <p>Create stunning prompts for your AI art</p>
         </div>
 
 ```
     <div class="prompt-box">
         <div class="prompt-header">
-            <h2>Your Prompt</h2>
+            <h2>📝 Your Prompt</h2>
             <div class="button-group">
-                <button class="icon-btn btn-randomize" onclick="randomize()" title="Randomize">🔄 Random</button>
-                <button class="icon-btn btn-clear" onclick="clearAll()" title="Clear All">✖ Clear</button>
-                <button class="icon-btn btn-copy" onclick="copyToClipboard()" title="Copy">📋 Copy</button>
+                <button class="icon-btn btn-randomize" onclick="randomize()">🔄 Random</button>
+                <button class="icon-btn btn-clear" onclick="clearAll()">✖️ Clear</button>
+                <button class="icon-btn btn-copy" onclick="copyToClipboard()">📋 Copy</button>
             </div>
         </div>
         <div class="prompt-display" id="promptDisplay">
             Select options to build your prompt...
         </div>
         <div class="copy-alert hidden" id="copyAlert">
-            ✓ Copied to clipboard!
+            ✅ Copied to clipboard!
         </div>
     </div>
 
     <div class="filters-grid" id="filtersContainer"></div>
 
     <div class="footer">
-        <p>Select one option from each category to build your perfect prompt</p>
+        <p>💡 Select one option from each category to build your perfect prompt</p>
     </div>
 </div>
 
@@ -261,11 +280,11 @@
 
     const filters = {
         complexity: {
-            title: 'Composition Complexity',
+            title: '📐 Composition Complexity',
             options: ['Simplified', 'Complex']
         },
         composition: {
-            title: 'Composition Type',
+            title: '🎯 Composition Type',
             options: [
                 'Rule of Thirds', 'Centered', 'Symmetrical', 'Diagonal', 'Radial',
                 'Framed', 'Spiral Section', 'Golden Spiral', 'Golden Ratio Triangle',
@@ -274,7 +293,7 @@
             ]
         },
         artStyle: {
-            title: 'Art Style',
+            title: '🖼️ Art Style',
             options: [
                 'Engraved Halftone', 'Monochrome Organic', 'Glossy Surfaces', '3D Style',
                 'Inspired Line Art', 'Flat Illustrative', 'Watercolor', 'Oil Painting',
@@ -283,21 +302,21 @@
             ]
         },
         designTrend: {
-            title: 'Design Trend',
+            title: '✨ Design Trend',
             options: [
                 'Artisanal Modernism', 'Neo-folk Character', 'Material Minimalism',
                 'Neo-Nostalgic Utility', 'Brutalist Maximalism'
             ]
         },
         perspective: {
-            title: 'Visual Perspective',
+            title: '👁️ Visual Perspective',
             options: [
                 'Peacocking', 'Signaling', 'Counter-Signaling', 'Boundary Signaling',
                 'Group Signaling', 'Anti-Group Signaling', 'Camouflage'
             ]
         },
         colorMood: {
-            title: 'Color & Mood',
+            title: '🎨 Color & Mood',
             options: [
                 'Vibrant Energy', 'Muted Elegance', 'Monochromatic Drama', 'Pastel Dreamscape',
                 'Neon Cyberpunk', 'Earth Tones Organic', 'Cool Minimalist', 'Warm Nostalgic',
@@ -305,7 +324,7 @@
             ]
         },
         lighting: {
-            title: 'Lighting & Atmosphere',
+            title: '💡 Lighting & Atmosphere',
             options: [
                 'Golden Hour Glow', 'Studio Perfect', 'Dramatic Chiaroscuro', 'Ethereal Backlit',
                 'Overcast Diffused', 'Neon Night', 'Harsh Midday', 'Candlelight Intimate',
@@ -313,7 +332,7 @@
             ]
         },
         conceptual: {
-            title: 'Conceptual Framework',
+            title: '🧠 Conceptual Framework',
             options: [
                 'Surrealist Juxtaposition', 'Deconstructed Reality', 'Symbolic Metaphor',
                 'Existential Minimalism', 'Dystopian Commentary', 'Utopian Idealism',
