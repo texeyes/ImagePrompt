@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER | AI Prompt Curator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #1a0b2e;
+            --card-color: #2d1b4e;
+            --card-border: #3f2a63;
+            --accent-color: #667eea;
+            --accent-hover: #764ba2;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --tag-bg: #150925;
+            --tag-hover: #3c2563;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* --- Typography & Magazine Header --- */
+        header {
+            text-align: center;
+            padding: 40px 0 60px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* --- Prompt Display Area --- */
+        .prompt-container {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: rgba(26, 11, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 1200px;
+            margin: 0 auto 50px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .prompt-output {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            resize: none;
+            outline: none;
+            min-height: 60px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--card-border);
+            padding-top: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 1px solid var(--accent-color);
+            background: transparent;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--accent-color);
+            color: #fff;
+        }
+
+        button.primary {
+            background: var(--accent-color);
+            color: #fff;
+        }
+        
+        button.primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        /* --- Grid Layout --- */
+        .grid-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* --- Category Cards --- */
+        .category-card {
+            background: var(--card-color);
+            border: 1px solid var(--card-border);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+        .category-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #150925;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: .4s;
+        }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: white; }
+
+        /* Tags */
+        .options-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            background: var(--tag-bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tag:hover {
+            background: var(--tag-hover);
+            color: #fff;
+        }
+
+        .tag.selected {
+            background: transparent;
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Disabled state styling */
+        .category-card.disabled .options-list {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .category-card.disabled .card-title {
+            color: var(--text-muted);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .prompt-container { top: 10px; padding: 15px; }
+            .grid-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Aether</h1>
+        <div class="subtitle">Vol. 12 &mdash; The Artificial Canvas</div>
+    </header>
+
+    <div class="prompt-container">
+        <textarea id="final-prompt" class="prompt-output" placeholder="Select options below to generate your prompt..."></textarea>
+        <div class="controls">
+            <button onclick="clearAll()">Clear</button>
+            <button onclick="randomize()">Randomize</button>
+            <button class="primary" onclick="copyPrompt()">Copy Prompt</button>
+        </div>
+    </div>
+
+    <div class="grid-wrapper" id="categories-root">
+        <!-- Categories will be injected here by JS -->
+    </div>
+
+    <script>
+        // --- Data Configuration ---
+        const data = [
+            {
+                name: "Composition Complexity",
+                id: "complexity",
+                options: ["Minimalist", "Sparse", "Balanced", "Detailed", "Intricate", "Hyper-Maximalist", "Chaotic", "Zen-like", "Cluttered"]
+            },
+            {
+                name: "Composition Type",
+                id: "comp_type",
+                options: ["Golden Ratio", "Rule of Thirds", "Symmetrical Center", "Asymmetrical", "Diagonal Leading Lines", "Fibonacci Spiral", "Framing within Frame", "Negative Space"]
+            },
+            {
+                name: "Art Style",
+                id: "style",
+                options: ["Oil Painting", "Cyberpunk", "Ukiyo-e", "Surrealism", "Watercolor", "Bauhaus", "Pixel Art", "Rococo", "Synthwave", "Abstract Expressionism", "Line Art", "Matte Painting"]
+            },
+            {
+                name: "Design Trend",
+                id: "trend",
+                options: ["Glassmorphism", "Brutalism", "Vaporwave", "Flat Design", "Skeuomorphism", "Retro-Futurism", "Neo-Noire", "Organic Modernism", "Glitch Art"]
+            },
+            {
+                name: "Visual Perspective",
+                id: "perspective",
+                options: ["Isometric View", "Bird's Eye View", "Worm's Eye View", "Macro Close-up", "Wide Angle Fisheye", "Telephoto", "First-Person", "Drone Shot", "Cross-Section"]
+            },
+            {
+                name: "Color & Mood",
+                id: "mood",
+                options: ["Pastel Palette", "Neon Noir", "Monochromatic", "Sepia Tone", "Vibrant Contrast", "Muted Earth Tones", "Cool Blues", "Warm Amber", "Desaturated", "Psychadelic"]
+            },
+            {
+                name: "Lighting & Atmosphere",
+                id: "lighting",
+                options: ["Cinematic Lighting", "Bioluminescence", "God Rays", "Softbox Studio", "Golden Hour", "Blue Hour", "Volumetric Fog", "Harsh Shadows", "Candlelight", "Neon Glow"]
+            },
+            {
+                name: "Conceptual Framework",
+                id: "concept",
+                options: ["Ethereal", "Dystopian", "Whimsical", "Avant-garde", "Dreamscape", "Industrial", "Post-Apocalyptic", "Mythological", "Scientific", "Occult"]
+            }
+        ];
+
+        // --- State Management ---
+        const state = {};
+
+        // Initialize state
+        data.forEach(cat => {
+            state[cat.id] = {
+                enabled: true,
+                selected: null
+            };
+        });
+
+        const root = document.getElementById('categories-root');
+        const promptOutput = document.getElementById('final-prompt');
+
+        // --- Render Functions ---
+        function renderCategories() {
+            root.innerHTML = '';
+            
+            data.forEach(cat => {
+                // Card Container
+                const card = document.createElement('div');
+                card.className = `category-card ${state[cat.id].enabled ? '' : 'disabled'}`;
+                card.id = `card-${cat.id}`;
+
+                // Header
+                const header = document.createElement('div');
+                header.className = 'card-header';
+                
+                const title = document.createElement('h3');
+                title.className = 'card-title';
+                title.innerText = cat.name;
+
+                // Toggle Switch
+                const switchLabel = document.createElement('label');
+                switchLabel.className = 'switch';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = state[cat.id].enabled;
+                checkbox.onchange = () => toggleCategory(cat.id);
+
+                const slider = document.createElement('span');
+                slider.className = 'slider';
+
+                switchLabel.appendChild(checkbox);
+                switchLabel.appendChild(slider);
+                header.appendChild(title);
+                header.appendChild(switchLabel);
+
+                // Options Container
+                const optionsList = document.createElement('div');
+                optionsList.className = 'options-list';
+
+                cat.options.forEach(opt => {
+                    const tag = document.createElement('div');
+                    tag.className = `tag ${state[cat.id].selected === opt ? 'selected' : ''}`;
+                    tag.innerText = opt;
+                    tag.onclick = () => selectOption(cat.id, opt);
+                    optionsList.appendChild(tag);
+                });
+
+                card.appendChild(header);
+                card.appendChild(optionsList);
+                root.appendChild(card);
+            });
+        }
+
+        // --- Logic Functions ---
+
+        function toggleCategory(id) {
+            state[id].enabled = !state[id].enabled;
+            renderCategories(); // Re-render to update UI state
+            updatePrompt();
+        }
+
+        function selectOption(catId, option) {
+            // Check if category is enabled before allowing selection
+            if(!state[catId].enabled) return;
+
+            // Toggle selection logic: if clicking same, deselect
+            if (state[catId].selected === option) {
+                state[catId].selected = null;
+            } else {
+                state[catId].selected = option;
+            }
+            
+            renderCategories();
+            updatePrompt();
+        }
+
+        function updatePrompt() {
+            const activeParts = [];
+            
+            data.forEach(cat => {
+                if (state[cat.id].enabled && state[cat.id].selected) {
+                    activeParts.push(state[cat.id].selected);
+                }
+            });
+
+            // Join with commas and spaces
+            promptOutput.value = activeParts.join(", ");
+        }
+
+        function clearAll() {
+            data.forEach(cat => {
+                state[cat.id].selected = null;
+            });
+            renderCategories();
+            updatePrompt();
+        }
+
+        function randomize() {
+            data.forEach(cat => {
+                if (state[cat.id].enabled) {
+                    const randomOption = cat.options[Math.floor(Math.random() * cat.options.length)];
+                    state[cat.id].selected = randomOption;
+                }
+            });
+            renderCategories();
+            updatePrompt();
+        }
+
+        function copyPrompt() {
+            promptOutput.select();
+            promptOutput.setSelectionRange(0, 99999); /* For mobile devices */
+            navigator.clipboard.writeText(promptOutput.value).then(() => {
+                // Visual feedback button text
+                const btn = document.querySelector('button.primary');
+                const originalText = btn.innerText;
+                btn.innerText = "Copied!";
+                setTimeout(() => btn.innerText = originalText, 2000);
+            });
+        }
+
+        // --- Initial Load ---
+        renderCategories();
+
+    </script>
+</body>
+</html>
