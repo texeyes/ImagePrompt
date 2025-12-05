@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home Buyer Art Prompt Generator — art1 (Minimalist/Contemporary)</title>
+  <meta name="description" content="Generate market-optimized AI image prompts for modern home art (Minimalist/Contemporary focus). Live filters, copy, download, presets, responsive." />
+
+  <style>
+    :root{
+      --bg:#F7F7F8; --surface:#FFFFFF; --muted:#9CA3AF; --text:#0F172A; --primary:#2B6CB0; --accent:#F6AD55; --success:#16A34A; --border:#E6E9EE; --radius-lg:14px; --radius-base:8px; --space-4:4px; --space-8:8px; --space-12:12px; --space-16:16px; --space-20:20px; --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+    html,body{height:100%;}
+    body{
+      margin:0; font-family:var(--font-sans); background:linear-gradient(180deg,var(--bg),#FFFFFF); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      padding:20px; box-sizing:border-box;
+    }
+
+    /* Layout */
+    .app{
+      max-width:1200px; margin:0 auto; display:flex; gap:20px; align-items:flex-start;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:340px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; box-shadow:0 6px 18px rgba(10,20,40,0.04); max-height:84vh; overflow:auto;
+    }
+
+    .brand{display:flex; gap:12px; align-items:center; margin-bottom:6px}
+    .brand .logo{width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--primary),#4C51BF); display:flex; align-items:center; justify-content:center; color:white; font-weight:700}
+    h1.title{font-size:16px; margin:0}
+    p.subtitle{margin:4px 0 12px; color:var(--muted); font-size:13px}
+
+    .filter-section{margin-bottom:16px; padding-bottom:12px; border-bottom:1px dashed var(--border)}
+    .filter-section h3{margin:0 0 8px; font-size:13px}
+    fieldset{border:0; padding:0; margin:0}
+    label.option{display:flex; align-items:center; gap:10px; padding:8px; border-radius:8px; cursor:pointer}
+    label.option input{min-width:16px; min-height:16px}
+    .muted-note{font-size:12px; color:var(--muted)}
+
+    /* Chips */
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{display:inline-flex; align-items:center; gap:8px; background:#EFF6FF; color:var(--primary); padding:6px 10px; border-radius:999px; font-size:13px}
+    .chip button{border:0; background:none; cursor:pointer; color:var(--primary); font-weight:700}
+
+    /* Accordion */
+    details{margin-bottom:10px}
+    summary{list-style:none; cursor:pointer; padding:8px 10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; background:linear-gradient(180deg,#FBFBFC,#FFFFFF)}
+    summary::-webkit-details-marker{display:none}
+    .accordion-content{padding:10px}
+
+    /* Main */
+    .main{flex:1; display:flex; flex-direction:column; gap:18px}
+    .prompt-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; box-shadow:0 8px 30px rgba(12,18,30,0.03)}
+    textarea#promptOutput{width:100%; min-height:220px; resize:vertical; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-size:13px; padding:12px; border-radius:10px; border:1px solid var(--border); background:#FBFDFF}
+
+    .controls{display:flex; gap:10px; align-items:center}
+    .btn{padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:transparent; cursor:pointer; font-weight:600}
+    .btn-primary{background:var(--primary); color:white; border:0}
+    .btn-ghost{background:transparent}
+
+    .meta-row{display:flex; justify-content:space-between; align-items:center; gap:12px}
+    .meta-left{display:flex; gap:8px; align-items:center}
+
+    .preset-list{display:flex; gap:8px; flex-wrap:wrap}
+    .preset{padding:6px 10px; border-radius:8px; background:#F3F4F6; cursor:pointer}
+
+    /* Active filter chips area */
+    .active-filters{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+    /* Toast */
+    .toast{position:fixed; right:20px; bottom:24px; background:var(--success); color:white; padding:10px 14px; border-radius:8px; box-shadow:0 6px 20px rgba(8,14,30,0.15)}
+
+    /* Responsive */
+    @media (max-width:1024px){ .app{padding:0 8px} .sidebar{width:320px} }
+    @media (max-width:800px){ .app{flex-direction:column} .sidebar{width:100%; max-height:none} }
+
+    /* Accessibility focus */
+    input:focus + .focus-ring, button:focus{outline:3px solid rgba(59,130,246,0.15); outline-offset:2px}
+
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Home Buyer Art Prompt Generator - art1">
+
+    <!-- Sidebar (Filters) -->
+    <aside class="sidebar" aria-labelledby="sidebarTitle">
+      <div class="brand">
+        <div class="logo">HB</div>
+        <div>
+          <h1 id="sidebarTitle" class="title">Home Buyer Art Prompt Generator</h1>
+          <p class="subtitle">art1 — Minimalist / Contemporary defaults</p>
+        </div>
+      </div>
+
+      <!-- Tier 1: Primary Filters -->
+      <section class="filter-section" aria-labelledby="roomTitle">
+        <h3 id="roomTitle">Room / Space</h3>
+        <p class="muted-note">Where will this art hang? (affects scale & mood)</p>
+        <fieldset>
+          <label class="option"><input type="radio" name="room" value="living-room" checked><span>Living Room</span></label>
+          <label class="option"><input type="radio" name="room" value="bedroom"><span>Bedroom</span></label>
+          <label class="option"><input type="radio" name="room" value="kitchen-dining"><span>Kitchen / Dining</span></label>
+          <label class="option"><input type="radio" name="room" value="bathroom"><span>Bathroom</span></label>
+          <label class="option"><input type="radio" name="room" value="entryway"><span>Entryway</span></label>
+          <label class="option"><input type="radio" name="room" value="office-study"><span>Office / Study</span></label>
+          <label class="option"><input type="radio" name="room" value="gallery-wall"><span>Accent / Gallery Wall</span></label>
+          <label class="option"><input type="radio" name="room" value="powder-room"><span>Powder Room / Half Bath</span></label>
+        </fieldset>
+      </section>
+
+      <section class="filter-section" aria-labelledby="subjectTitle">
+        <h3 id="subjectTitle">Subject Matter</h3>
+        <fieldset>
+          <label class="option"><input type="radio" name="subject" value="abstract-landscape" checked><span>Abstract Landscape</span></label>
+          <label class="option"><input type="radio" name="subject" value="botanical"><span>Botanical / Floral</span></label>
+          <label class="option"><input type="radio" name="subject" value="geometric"><span>Abstract Geometric</span></label>
+          <label class="option"><input type="radio" name="subject" value="seascape"><span>Seascape / Coastal</span></label>
+          <label class="option"><input type="radio" name="subject" value="urban"><span>Urban / Cityscape</span></label>
+          <label class="option"><input type="radio" name="subject" value="still-life"><span>Still Life</span></label>
+          <label class="option"><input type="radio" name="subject" value="local-scene"><span>Local Scene / Texas</span></label>
+          <label class="option"><input type="radio" name="subject" value="figurative"><span>Contemporary Figurative</span></label>
+          <label class="option"><input type="radio" name="subject" value="line-art"><span>Minimalist Line Art</span></label>
+          <label class="option"><input type="radio" name="subject" value="surrealist"><span>Surrealist</span></label>
+        </fieldset>
+      </section>
+
+      <section class="filter-section" aria-labelledby="colorTitle">
+        <h3 id="colorTitle">Color Palette</h3>
+        <p class="muted-note">(select one or more — trending palettes included)</p>
+        <fieldset>
+          <label class="option"><input type="checkbox" name="color" value="warm-neutrals" checked><span>Warm Neutrals</span></label>
+          <label class="option"><input type="checkbox" name="color" value="earth-tones"><span>Earth Tones</span></label>
+          <label class="option"><input type="checkbox" name="color" value="rich-greens"><span>Rich Greens</span></label>
+          <label class="option"><input type="checkbox" name="color" value="burgundy"><span>Burgundy / Wine</span></label>
+          <label class="option"><input type="checkbox" name="color" value="coastal-blues"><span>Coastal Blues</span></label>
+          <label class="option"><input type="checkbox" name="color" value="sunset-tones"><span>Sunset Tones</span></label>
+          <label class="option"><input type="checkbox" name="color" value="monochrome"><span>Monochromatic / Grayscale</span></label>
+          <label class="option"><input type="checkbox" name="color" value="pastels"><span>Soft Pastels</span></label>
+          <label class="option"><input type="checkbox" name="color" value="jewel-tones"><span>Jewel Tones</span></label>
+        </fieldset>
+      </section>
+
+      <section class="filter-section" aria-labelledby="styleTitle">
+        <h3 id="styleTitle">Style / Aesthetic</h3>
+        <fieldset>
+          <label class="option"><input type="radio" name="style" value="organic-modern" checked><span>Organic Modern (default)</span></label>
+          <label class="option"><input type="radio" name="style" value="minimalist"><span>Minimalist</span></label>
+          <label class="option"><input type="radio" name="style" value="mediterranean"><span>Mediterranean</span></label>
+          <label class="option"><input type="radio" name="style" value="bohemian"><span>Bohemian / Eclectic</span></label>
+          <label class="option"><input type="radio" name="style" value="contemporary"><span>Contemporary / Modern</span></label>
+          <label class="option"><input type="radio" name="style" value="surrealist"><span>Surrealist / Dreamlike</span></label>
+          <label class="option"><input type="radio" name="style" value="maximalist"><span>Maximalist</span></label>
+          <label class="option"><input type="radio" name="style" value="scandinavian"><span>Scandinavian / Nordic</span></label>
+          <label class="option"><input type="radio" name="style" value="transitional"><span>Transitional</span></label>
+        </fieldset>
+      </section>
+
+      <!-- Tier 2: Refine (Accordion) -->
+      <details class="filter-accordion" open>
+        <summary>Refine Your Art</summary>
+        <div class="accordion-content">
+
+          <div class="filter-section">
+            <h3>Mood / Feeling</h3>
+            <fieldset>
+              <label class="option"><input type="checkbox" name="mood" value="calming" checked><span>Calming / Peaceful / Zen</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="energetic"><span>Energetic / Vibrant</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="luxurious"><span>Luxurious / Sophisticated</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="playful"><span>Playful / Whimsical</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="romantic"><span>Romantic / Warm</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="moody"><span>Moody / Dramatic</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="uplifting"><span>Uplifting / Inspiring</span></label>
+              <label class="option"><input type="checkbox" name="mood" value="grounding"><span>Grounding / Earthy</span></label>
+            </fieldset>
+          </div>
+
+          <div class="filter-section">
+            <h3>Texture / Dimension</h3>
+            <fieldset>
+              <label class="option"><input type="radio" name="texture" value="flat" checked><span>Flat / Minimalist</span></label>
+              <label class="option"><input type="radio" name="texture" value="subtle-texture"><span>Subtle Texture</span></label>
+              <label class="option"><input type="radio" name="texture" value="textured"><span>Textured</span></label>
+              <label class="option"><input type="radio" name="texture" value="highly-textured"><span>Highly Textured</span></label>
+              <label class="option"><input type="radio" name="texture" value="dimensional"><span>Dimensional / 3D</span></label>
+              <label class="option"><input type="radio" name="texture" value="metallic"><span>Metallic / Reflective Accents</span></label>
+              <label class="option"><input type="radio" name="texture" value="painterly"><span>Painterly / Expressive Brushwork</span></label>
+            </fieldset>
+          </div>
+
+          <div class="filter-section">
+            <h3>Size Category</h3>
+            <fieldset>
+              <label class="option"><input type="radio" name="size" value="intimate"><span>Intimate / Small (16x20")</span></label>
+              <label class="option"><input type="radio" name="size" value="medium" checked><span>Medium (24x36")</span></label>
+              <label class="option"><input type="radio" name="size" value="large"><span>Large / Statement (36x48")</span></label>
+              <label class="option"><input type="radio" name="size" value="oversized"><span>Oversized / Focal (48x60+")</span></label>
+              <label class="option"><input type="radio" name="size" value="scalable"><span>Scalable / Modular</span></label>
+            </fieldset>
+          </div>
+
+          <div class="filter-section">
+            <h3>Complexity Level</h3>
+            <fieldset>
+              <label class="option"><input type="radio" name="complexity" value="simple" checked><span>Simple / Clean</span></label>
+              <label class="option"><input type="radio" name="complexity" value="moderate"><span>Moderate</span></label>
+              <label class="option"><input type="radio" name="complexity" value="high"><span>Highly Detailed</span></label>
+              <label class="option"><input type="radio" name="complexity" value="layered"><span>Layered / Multi-Element</span></label>
+            </fieldset>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- Tier 3: Advanced Options -->
+      <details class="filter-accordion">
+        <summary>Advanced Options</summary>
+        <div class="accordion-content">
+          <div class="filter-section">
+            <h3>Design Movement</h3>
+            <fieldset>
+              <label class="option"><input type="radio" name="movement" value="contemporary" checked><span>Contemporary</span></label>
+              <label class="option"><input type="radio" name="movement" value="art-deco"><span>Art Deco</span></label>
+              <label class="option"><input type="radio" name="movement" value="impressionist"><span>Impressionist-Inspired</span></label>
+              <label class="option"><input type="radio" name="movement" value="abstract-expressionist"><span>Abstract Expressionist</span></label>
+              <label class="option"><input type="radio" name="movement" value="modernist"><span>Modernist</span></label>
+              <label class="option"><input type="radio" name="movement" value="mid-century"><span>Mid-Century Modern Inspired</span></label>
+            </fieldset>
+          </div>
+
+          <div class="filter-section">
+            <h3>Material / Technique</h3>
+            <fieldset>
+              <label class="option"><input type="radio" name="material" value="oil" checked><span>Oil Paint Look</span></label>
+              <label class="option"><input type="radio" name="material" value="watercolor"><span>Watercolor</span></label>
+              <label class="option"><input type="radio" name="material" value="line-art"><span>Line Art / Ink</span></label>
+              <label class="option"><input type="radio" name="material" value="mixed-media"><span>Mixed Media</span></label>
+              <label class="option"><input type="radio" name="material" value="digital"><span>Digital / Clean</span></label>
+              <label class="option"><input type="radio" name="material" value="printable"><span>Printable / Canvas-Ready</span></label>
+            </fieldset>
+          </div>
+
+          <div class="filter-section">
+            <h3>Sustainability</h3>
+            <fieldset>
+              <label class="option"><input type="checkbox" name="sustain" value="eco-theme"><span>Eco-Conscious Theme</span></label>
+              <label class="option"><input type="checkbox" name="sustain" value="sustainable-materials"><span>Sustainable Materials Emphasis</span></label>
+              <label class="option"><input type="checkbox" name="sustain" value="ethical"><span>Ethically-Sourced Art</span></label>
+              <label class="option"><input type="checkbox" name="sustain" value="digital-print"><span>Digital Print Option</span></label>
+            </fieldset>
+          </div>
+
+        </div>
+      </details>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="resetFilters" class="btn">Reset All</button>
+        <button id="resetDefaults" class="btn">Reset to Defaults</button>
+      </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="prompt-card" role="region" aria-label="Generated prompt">
+        <div class="meta-row">
+          <div class="meta-left">
+            <strong>Live Prompt Preview</strong>
+            <div style="margin-left:12px; color:var(--muted); font-size:13px">Minimalist / Contemporary starting defaults</div>
+          </div>
+
+          <div>
+            <span id="charCount">0</span> chars
+          </div>
+        </div>
+
+        <textarea id="promptOutput" aria-label="Generated prompt text" readonly></textarea>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px;">
+          <div class="controls">
+            <button id="copyBtn" class="btn btn-primary" aria-live="polite">📋 Copy Prompt</button>
+            <button id="downloadBtn" class="btn">⬇️ Download</button>
+            <button id="shareJsonBtn" class="btn">JSON</button>
+          </div>
+
+          <div class="preset-list" aria-hidden="false">
+            <div class="preset" data-preset="zen">Zen Living</div>
+            <div class="preset" data-preset="lux">Luxury Minimalist</div>
+            <div class="preset" data-preset="med">Mediterranean Kitchen</div>
+            <div class="preset" data-preset="gallery">Gallery Wall Modern</div>
+            <div class="preset" data-preset="max">Maximalist Drama</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <div class="chips" id="activeChips" aria-live="polite"></div>
+        </div>
+
+      </div>
+
+      <!-- Explainer / Tips -->
+      <div class="prompt-card" style="padding:14px">
+        <h3 style="margin:0 0 8px">Tips</h3>
+        <ul style="margin:0 0 8px 18px; color:var(--muted)">
+          <li>Use the Copy button to paste directly into ComfyUI or Midjourney.</li>
+          <li>Adjust color palettes and style to match the room photograph you plan to test the art in.</li>
+          <li>Download JSON to save the filter state for later (no localStorage used).</li>
+        </ul>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast" style="display:none" role="status" aria-live="polite"></div>
+
+  <script>
+    // ----------------------------
+    // Data definitions (compact)
+    // ----------------------------
+    const DATA = {
+      subjects: {
+        'abstract-landscape': 'Abstract landscape with layered rolling hills and atmospheric depth',
+        'botanical': 'Organic botanical illustration with delicate leaves and flowing stems',
+        'geometric': 'Geometric composition with clean lines and balanced negative space',
+        'seascape': 'Coastal seascape with rolling waves and soft sand tones',
+        'urban': 'Contemporary urban landscape with modern architecture and geometric buildings',
+        'still-life': 'Artfully arranged still life composition with complementary objects',
+        'local-scene': 'Texas landscape featuring recognizable terrain and natural landmarks',
+        'figurative': 'Modern figure study with abstracted human form and gesture',
+        'line-art': 'Minimalist single-line drawing, elegant and refined',
+        'surrealist': 'Dreamlike surrealist composition with unexpected juxtapositions'
+      },
+
+      styles: {
+        'organic-modern': 'organic modern aesthetic with curved forms, natural materials, and biophilic elements',
+        'minimalist': 'clean minimalist aesthetic with negative space and serene simplicity',
+        'mediterranean': 'terracotta warmth, sun-drenched rustic elegance',
+        'bohemian': 'eclectic layered textures and global pattern mixing',
+        'contemporary': 'current design language with bold yet balanced statements',
+        'surrealist': 'dreamlike and fantastical elements with unexpected combinations',
+        'maximalist': 'rich textures, abundant pattern and layered complexity',
+        'scandinavian': 'light-filled simplicity with natural materials and hygge warmth',
+        'transitional': 'balanced blend of modern and traditional elements'
+      },
+
+      colorNames: {
+        'warm-neutrals': 'warm neutrals (cream, beige, sand)',
+        'earth-tones': 'earth tones (terracotta, ochre, rust)',
+        'rich-greens': 'rich greens (olive, sage)',
+        'burgundy': 'burgundy and wine tones',
+        'coastal-blues': 'coastal blues and dusty navy',
+        'sunset-tones': 'sunset tones (peach, coral, golden orange)',
+        'monochrome': 'monochromatic grayscale palette',
+        'pastels': 'soft pastels (muted pinks, mint, lavender)',
+        'jewel-tones': 'jewel tones (deep saturated colors)'
+      }
+    };
+
+    // ----------------------------
+    // State (no localStorage)
+    // ----------------------------
+    let state = {
+      room: 'living-room',
+      subject: 'abstract-landscape',
+      color: ['warm-neutrals'],
+      style: 'organic-modern',
+      mood: ['calming'],
+      texture: 'flat',
+      size: 'medium',
+      complexity: 'simple',
+      movement: 'contemporary',
+      material: 'oil',
+      sustain: []
+    };
+
+    // ----------------------------
+    // Helpers
+    // ----------------------------
+    function qAll(sel){return Array.from(document.querySelectorAll(sel));}
+    function showToast(msg, ms=2200){ const t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; t.className='toast'; setTimeout(()=>{ t.style.display='none'; }, ms);}    
+
+    function updateCharCount(text){ document.getElementById('charCount').innerText = text.length; }
+
+    // Humanize room labels for prompt
+    const ROOM_LABELS = {
+      'living-room':'modern living room', 'bedroom':'modern bedroom','kitchen-dining':'kitchen/dining area','bathroom':'bathroom','entryway':'entryway','office-study':'office or study','gallery-wall':'accent gallery wall','powder-room':'powder room'
+    };
+
+    // ----------------------------
+    // Prompt Builder
+    // ----------------------------
+    function buildPrompt(s){
+      // 1 - Subject
+      const subj = DATA.subjects[s.subject] || 'Modern art composition';
+
+      // 2 - Style
+      const style = DATA.styles[s.style] ? `in ${DATA.styles[s.style]}` : `in ${s.style} aesthetic`;
+
+      // 3 - Colors
+      const colors = (s.color.length>0) ? `dominated by ${s.color.map(c=>DATA.colorNames[c]||c).join(' and ')} colors` : '';
+
+      // 4 - Texture
+      const textureText = (s.texture==='highly-textured') ? 'featuring highly textured, impasto-style brushwork for tactile depth' :
+                          (s.texture==='dimensional') ? 'with layered dimensional composition, foreground/background separation' :
+                          (s.texture==='metallic') ? 'with subtle metallic accents (gold/copper) and reflective highlights' :
+                          (s.texture==='painterly') ? 'with expressive painterly brushwork and visible technique' :
+                          (s.texture==='textured') ? 'with visible surface texture and material depth' : 'with a flat, clean graphic surface';
+
+      // 5 - Size + Room
+      const sizeMap = {intimate:'an intimate accent piece', medium:'a medium-sized wall art', large:'a large statement piece', oversized:'an oversized focal artwork', scalable:'a scalable modular piece'};
+      const roomLabel = ROOM_LABELS[s.room] || s.room;
+      const sizeText = `${sizeMap[s.size] || 'a well-scaled piece'} for a modern ${roomLabel}`;
+
+      // 6 - Mood
+      const moodList = (s.mood && s.mood.length>0) ? s.mood.join(' and ') : 'sophisticated and calming';
+      const moodText = `evoking a sense of ${moodList}`;
+
+      // 7 - Complexity & detail
+      const complexity = (s.complexity==='simple') ? 'simple clean lines and balanced negative space' :
+                         (s.complexity==='moderate') ? 'moderate visual detail with balanced focal points' :
+                         (s.complexity==='high') ? 'highly detailed visual information' : 'layered, multi-element composition';
+
+      // 8 - Movement & material
+      const movementText = s.movement ? `inspired by ${s.movement} design principles, contemporary interpretation` : '';
+      const materialText = s.material ? `created with ${s.material === 'oil' ? 'oil paint look' : s.material} technique for gallery-quality reproduction` : '';
+
+      // 9 - Sustainability
+      const sustainText = (s.sustain && s.sustain.length>0) ? 'with emphasis on sustainable and eco-conscious design principles' : '';
+
+      // 10 - Final line
+      const final = `professional gallery-quality, ready for high-resolution canvas or print reproduction.`;
+
+      // Build components
+      const parts = [subj, style, colors, textureText, sizeText, moodText, complexity, movementText, materialText, sustainText, final].filter(Boolean);
+      // join with commas, ensure readability
+      return parts.join(', ') + ' Modern interior design masterpiece for sophisticated home buyers.';
+    }
+
+    // ----------------------------
+    // UI sync
+    // ----------------------------
+    function renderPrompt(){
+      const prompt = buildPrompt(state);
+      const out = document.getElementById('promptOutput');
+      out.value = prompt;
+      updateCharCount(prompt);
+      renderChips();
+    }
+
+    function renderChips(){
+      const container = document.getElementById('activeChips'); container.innerHTML='';
+      // Show a representative set of active filters (not every single value to avoid clutter)
+      const makeChip = (label, key, removable=true)=>{
+        const el = document.createElement('span'); el.className='chip'; el.innerText=label;
+        if(removable){ const btn=document.createElement('button'); btn.innerText='×'; btn.title='Remove '+label; btn.addEventListener('click', ()=>{ removeFilter(key); }); el.appendChild(btn); }
+        container.appendChild(el);
+      };
+
+      makeChip(ROOM_LABELS[state.room], 'room');
+      makeChip(state.subject.replace(/-/g,' '), 'subject');
+      if(state.color.length) makeChip(state.color.map(c=>c.replace(/-/g,' ')).join(', '), 'color');
+      makeChip(state.style.replace(/-/g,' '), 'style');
+      if(state.mood && state.mood.length) makeChip(state.mood.join(', '), 'mood');
+    }
+
+    function removeFilter(key){
+      // Remove or reset particular filter to default
+      if(key==='color'){ state.color = []; qAll('input[name="color"]').forEach(i=>i.checked=false); }
+      else if(key==='mood'){ state.mood = []; qAll('input[name="mood"]').forEach(i=>i.checked=false); }
+      else if(key==='room'){ state.room=''; qAll('input[name="room"]').forEach(i=>i.checked=false); }
+      else if(key==='subject'){ state.subject=''; qAll('input[name="subject"]').forEach(i=>i.checked=false); }
+      else if(key==='style'){ state.style=''; qAll('input[name="style"]').forEach(i=>i.checked=false); }
+      renderPrompt();
+    }
+
+    // ----------------------------
+    // Event Wiring: inputs -> state
+    // ----------------------------
+    function wireInputs(){
+      // Radios
+      qAll('input[type=radio]').forEach(r=>{
+        r.addEventListener('change', (e)=>{
+          const name = e.target.name; const val = e.target.value;
+          if(name in state) state[name] = val;
+          else if(name==='movement') state.movement = val;
+          else if(name==='material') state.material = val;
+          else if(name==='texture') state.texture = val;
+          else if(name==='size') state.size = val;
+          else if(name==='complexity') state.complexity = val;
+          renderPrompt();
+        });
+      });
+
+      // Checkboxes
+      qAll('input[type=checkbox]').forEach(cb=>{
+        cb.addEventListener('change', (e)=>{
+          const name = e.target.name; const val = e.target.value; const checked = e.target.checked;
+          if(name==='color'){
+            if(checked && !state.color.includes(val)) state.color.push(val);
+            if(!checked) state.color = state.color.filter(x=>x!==val);
+          } else if(name==='mood'){
+            if(checked && !state.mood.includes(val)) state.mood.push(val);
+            if(!checked) state.mood = state.mood.filter(x=>x!==val);
+          } else if(name==='sustain'){
+            if(checked && !state.sustain.includes(val)) state.sustain.push(val);
+            if(!checked) state.sustain = state.sustain.filter(x=>x!==val);
+          }
+          renderPrompt();
+        });
+      });
+
+      // Reset buttons
+      document.getElementById('resetFilters').addEventListener('click', ()=>{ clearAllFilters(); showToast('Filters cleared'); });
+      document.getElementById('resetDefaults').addEventListener('click', ()=>{ resetDefaults(); showToast('Defaults restored'); });
+
+      // Copy
+      document.getElementById('copyBtn').addEventListener('click', async ()=>{
+        try{ await navigator.clipboard.writeText(document.getElementById('promptOutput').value); showToast('Prompt copied to clipboard'); }
+        catch(e){ showToast('Copy failed — select and copy manually'); }
+      });
+
+      // Download text
+      document.getElementById('downloadBtn').addEventListener('click', ()=>{
+        const txt = document.getElementById('promptOutput').value;
+        const a = document.createElement('a'); a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(txt);
+        a.download = 'art-prompt.txt'; document.body.appendChild(a); a.click(); a.remove(); showToast('Downloaded prompt.txt');
+      });
+
+      // Share JSON (filter snapshot)
+      document.getElementById('shareJsonBtn').addEventListener('click', ()=>{
+        const data = JSON.stringify(state, null, 2);
+        const blob = new Blob([data], {type:'application/json'});
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'art-prompt-state.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Downloaded JSON');
+      });
+
+      // Presets
+      qAll('.preset').forEach(el=> el.addEventListener('click', ()=>{ applyPreset(el.dataset.preset); }));
+    }
+
+    // ----------------------------
+    // Presets
+    // ----------------------------
+    function applyPreset(name){
+      const presets = {
+        zen: {
+          room:'living-room', subject:'abstract-landscape', color:['warm-neutrals','coastal-blues'], style:'minimalist', mood:['calming','grounding'], texture:'subtle-texture', size:'large', complexity:'simple', movement:'contemporary', material:'printable'
+        },
+        lux: {
+          room:'bedroom', subject:'line-art', color:['monochrome','warm-neutrals'], style:'scandinavian', mood:['luxurious','sophisticated'], texture:'flat', size:'medium', complexity:'simple', movement:'contemporary', material:'oil'
+        },
+        med: {
+          room:'kitchen-dining', subject:'botanical', color:['earth-tones','warm-neutrals'], style:'mediterranean', mood:['romantic','playful'], texture:'textured', size:'medium', complexity:'moderate', movement:'modernist', material:'painterly'
+        },
+        gallery: {
+          room:'gallery-wall', subject:'geometric', color:['rich-greens','warm-neutrals'], style:'organic-modern', mood:['luxurious','grounding'], texture:'dimensional', size:'scalable', complexity:'moderate', movement:'contemporary', material:'mixed-media'
+        },
+        max: {
+          room:'living-room', subject:'geometric', color:['jewel-tones','burgundy'], style:'maximalist', mood:['energetic','moody'], texture:'highly-textured', size:'large', complexity:'high', movement:'art-deco', material:'mixed-media'
+        }
+      };
+
+      if(presets[name]){
+        const p = presets[name]; Object.assign(state, p);
+        // update UI inputs to reflect preset
+        // radios
+        for(const k in p){
+          if(['room','subject','style','texture','size','complexity','movement','material'].includes(k)){
+            qAll(`input[name="${k}"]`).forEach(i=> i.checked = (i.value===p[k]));
+          }
+        }
+        // checkboxes
+        qAll('input[name="color"]').forEach(i=> i.checked = p.color.includes(i.value));
+        qAll('input[name="mood"]').forEach(i=> i.checked = p.mood.includes(i.value));
+        renderPrompt();
+        showToast('Preset applied: '+name);
+      }
+    }
+
+    // ----------------------------
+    // Reset / Clear
+    // ----------------------------
+    function clearAllFilters(){
+      // Clear every input
+      qAll('input').forEach(i=> i.checked = false);
+      state = { room:'', subject:'', color:[], style:'', mood:[], texture:'', size:'', complexity:'', movement:'', material:'', sustain:[] };
+      renderPrompt();
+    }
+
+    function resetDefaults(){
+      // reset to the initial defaults defined earlier
+      state = {
+        room: 'living-room', subject: 'abstract-landscape', color: ['warm-neutrals'], style: 'organic-modern', mood: ['calming'], texture: 'flat', size: 'medium', complexity: 'simple', movement: 'contemporary', material: 'oil', sustain: []
+      };
+      // update inputs
+      qAll('input').forEach(i=> i.checked = false);
+      // set radios/checkboxes based on defaults
+      qAll('input[name="room"]').forEach(i=> i.checked = (i.value===state.room));
+      qAll('input[name="subject"]').forEach(i=> i.checked = (i.value===state.subject));
+      qAll('input[name="style"]').forEach(i=> i.checked = (i.value===state.style));
+      qAll('input[name="texture"]').forEach(i=> i.checked = (i.value===state.texture));
+      qAll('input[name="size"]').forEach(i=> i.checked = (i.value===state.size));
+      qAll('input[name="complexity"]').forEach(i=> i.checked = (i.value===state.complexity));
+      qAll('input[name="material"]').forEach(i=> i.checked = (i.value===state.material));
+      qAll('input[name="movement"]').forEach(i=> i.checked = (i.value===state.movement));
+      qAll('input[name="color"]').forEach(i=> i.checked = state.color.includes(i.value));
+      qAll('input[name="mood"]').forEach(i=> i.checked = state.mood.includes(i.value));
+      renderPrompt();
+    }
+
+    // ----------------------------
+    // Init
+    // ----------------------------
+    (function init(){
+      wireInputs(); resetDefaults();
+      // show ARIA hint for keyboard users
+      document.addEventListener('keydown', (e)=>{ if(e.key==='?' || (e.shiftKey && e.key==='?')) showToast('Tip: Use Tab to navigate filters.'); }, {once:true});
+    })();
+
+  </script>
+</body>
+</html>
