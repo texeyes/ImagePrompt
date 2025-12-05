@@ -1,235 +1,421 @@
-import React, { useState } from ‘react’;
-import { Copy, X, RefreshCw } from ‘lucide-react’;
+<!DOCTYPE html>
 
-const PromptGenerator = () => {
-const [selections, setSelections] = useState({
-complexity: ‘’,
-composition: ‘’,
-artStyle: ‘’,
-designTrend: ‘’,
-perspective: ‘’,
-colorMood: ‘’,
-lighting: ‘’,
-conceptual: ‘’
-});
-
-const [copiedAlert, setCopiedAlert] = useState(false);
-
-const filters = {
-complexity: {
-title: ‘Composition Complexity’,
-options: [‘Simplified’, ‘Complex’]
-},
-composition: {
-title: ‘Composition Type’,
-options: [
-‘Rule of Thirds’, ‘Centered’, ‘Symmetrical’, ‘Diagonal’, ‘Radial’,
-‘Framed’, ‘Spiral Section’, ‘Golden Spiral’, ‘Golden Ratio Triangle’,
-‘Harmonious Triangle’, ‘S-Curve’, ‘Triangular’, ‘Circular’, ‘Grid’,
-‘Focal Mass’, ‘Y-Arrangement’, ‘Steelyrad’, ‘Balanced Scales’, ‘Tunnel’, ‘Cross’
-]
-},
-artStyle: {
-title: ‘Art Style’,
-options: [
-‘Engraved Halftone’, ‘Monochrome Organic’, ‘Glossy Surfaces’, ‘3D Style’,
-‘Inspired Line Art’, ‘Flat Illustrative’, ‘Watercolor’, ‘Oil Painting’,
-‘Digital Art’, ‘Pixel Art’, ‘Pencil Sketch’, ‘Ink Wash’, ‘Charcoal’,
-‘Photorealistic’, ‘Vector Art’, ‘Low Poly’
-]
-},
-designTrend: {
-title: ‘Design Trend’,
-options: [
-‘Artisanal Modernism’, ‘Neo-folk Character’, ‘Material Minimalism’,
-‘Neo-Nostalgic Utility’, ‘Brutalist Maximalism’
-]
-},
-perspective: {
-title: ‘Visual Perspective’,
-options: [
-‘Peacocking’, ‘Signaling’, ‘Counter-Signaling’, ‘Boundary Signaling’,
-‘Group Signaling’, ‘Anti-Group Signaling’, ‘Camouflage’
-]
-},
-colorMood: {
-title: ‘Color & Mood’,
-options: [
-‘Vibrant Energy’, ‘Muted Elegance’, ‘Monochromatic Drama’, ‘Pastel Dreamscape’,
-‘Neon Cyberpunk’, ‘Earth Tones Organic’, ‘Cool Minimalist’, ‘Warm Nostalgic’,
-‘High Contrast Bold’, ‘Gradient Fusion’
-]
-},
-lighting: {
-title: ‘Lighting & Atmosphere’,
-options: [
-‘Golden Hour Glow’, ‘Studio Perfect’, ‘Dramatic Chiaroscuro’, ‘Ethereal Backlit’,
-‘Overcast Diffused’, ‘Neon Night’, ‘Harsh Midday’, ‘Candlelight Intimate’,
-‘Volumetric Fog’, ‘Moonlit Mystery’, ‘Bioluminescent Glow’, ‘Lens Flare Dynamic’
-]
-},
-conceptual: {
-title: ‘Conceptual Framework’,
-options: [
-‘Surrealist Juxtaposition’, ‘Deconstructed Reality’, ‘Symbolic Metaphor’,
-‘Existential Minimalism’, ‘Dystopian Commentary’, ‘Utopian Idealism’,
-‘Abstract Emotion’, ‘Paradoxical Tension’, ‘Temporal Layering’,
-‘Identity Fragmentation’, ‘System Critique’, ‘Organic vs Synthetic’
-]
-}
-};
-
-const handleSelect = (category, value) => {
-setSelections(prev => ({
-…prev,
-[category]: prev[category] === value ? ‘’ : value
-}));
-};
-
-const generatePrompt = () => {
-const parts = [];
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Prompt Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
 ```
-if (selections.complexity) parts.push(selections.complexity.toLowerCase() + ' composition');
-if (selections.composition) parts.push(selections.composition.toLowerCase());
-if (selections.artStyle) parts.push(selections.artStyle.toLowerCase() + ' style');
-if (selections.designTrend) parts.push(selections.designTrend.toLowerCase());
-if (selections.perspective) parts.push(selections.perspective.toLowerCase() + ' perspective');
-if (selections.colorMood) parts.push(selections.colorMood.toLowerCase());
-if (selections.lighting) parts.push(selections.lighting.toLowerCase() + ' lighting');
-if (selections.conceptual) parts.push(selections.conceptual.toLowerCase() + ' concept');
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #1e293b 0%, #7e22ce 50%, #1e293b 100%);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
 
-return parts.length > 0 ? parts.join(', ') : 'Select options to build your prompt...';
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .header h1 {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .header p {
+        color: #e9d5ff;
+        font-size: 1.125rem;
+    }
+
+    .prompt-box {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .prompt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .prompt-header h2 {
+        color: white;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .icon-btn {
+        padding: 0.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .icon-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-randomize {
+        background: #9333ea;
+        color: white;
+    }
+
+    .btn-randomize:hover {
+        background: #7e22ce;
+    }
+
+    .btn-clear {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn-clear:hover {
+        background: #b91c1c;
+    }
+
+    .btn-copy {
+        background: #16a34a;
+        color: white;
+    }
+
+    .btn-copy:hover {
+        background: #15803d;
+    }
+
+    .prompt-display {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        min-height: 6rem;
+        color: #e9d5ff;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    .copy-alert {
+        margin-top: 0.75rem;
+        text-align: center;
+        color: #4ade80;
+        font-size: 0.875rem;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .filters-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .filter-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 1rem;
+        padding: 1.5rem;
+    }
+
+    .filter-card h3 {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .selected-badge {
+        background: #9333ea;
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+    }
+
+    .options-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .option-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: rgba(255, 255, 255, 0.1);
+        color: #e9d5ff;
+    }
+
+    .option-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .option-btn.selected {
+        background: #9333ea;
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: scale(1.05);
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 2rem;
+        color: #e9d5ff;
+        font-size: 0.875rem;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
 ```
 
-};
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Image Prompt Generator</h1>
+            <p>Create stunning prompts for your AI art</p>
+        </div>
 
-const copyToClipboard = () => {
-const prompt = generatePrompt();
-if (prompt !== ‘Select options to build your prompt…’) {
-navigator.clipboard.writeText(prompt);
-setCopiedAlert(true);
-setTimeout(() => setCopiedAlert(false), 2000);
-}
-};
+```
+    <div class="prompt-box">
+        <div class="prompt-header">
+            <h2>Your Prompt</h2>
+            <div class="button-group">
+                <button class="icon-btn btn-randomize" onclick="randomize()" title="Randomize">🔄 Random</button>
+                <button class="icon-btn btn-clear" onclick="clearAll()" title="Clear All">✖ Clear</button>
+                <button class="icon-btn btn-copy" onclick="copyToClipboard()" title="Copy">📋 Copy</button>
+            </div>
+        </div>
+        <div class="prompt-display" id="promptDisplay">
+            Select options to build your prompt...
+        </div>
+        <div class="copy-alert hidden" id="copyAlert">
+            ✓ Copied to clipboard!
+        </div>
+    </div>
 
-const clearAll = () => {
-setSelections({
-complexity: ‘’,
-composition: ‘’,
-artStyle: ‘’,
-designTrend: ‘’,
-perspective: ‘’,
-colorMood: ‘’,
-lighting: ‘’,
-conceptual: ‘’
-});
-};
+    <div class="filters-grid" id="filtersContainer"></div>
 
-const randomize = () => {
-const newSelections = {};
-Object.keys(filters).forEach(key => {
-const options = filters[key].options;
-newSelections[key] = options[Math.floor(Math.random() * options.length)];
-});
-setSelections(newSelections);
-};
-
-return (
-<div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-8">
-<div className="max-w-6xl mx-auto">
-{/* Header */}
-<div className="text-center mb-8">
-<h1 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
-AI Image Prompt Generator
-</h1>
-<p className="text-purple-200 text-lg">
-Create stunning prompts for your AI art
-</p>
+    <div class="footer">
+        <p>Select one option from each category to build your perfect prompt</p>
+    </div>
 </div>
 
+<script>
+    const selections = {
+        complexity: '',
+        composition: '',
+        artStyle: '',
+        designTrend: '',
+        perspective: '',
+        colorMood: '',
+        lighting: '',
+        conceptual: ''
+    };
+
+    const filters = {
+        complexity: {
+            title: 'Composition Complexity',
+            options: ['Simplified', 'Complex']
+        },
+        composition: {
+            title: 'Composition Type',
+            options: [
+                'Rule of Thirds', 'Centered', 'Symmetrical', 'Diagonal', 'Radial',
+                'Framed', 'Spiral Section', 'Golden Spiral', 'Golden Ratio Triangle',
+                'Harmonious Triangle', 'S-Curve', 'Triangular', 'Circular', 'Grid',
+                'Focal Mass', 'Y-Arrangement', 'Steelyrad', 'Balanced Scales', 'Tunnel', 'Cross'
+            ]
+        },
+        artStyle: {
+            title: 'Art Style',
+            options: [
+                'Engraved Halftone', 'Monochrome Organic', 'Glossy Surfaces', '3D Style',
+                'Inspired Line Art', 'Flat Illustrative', 'Watercolor', 'Oil Painting',
+                'Digital Art', 'Pixel Art', 'Pencil Sketch', 'Ink Wash', 'Charcoal',
+                'Photorealistic', 'Vector Art', 'Low Poly'
+            ]
+        },
+        designTrend: {
+            title: 'Design Trend',
+            options: [
+                'Artisanal Modernism', 'Neo-folk Character', 'Material Minimalism',
+                'Neo-Nostalgic Utility', 'Brutalist Maximalism'
+            ]
+        },
+        perspective: {
+            title: 'Visual Perspective',
+            options: [
+                'Peacocking', 'Signaling', 'Counter-Signaling', 'Boundary Signaling',
+                'Group Signaling', 'Anti-Group Signaling', 'Camouflage'
+            ]
+        },
+        colorMood: {
+            title: 'Color & Mood',
+            options: [
+                'Vibrant Energy', 'Muted Elegance', 'Monochromatic Drama', 'Pastel Dreamscape',
+                'Neon Cyberpunk', 'Earth Tones Organic', 'Cool Minimalist', 'Warm Nostalgic',
+                'High Contrast Bold', 'Gradient Fusion'
+            ]
+        },
+        lighting: {
+            title: 'Lighting & Atmosphere',
+            options: [
+                'Golden Hour Glow', 'Studio Perfect', 'Dramatic Chiaroscuro', 'Ethereal Backlit',
+                'Overcast Diffused', 'Neon Night', 'Harsh Midday', 'Candlelight Intimate',
+                'Volumetric Fog', 'Moonlit Mystery', 'Bioluminescent Glow', 'Lens Flare Dynamic'
+            ]
+        },
+        conceptual: {
+            title: 'Conceptual Framework',
+            options: [
+                'Surrealist Juxtaposition', 'Deconstructed Reality', 'Symbolic Metaphor',
+                'Existential Minimalism', 'Dystopian Commentary', 'Utopian Idealism',
+                'Abstract Emotion', 'Paradoxical Tension', 'Temporal Layering',
+                'Identity Fragmentation', 'System Critique', 'Organic vs Synthetic'
+            ]
+        }
+    };
+
+    function handleSelect(category, value) {
+        selections[category] = selections[category] === value ? '' : value;
+        updatePrompt();
+        renderFilters();
+    }
+
+    function generatePrompt() {
+        const parts = [];
+        
+        if (selections.complexity) parts.push(selections.complexity.toLowerCase() + ' composition');
+        if (selections.composition) parts.push(selections.composition.toLowerCase());
+        if (selections.artStyle) parts.push(selections.artStyle.toLowerCase() + ' style');
+        if (selections.designTrend) parts.push(selections.designTrend.toLowerCase());
+        if (selections.perspective) parts.push(selections.perspective.toLowerCase() + ' perspective');
+        if (selections.colorMood) parts.push(selections.colorMood.toLowerCase());
+        if (selections.lighting) parts.push(selections.lighting.toLowerCase() + ' lighting');
+        if (selections.conceptual) parts.push(selections.conceptual.toLowerCase() + ' concept');
+        
+        return parts.length > 0 ? parts.join(', ') : 'Select options to build your prompt...';
+    }
+
+    function updatePrompt() {
+        document.getElementById('promptDisplay').textContent = generatePrompt();
+    }
+
+    function copyToClipboard() {
+        const prompt = generatePrompt();
+        if (prompt !== 'Select options to build your prompt...') {
+            navigator.clipboard.writeText(prompt).then(() => {
+                const alert = document.getElementById('copyAlert');
+                alert.classList.remove('hidden');
+                setTimeout(() => alert.classList.add('hidden'), 2000);
+            });
+        }
+    }
+
+    function clearAll() {
+        Object.keys(selections).forEach(key => selections[key] = '');
+        updatePrompt();
+        renderFilters();
+    }
+
+    function randomize() {
+        Object.keys(filters).forEach(key => {
+            const options = filters[key].options;
+            selections[key] = options[Math.floor(Math.random() * options.length)];
+        });
+        updatePrompt();
+        renderFilters();
+    }
+
+    function renderFilters() {
+        const container = document.getElementById('filtersContainer');
+        container.innerHTML = '';
+
+        Object.entries(filters).forEach(([key, filter]) => {
+            const card = document.createElement('div');
+            card.className = 'filter-card';
+
+            const title = document.createElement('h3');
+            title.textContent = filter.title;
+            
+            if (selections[key]) {
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
+                badge.textContent = 'Selected';
+                title.appendChild(badge);
+            }
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            filter.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                if (selections[key] === option) {
+                    btn.classList.add('selected');
+                }
+                btn.textContent = option;
+                btn.onclick = () => handleSelect(key, option);
+                optionsContainer.appendChild(btn);
+            });
+
+            card.appendChild(title);
+            card.appendChild(optionsContainer);
+            container.appendChild(card);
+        });
+    }
+
+    // Initial render
+    renderFilters();
+</script>
 ```
-    {/* Prompt Display */}
-    <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20">
-      <div className="flex justify-between items-start mb-3">
-        <h2 className="text-white font-semibold text-lg">Your Prompt</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={randomize}
-            className="p-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
-            title="Randomize"
-          >
-            <RefreshCw className="w-4 h-4 text-white" />
-          </button>
-          <button
-            onClick={clearAll}
-            className="p-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-            title="Clear All"
-          >
-            <X className="w-4 h-4 text-white" />
-          </button>
-          <button
-            onClick={copyToClipboard}
-            className="p-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
-            title="Copy to Clipboard"
-          >
-            <Copy className="w-4 h-4 text-white" />
-          </button>
-        </div>
-      </div>
-      <div className="bg-slate-900/50 rounded-lg p-4 min-h-24 text-purple-100 font-mono text-sm leading-relaxed">
-        {generatePrompt()}
-      </div>
-      {copiedAlert && (
-        <div className="mt-3 text-green-400 text-sm text-center animate-pulse">
-          ✓ Copied to clipboard!
-        </div>
-      )}
-    </div>
 
-    {/* Filter Grid */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {Object.entries(filters).map(([key, filter]) => (
-        <div
-          key={key}
-          className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
-        >
-          <h3 className="text-white font-semibold text-xl mb-4 flex items-center gap-2">
-            {filter.title}
-            {selections[key] && (
-              <span className="text-xs bg-purple-600 px-2 py-1 rounded-full">
-                Selected
-              </span>
-            )}
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {filter.options.map((option) => (
-              <button
-                key={option}
-                onClick={() => handleSelect(key, option)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  selections[key] === option
-                    ? 'bg-purple-600 text-white shadow-lg scale-105'
-                    : 'bg-white/10 text-purple-100 hover:bg-white/20'
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-
-    {/* Footer */}
-    <div className="text-center mt-8 text-purple-200 text-sm">
-      <p>Select one option from each category to build your perfect prompt</p>
-    </div>
-  </div>
-</div>
-```
-
-);
-};
-
-export default PromptGenerator;
+</body>
+</html>
