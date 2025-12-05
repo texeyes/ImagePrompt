@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nano Banana Composition Prompt Builder</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <style>
+    :root{
+      --bg:#050714;--card:#101426;--accent:#5ef2c5;--accent-soft:rgba(94,242,197,.16);
+      --accent-strong:#3bd2a4;--text-main:#f8f8ff;--text-soft:#b4b7d4;
+      --border-subtle:#1f2440;--chip-bg:#161b33;--chip-border:#262c4a;
+      --radius-lg:18px;--radius-md:12px;--radius-pill:999px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#161a33 0,#050714 46%,#020309 100%);
+      color:var(--text-main);min-height:100vh;padding:24px;display:flex;justify-content:center
+    }
+    .app{width:100%;max-width:1100px;display:grid;gap:20px;
+      grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+    @media(max-width:900px){.app{grid-template-columns:minmax(0,1fr)}}
+    .card{
+      background:radial-gradient(circle at top left,#171a35 0,#0b0f21 40%,#050714 100%);
+      border-radius:var(--radius-lg);border:1px solid var(--border-subtle);
+      padding:20px 22px;position:relative;overflow:hidden
+    }
+    .card::before{
+      content:"";position:absolute;inset:0;
+      background:radial-gradient(circle at top,rgba(94,242,197,.06),transparent 55%);
+      opacity:.7;pointer-events:none
+    }
+    .inner{position:relative;z-index:1}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+      border-radius:var(--radius-pill);background:rgba(22,27,51,.9);
+      border:1px solid rgba(94,242,197,.3);font-size:11px;
+      letter-spacing:.12em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:6px}
+    .dot{width:7px;height:7px;border-radius:999px;background:var(--accent);
+      box-shadow:0 0 8px rgba(94,242,197,.9)}
+    h1{font-size:24px;margin-bottom:4px;display:flex;gap:8px;align-items:center}
+    h1 span{color:var(--accent)}
+    .subtitle{font-size:13px;color:var(--text-soft);max-width:520px;line-height:1.4;margin-bottom:14px}
+    .small-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-soft);margin-bottom:6px}
+    .filter{margin-bottom:14px;padding:10px;border-radius:var(--radius-md);
+      background:linear-gradient(135deg,rgba(17,21,44,.95),rgba(10,13,29,.95));
+      border:1px solid var(--border-subtle)}
+    .filter-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:10px}
+    .filter-title{font-size:14px;font-weight:600}
+    .filter-pill{font-size:11px;padding:2px 8px;border-radius:var(--radius-pill);
+      background:rgba(94,242,197,.1);color:var(--accent-strong)}
+    .filter-hint{font-size:11px;color:var(--text-soft);text-align:right}
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{
+      padding:5px 9px;border-radius:var(--radius-pill);border:1px solid var(--chip-border);
+      background:var(--chip-bg);font-size:11px;color:var(--text-soft);
+      display:inline-flex;align-items:center;gap:5px;cursor:pointer;
+      transition:.15s all ease-out
+    }
+    .chip-bullet{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.18)}
+    .chip strong{color:var(--text-main);font-weight:600}
+    .chip.selected{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-strong)}
+    .chip.selected .chip-bullet{background:var(--accent)}
+    textarea{
+      width:100%;min-height:230px;border-radius:var(--radius-md);
+      border:1px solid var(--border-subtle);background:rgba(5,7,20,.9);
+      color:var(--text-main);padding:12px;font-size:13px;line-height:1.5;resize:vertical
+    }
+    textarea:focus{
+      outline:none;border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(94,242,197,.5)
+    }
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+    button{border:none;cursor:pointer;font-size:13px}
+    .primary{
+      padding:9px 16px;border-radius:var(--radius-pill);
+      background:linear-gradient(135deg,var(--accent-strong),#55f5ff);
+      color:#020308;font-weight:600;display:inline-flex;align-items:center;gap:6px
+    }
+    .secondary{
+      padding:8px 12px;border-radius:var(--radius-pill);
+      background:rgba(16,20,42,.95);border:1px solid var(--border-subtle);color:var(--text-soft)
+    }
+    .hint{font-size:11px;color:var(--text-soft);margin-top:8px}
+    .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--text-soft)}
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- LEFT: Controls -->
+  <section class="card">
+    <div class="inner">
+      <div class="badge"><span class="dot"></span> Nano Banana · Prompt Forge</div>
+      <h1><span>Nano</span> Composition Builder</h1>
+      <p class="subtitle">
+        Start with composition, then layer in subject, style, mood, and detail.
+        The tool outputs a clean prompt tuned for Nano Banana image generation.
+      </p>
+
+      <!-- STEP 1: Composition -->
+      <div class="small-label">Step 1 · Composition layout</div>
+      <div class="filter">
+        <div class="filter-head">
+          <div class="filter-title">
+            Composition guide
+            <span class="filter-pill">pick 1–3</span>
+          </div>
+          <div class="filter-hint">How the frame is organised</div>
+        </div>
+        <div class="chips" id="composition-chips">
+          <!-- basic layouts -->
+          <div class="chip" data-group="composition" data-key="centered">
+            <span class="chip-bullet"></span><strong>Centered subject</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="rule_of_thirds">
+            <span class="chip-bullet"></span><strong>Rule of thirds</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="golden_ratio">
+            <span class="chip-bullet"></span><strong>Golden ratio / spiral</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="diagonal">
+            <span class="chip-bullet"></span><strong>Diagonal energy</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="leading_lines">
+            <span class="chip-bullet"></span><strong>Leading lines</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="framed_subject">
+            <span class="chip-bullet"></span><strong>Framed foreground</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="low_horizon">
+            <span class="chip-bullet"></span><strong>Low horizon</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="high_horizon">
+            <span class="chip-bullet"></span><strong>High horizon</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="s_curve">
+            <span class="chip-bullet"></span><strong>S‑curve / flowing path</strong>
+          </div>
+          <div class="chip" data-group="composition" data-key="triangular">
+            <span class="chip-bullet"></span><strong>Triangular balance</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Subject & focus -->
+      <div class="small-label">Step 2 · What are we seeing?</div>
+      <div class="filter">
+        <div class="filter-head">
+          <div class="filter-title">
+            Subject & focus
+            <span class="filter-pill">required</span>
+          </div>
+          <div class="filter-hint">Describe the main thing in the scene</div>
+        </div>
+        <textarea id="subject-input" placeholder="Example: heroic banana knight standing on a cliff, holding a glowing sword"></textarea>
+      </div>
+
+      <!-- STEP 3: Style, mood, detail -->
+      <div class="small-label">Step 3 · Style, mood, detail</div>
+      <div class="filter">
+        <div class="filter-head">
+          <div class="filter-title">Style</div>
+          <div class="filter-hint">Visual language</div>
+        </div>
+        <div class="chips" id="style-chips">
+          <div class="chip" data-group="style" data-key="painterly"><span class="chip-bullet"></span><strong>Painterly</strong></div>
+          <div class="chip" data-group="style" data-key="cinematic"><span class="chip-bullet"></span><strong>Cinematic</strong></div>
+          <div class="chip" data-group="style" data-key="illustration"><span class="chip-bullet"></span><strong>Illustration</strong></div>
+          <div class="chip" data-group="style" data-key="3d_render"><span class="chip-bullet"></span><strong>3D render</strong></div>
+          <div class="chip" data-group="style" data-key="graphic_poster"><span class="chip-bullet"></span><strong>Graphic poster</strong></div>
+        </div>
+      </div>
+
+      <div class="filter">
+        <div class="filter-head">
+          <div class="filter-title">Lighting & mood</div>
+          <div class="filter-hint">Energy of the scene</div>
+        </div>
+        <div class="chips" id="mood-chips">
+          <div class="chip" data-group="mood" data-key="soft_diffused"><span class="chip-bullet"></span><strong>Soft diffused light</strong></div>
+          <div class="chip" data-group="mood" data-key="dramatic_spotlight"><span class="chip-bullet"></span><strong>Dramatic spotlight</strong></div>
+          <div class="chip" data-group="mood" data-key="golden_hour"><span class="chip-bullet"></span><strong>Golden hour</strong></div>
+          <div class="chip" data-group="mood" data-key="noir_high_contrast"><span class="chip-bullet"></span><strong>Noir high‑contrast</strong></div>
+          <div class="chip" data-group="mood" data-key="neon_glow"><span class="chip-bullet"></span><strong>Neon glow</strong></div>
+        </div>
+      </div>
+
+      <div class="filter">
+        <div class="filter-head">
+          <div class="filter-title">Detail level</div>
+          <div class="filter-hint">How busy or clean</div>
+        </div>
+        <div class="chips" id="detail-chips">
+          <div class="chip" data-group="detail" data-key="minimal"><span class="chip-bullet"></span><strong>Minimal</strong></div>
+          <div class="chip" data-group="detail" data-key="balanced"><span class="chip-bullet"></span><strong>Balanced detail</strong></div>
+          <div class="chip" data-group="detail" data-key="high_detail"><span class="chip-bullet"></span><strong>Highly detailed</strong></div>
+        </div>
+      </div>
+      <!-- STEP 4: Nano Banana guardrails -->
+      <div class="small-label">Step 4 · Model guidance</div>
+      <div class="filter">
+        <div class="filter-head">
+          <div class="filter-title">
+            Nano Banana focus
+          </div>
+          <div class="filter-hint">Optional but recommended</div>
+        </div>
+        <div class="chips" id="nano-chips">
+          <div class="chip" data-group="nano" data-key="high_coherence">
+            <span class="chip-bullet"></span><strong>High visual coherence</strong>
+          </div>
+          <div class="chip" data-group="nano" data-key="natural_colors">
+            <span class="chip-bullet"></span><strong>Natural, pleasing colors</strong>
+          </div>
+          <div class="chip" data-group="nano" data-key="sharp_details">
+            <span class="chip-bullet"></span><strong>Sharp, crisp details</strong>
+          </div>
+          <div class="chip" data-group="nano" data-key="avoid_text">
+            <span class="chip-bullet"></span><strong>Avoid large text</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="row">
+        <button class="primary" id="btn-generate">Generate Nano Banana prompt</button>
+        <button class="secondary" id="btn-random">Randomize choices</button>
+      </div>
+      <p class="hint">
+        Tip: keep the subject sentence short and concrete; let the filters handle composition and style.
+      </p>
+    </div>
+  </section>
+
+  <!-- RIGHT: Output -->
+  <section class="card">
+    <div class="inner">
+      <div class="badge"><span class="dot"></span> Output · Copy‑ready</div>
+      <h1><span>Final</span> prompt</h1>
+      <p class="subtitle">
+        Paste this directly into Nano Banana / Gemini 2.5 Flash Image. Adjust wording as needed, but avoid removing the composition cues.
+      </p>
+
+      <textarea id="output" readonly></textarea>
+      <div class="row">
+        <button class="secondary" id="btn-copy">Copy prompt</button>
+      </div>
+      <p class="hint mono" id="status-line">Ready. Choose options on the left, then click “Generate Nano Banana prompt”.</p>
+    </div>
+  </section>
+</div>
+<script>
+  // --- helper: chip selection toggling ---
+  function setupChipGroup(containerId, allowMany = true) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      if (!allowMany) {
+        // single-select group
+        [...container.querySelectorAll(".chip")].forEach(c => c.classList.remove("selected"));
+        chip.classList.add("selected");
+      } else {
+        chip.classList.toggle("selected");
+      }
+    });
+  }
+
+  setupChipGroup("composition-chips", true);
+  setupChipGroup("style-chips", true);
+  setupChipGroup("mood-chips", true);
+  setupChipGroup("detail-chips", false); // only one detail level
+  setupChipGroup("nano-chips", true);
+
+  function getSelectedKeys(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return [];
+    return [...container.querySelectorAll(".chip.selected")].map(c => c.dataset.key);
+  }
+
+  function buildCompositionPhrase(keys) {
+    if (!keys.length) return "";
+    const map = {
+      centered: "centered, symmetrical composition",
+      rule_of_thirds: "rule of thirds composition with the subject placed on a strong third",
+      golden_ratio: "golden ratio composition with a gentle spiral leading to the subject",
+      diagonal: "dynamic diagonal composition that adds energy to the frame",
+      leading_lines: "strong leading lines guiding the viewer's eye to the subject",
+      framed_subject: "foreground framing elements that surround and highlight the subject",
+      low_horizon: "low horizon line that emphasizes the sky and atmosphere",
+      high_horizon: "high horizon line that emphasizes the ground and environment",
+      s_curve: "elegant S‑curve that guides the viewer through the scene",
+      triangular: "stable triangular grouping of major elements"
+    };
+    const phrases = keys.map(k => map[k]).filter(Boolean);
+    if (!phrases.length) return "";
+    return "Composed using " + phrases.join(", ") + ". ";
+  }
+
+  function buildStylePhrase(keys) {
+    if (!keys.length) return "";
+    const map = {
+      painterly: "painterly style with visible brushwork",
+      cinematic: "cinematic framing and grading",
+      illustration: "clean illustration style",
+      "3d_render": "polished 3D render look",
+      graphic_poster: "bold graphic poster aesthetic"
+    };
+    const bits = keys.map(k => map[k] || k.replace("_", " "));
+    return bits.join(", ") + ". ";
+  }
+
+  function buildMoodPhrase(keys) {
+    if (!keys.length) return "";
+    const map = {
+      soft_diffused: "soft, diffused lighting for a calm atmosphere",
+      dramatic_spotlight: "dramatic spotlight with deep shadows",
+      golden_hour: "warm golden hour light with long, soft shadows",
+      noir_high_contrast: "noir, high‑contrast lighting",
+      neon_glow: "vibrant neon lighting and colored highlights"
+    };
+    const bits = keys.map(k => map[k]).filter(Boolean);
+    return bits.join(", ") + ". ";
+  }
+
+  function buildDetailPhrase(key) {
+    if (!key) return "";
+    if (key === "minimal") {
+      return "Clean, minimal detail with lots of breathing room. ";
+    }
+    if (key === "balanced") {
+      return "Balanced level of detail, avoiding clutter. ";
+    }
+    if (key === "high_detail") {
+      return "Highly detailed with rich textures and small visual accents. ";
+    }
+    return "";
+  }
+
+  function buildNanoPhrase(keys) {
+    if (!keys.length) return "";
+    const bits = [];
+    if (keys.includes("high_coherence")) {
+      bits.push("keep the scene highly coherent and logically structured");
+    }
+    if (keys.includes("natural_colors")) {
+      bits.push("use natural, pleasing color harmony");
+    }
+    if (keys.includes("sharp_details")) {
+      bits.push("render sharp, crisp edges and clear forms");
+    }
+    if (keys.includes("avoid_text")) {
+      bits.push("avoid large blocks of text or UI elements");
+    }
+    if (!bits.length) return "";
+    return "For the Nano Banana model: " + bits.join(", ") + ".";
+  }
+
+  function generatePrompt() {
+    const subject = (document.getElementById("subject-input").value || "").trim();
+    const output = document.getElementById("output");
+    const status = document.getElementById("status-line");
+
+    if (!subject) {
+      output.value = "";
+      status.textContent = "Add a subject description before generating a prompt.";
+      return;
+    }
+
+    const comp = getSelectedKeys("composition-chips");
+    const style = getSelectedKeys("style-chips");
+    const mood = getSelectedKeys("mood-chips");
+    const detailSel = getSelectedKeys("detail-chips")[0];
+    const nano = getSelectedKeys("nano-chips");
+
+    let parts = [];
+    parts.push(subject.endsWith(".") ? subject + " " : subject + ". ");
+    parts.push(buildCompositionPhrase(comp));
+    parts.push(buildStylePhrase(style));
+    parts.push(buildMoodPhrase(m
+    parts.push(buildMoodPhrase(mood));
+    parts.push(buildDetailPhrase(detailSel));
+    parts.push(buildNanoPhrase(nano));
+
+    const finalPrompt =
+      "Nano Banana image prompt: " +
+      parts.join("").replace(/\s+/g, " ").trim();
+
+    output.value = finalPrompt;
+    status.textContent = "Prompt generated. Copy and paste into Nano Banana / Gemini 2.5 Flash Image.";
+  }
+
+  function randomizeChoices() {
+    // simple randomization: toggle a few random chips in each group
+    const groups = [
+      { id: "composition-chips", max: 3 },
+      { id: "style-chips", max: 2 },
+      { id: "mood-chips", max: 2 },
+      { id: "detail-chips", max: 1 },
+      { id: "nano-chips", max: 2 }
+    ];
+
+    groups.forEach(group => {
+      const container = document.getElementById(group.id);
+      if (!container) return;
+      const chips = [...container.querySelectorAll(".chip")];
+      chips.forEach(c => c.classList.remove("selected"));
+      const count = Math.max(1, Math.min(group.max, Math.floor(Math.random() * (group.max + 1))));
+      for (let i = 0; i < count; i++) {
+        const chip = chips[Math.floor(Math.random() * chips.length)];
+        if (chip) chip.classList.add("selected");
+      }
+    });
+  }
+
+  document.getElementById("btn-generate").addEventListener("click", generatePrompt);
+  document.getElementById("btn-random").addEventListener("click", () => {
+    randomizeChoices();
+    generatePrompt();
+  });
+
+  document.getElementById("btn-copy").addEventListener("click", async () => {
+    const output = document.getElementById("output");
+    const status = document.getElementById("status-line");
+    if (!output.value.trim()) {
+      status.textContent = "Nothing to copy yet. Generate a prompt first.";
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(output.value);
+      status.textContent = "Prompt copied to clipboard.";
+    } catch {
+      status.textContent = "Could not access clipboard. Select and copy manually.";
+    }
+  });
+</script>
+</body>
+</html>
