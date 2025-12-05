@@ -1,0 +1,235 @@
+import React, { useState } from ‘react’;
+import { Copy, X, RefreshCw } from ‘lucide-react’;
+
+const PromptGenerator = () => {
+const [selections, setSelections] = useState({
+complexity: ‘’,
+composition: ‘’,
+artStyle: ‘’,
+designTrend: ‘’,
+perspective: ‘’,
+colorMood: ‘’,
+lighting: ‘’,
+conceptual: ‘’
+});
+
+const [copiedAlert, setCopiedAlert] = useState(false);
+
+const filters = {
+complexity: {
+title: ‘Composition Complexity’,
+options: [‘Simplified’, ‘Complex’]
+},
+composition: {
+title: ‘Composition Type’,
+options: [
+‘Rule of Thirds’, ‘Centered’, ‘Symmetrical’, ‘Diagonal’, ‘Radial’,
+‘Framed’, ‘Spiral Section’, ‘Golden Spiral’, ‘Golden Ratio Triangle’,
+‘Harmonious Triangle’, ‘S-Curve’, ‘Triangular’, ‘Circular’, ‘Grid’,
+‘Focal Mass’, ‘Y-Arrangement’, ‘Steelyrad’, ‘Balanced Scales’, ‘Tunnel’, ‘Cross’
+]
+},
+artStyle: {
+title: ‘Art Style’,
+options: [
+‘Engraved Halftone’, ‘Monochrome Organic’, ‘Glossy Surfaces’, ‘3D Style’,
+‘Inspired Line Art’, ‘Flat Illustrative’, ‘Watercolor’, ‘Oil Painting’,
+‘Digital Art’, ‘Pixel Art’, ‘Pencil Sketch’, ‘Ink Wash’, ‘Charcoal’,
+‘Photorealistic’, ‘Vector Art’, ‘Low Poly’
+]
+},
+designTrend: {
+title: ‘Design Trend’,
+options: [
+‘Artisanal Modernism’, ‘Neo-folk Character’, ‘Material Minimalism’,
+‘Neo-Nostalgic Utility’, ‘Brutalist Maximalism’
+]
+},
+perspective: {
+title: ‘Visual Perspective’,
+options: [
+‘Peacocking’, ‘Signaling’, ‘Counter-Signaling’, ‘Boundary Signaling’,
+‘Group Signaling’, ‘Anti-Group Signaling’, ‘Camouflage’
+]
+},
+colorMood: {
+title: ‘Color & Mood’,
+options: [
+‘Vibrant Energy’, ‘Muted Elegance’, ‘Monochromatic Drama’, ‘Pastel Dreamscape’,
+‘Neon Cyberpunk’, ‘Earth Tones Organic’, ‘Cool Minimalist’, ‘Warm Nostalgic’,
+‘High Contrast Bold’, ‘Gradient Fusion’
+]
+},
+lighting: {
+title: ‘Lighting & Atmosphere’,
+options: [
+‘Golden Hour Glow’, ‘Studio Perfect’, ‘Dramatic Chiaroscuro’, ‘Ethereal Backlit’,
+‘Overcast Diffused’, ‘Neon Night’, ‘Harsh Midday’, ‘Candlelight Intimate’,
+‘Volumetric Fog’, ‘Moonlit Mystery’, ‘Bioluminescent Glow’, ‘Lens Flare Dynamic’
+]
+},
+conceptual: {
+title: ‘Conceptual Framework’,
+options: [
+‘Surrealist Juxtaposition’, ‘Deconstructed Reality’, ‘Symbolic Metaphor’,
+‘Existential Minimalism’, ‘Dystopian Commentary’, ‘Utopian Idealism’,
+‘Abstract Emotion’, ‘Paradoxical Tension’, ‘Temporal Layering’,
+‘Identity Fragmentation’, ‘System Critique’, ‘Organic vs Synthetic’
+]
+}
+};
+
+const handleSelect = (category, value) => {
+setSelections(prev => ({
+…prev,
+[category]: prev[category] === value ? ‘’ : value
+}));
+};
+
+const generatePrompt = () => {
+const parts = [];
+
+```
+if (selections.complexity) parts.push(selections.complexity.toLowerCase() + ' composition');
+if (selections.composition) parts.push(selections.composition.toLowerCase());
+if (selections.artStyle) parts.push(selections.artStyle.toLowerCase() + ' style');
+if (selections.designTrend) parts.push(selections.designTrend.toLowerCase());
+if (selections.perspective) parts.push(selections.perspective.toLowerCase() + ' perspective');
+if (selections.colorMood) parts.push(selections.colorMood.toLowerCase());
+if (selections.lighting) parts.push(selections.lighting.toLowerCase() + ' lighting');
+if (selections.conceptual) parts.push(selections.conceptual.toLowerCase() + ' concept');
+
+return parts.length > 0 ? parts.join(', ') : 'Select options to build your prompt...';
+```
+
+};
+
+const copyToClipboard = () => {
+const prompt = generatePrompt();
+if (prompt !== ‘Select options to build your prompt…’) {
+navigator.clipboard.writeText(prompt);
+setCopiedAlert(true);
+setTimeout(() => setCopiedAlert(false), 2000);
+}
+};
+
+const clearAll = () => {
+setSelections({
+complexity: ‘’,
+composition: ‘’,
+artStyle: ‘’,
+designTrend: ‘’,
+perspective: ‘’,
+colorMood: ‘’,
+lighting: ‘’,
+conceptual: ‘’
+});
+};
+
+const randomize = () => {
+const newSelections = {};
+Object.keys(filters).forEach(key => {
+const options = filters[key].options;
+newSelections[key] = options[Math.floor(Math.random() * options.length)];
+});
+setSelections(newSelections);
+};
+
+return (
+<div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-8">
+<div className="max-w-6xl mx-auto">
+{/* Header */}
+<div className="text-center mb-8">
+<h1 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
+AI Image Prompt Generator
+</h1>
+<p className="text-purple-200 text-lg">
+Create stunning prompts for your AI art
+</p>
+</div>
+
+```
+    {/* Prompt Display */}
+    <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20">
+      <div className="flex justify-between items-start mb-3">
+        <h2 className="text-white font-semibold text-lg">Your Prompt</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={randomize}
+            className="p-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+            title="Randomize"
+          >
+            <RefreshCw className="w-4 h-4 text-white" />
+          </button>
+          <button
+            onClick={clearAll}
+            className="p-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+            title="Clear All"
+          >
+            <X className="w-4 h-4 text-white" />
+          </button>
+          <button
+            onClick={copyToClipboard}
+            className="p-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+            title="Copy to Clipboard"
+          >
+            <Copy className="w-4 h-4 text-white" />
+          </button>
+        </div>
+      </div>
+      <div className="bg-slate-900/50 rounded-lg p-4 min-h-24 text-purple-100 font-mono text-sm leading-relaxed">
+        {generatePrompt()}
+      </div>
+      {copiedAlert && (
+        <div className="mt-3 text-green-400 text-sm text-center animate-pulse">
+          ✓ Copied to clipboard!
+        </div>
+      )}
+    </div>
+
+    {/* Filter Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {Object.entries(filters).map(([key, filter]) => (
+        <div
+          key={key}
+          className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+        >
+          <h3 className="text-white font-semibold text-xl mb-4 flex items-center gap-2">
+            {filter.title}
+            {selections[key] && (
+              <span className="text-xs bg-purple-600 px-2 py-1 rounded-full">
+                Selected
+              </span>
+            )}
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {filter.options.map((option) => (
+              <button
+                key={option}
+                onClick={() => handleSelect(key, option)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  selections[key] === option
+                    ? 'bg-purple-600 text-white shadow-lg scale-105'
+                    : 'bg-white/10 text-purple-100 hover:bg-white/20'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Footer */}
+    <div className="text-center mt-8 text-purple-200 text-sm">
+      <p>Select one option from each category to build your perfect prompt</p>
+    </div>
+  </div>
+</div>
+```
+
+);
+};
+
+export default PromptGenerator;
