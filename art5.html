@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Preset Library — Neon Builder</title>
+  <style>
+    :root{
+      --bg:#071021;
+      --card:#0f1724;
+      --muted:#98a0b3;
+      --neon1:#7b61ff;
+      --neon2:#00e0ff;
+      --accent:#ff6ec7;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,var(--bg),#031024 120%);color:#e6eef8;padding:28px}
+    .shell{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    h1{font-weight:700;margin:0;font-size:20px;letter-spacing:0.2px}
+    .sub{color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:14px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
+
+    /* Editor */
+    .editor textarea{width:100%;height:300px;padding:14px;border-radius:10px;border:none;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));color:#dff0ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono',monospace;font-size:13px}
+    .row{display:flex;gap:10px;margin-top:12px}
+    .btn{background:linear-gradient(90deg,var(--neon1),var(--neon2));border:none;padding:10px 12px;border-radius:10px;color:#061426;font-weight:700;cursor:pointer;box-shadow:0 6px 30px rgba(99,69,255,0.14);}
+    .btn.ghost{background:transparent;color:var(--neon2);border:1px solid rgba(0,224,255,0.12);box-shadow:none}
+    .input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    /* Preset list */
+    .list{max-height:520px;overflow:auto;margin-top:8px}
+    .preset{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;margin-bottom:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));border:1px solid rgba(255,255,255,0.02)}
+    .preset .meta{flex:1}
+    .preset h3{margin:0;font-size:14px}
+    .preset p{margin:6px 0 0;color:var(--muted);font-size:12px;white-space:pre-wrap}
+    .preset .actions{display:flex;flex-direction:column;gap:8px}
+    .small{font-size:12px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+
+    /* neon outlines */
+    .logo{display:flex;gap:10px;align-items:center}
+    .sig{padding:6px 10px;border-radius:10px;background:linear-gradient(90deg,var(--neon1),var(--neon2));color:#021124;font-weight:700;box-shadow:0 6px 30px rgba(0,224,255,0.06)}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+
+    .control-row{display:flex;gap:8px;align-items:center}
+    .tag{font-size:11px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:900px){.grid{grid-template-columns:1fr;}.editor textarea{height:220px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="logo">
+        <div class="sig">NEON</div>
+        <div>
+          <h1>Prompt Preset Library</h1>
+          <div class="sub">Dark creative workspace — save, load, copy, export presets</div>
+        </div>
+      </div>
+      <div class="control-row">
+        <button class="btn" id="exportBtn">Export JSON</button>
+        <label class="small" for="importFile" style="cursor:pointer">Import</label>
+        <input id="importFile" type="file" accept="application/json" style="display:none">
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card editor">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <input id="presetName" class="input" placeholder="Preset name (eg. 'Sora: Medusa Showdown')">
+          <input id="presetTags" class="input" style="width:160px" placeholder="tags,comma,separated">
+          <button class="btn" id="saveBtn">Save Preset</button>
+        </div>
+
+        <textarea id="promptText" placeholder="Paste or build your prompt here..."></textarea>
+
+        <div class="row">
+          <button class="btn" id="copyBtn">Copy to Clipboard</button>
+          <button class="btn ghost" id="clearBtn">Clear</button>
+          <div style="flex:1"></div>
+          <div class="tag" id="countTag">0 chars</div>
+        </div>
+
+        <footer>
+          Tip: Use descriptive names and a couple tags. Drag this HTML file into any browser to run offline.
+        </footer>
+      </section>
+
+      <aside class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700">Saved Presets</div>
+            <div class="sub">Local to this browser (localStorage)</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input id="search" class="input" placeholder="Search name or tag" style="width:180px">
+            <button class="btn ghost" id="clearAll">Clear All</button>
+          </div>
+        </div>
+
+        <div class="list" id="presetList" aria-live="polite"></div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const LS_KEY = 'brady_prompt_presets_v1';
+
+    function uid() { return 'p_'+Math.random().toString(36).slice(2,9); }
+
+    function loadPresets(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){console.error(e);return []}
+    }
+    function savePresets(list){ localStorage.setItem(LS_KEY, JSON.stringify(list)); }
+
+    function renderList(filter=''){
+      const container = document.getElementById('presetList');
+      container.innerHTML = '';
+      const list = loadPresets();
+      const q = filter.trim().toLowerCase();
+      const filtered = list.filter(p => {
+        if(!q) return true;
+        return p.name.toLowerCase().includes(q) || (p.tags||'').toLowerCase().includes(q) || p.text.toLowerCase().includes(q);
+      });
+      if(filtered.length===0){ container.innerHTML = '<div style="padding:18px;color:var(--muted)">No presets yet — save one from the editor.</div>'; return }
+
+      filtered.reverse().forEach(p => {
+        const el = document.createElement('div'); el.className='preset';
+        const meta = document.createElement('div'); meta.className='meta';
+        const h = document.createElement('h3'); h.textContent = p.name || '(untitled)';
+        const tags = document.createElement('div'); tags.style.marginTop='6px'; tags.innerHTML = p.tags ? p.tags.split(',').slice(0,4).map(t=>`<span class="tag">${escapeHtml(t.trim())}</span>`).join(' ') : '';
+        const ptxt = document.createElement('p'); ptxt.textContent = p.text.length>320 ? p.text.slice(0,320)+'...': p.text;
+        meta.appendChild(h); meta.appendChild(tags); meta.appendChild(ptxt);
+
+        const actions = document.createElement('div'); actions.className='actions';
+        const loadBtn = document.createElement('button'); loadBtn.className='small'; loadBtn.textContent='Load'; loadBtn.onclick = ()=>{ loadToEditor(p.id) };
+        const copyBtn = document.createElement('button'); copyBtn.className='small'; copyBtn.textContent='Copy'; copyBtn.onclick = ()=>{ copyText(p.text) };
+        const exportBtn = document.createElement('button'); exportBtn.className='small'; exportBtn.textContent='Export'; exportBtn.onclick = ()=>{ downloadJSON(p, `${sanitizeFilename(p.name||'preset')}.json`) };
+        const delBtn = document.createElement('button'); delBtn.className='small'; delBtn.textContent='Delete'; delBtn.onclick = ()=>{ deletePreset(p.id) };
+
+        actions.appendChild(loadBtn); actions.appendChild(copyBtn); actions.appendChild(exportBtn); actions.appendChild(delBtn);
+
+        el.appendChild(meta); el.appendChild(actions);
+        container.appendChild(el);
+      });
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>\"']/g, c=>'&#'+c.charCodeAt(0)+';'); }
+    function sanitizeFilename(s){ return s.replace(/[^a-z0-9\-\_\.]/ig,'_').slice(0,120) }
+
+    function saveCurrent(){
+      const name = document.getElementById('presetName').value.trim();
+      const tags = document.getElementById('presetTags').value.trim();
+      const text = document.getElementById('promptText').value;
+      if(!text.trim()){ alert('Prompt is empty — paste or write a prompt first.'); return }
+      const list = loadPresets();
+      const item = { id: uid(), name: name || ('Preset ' + (list.length+1)), tags, text, created: Date.now() };
+      list.push(item);
+      savePresets(list);
+      document.getElementById('presetName').value=''; document.getElementById('presetTags').value='';
+      renderList(document.getElementById('search').value||'');
+      flashSaved();
+    }
+
+    function flashSaved(){ const c = document.createElement('div'); c.textContent='Saved ✓'; c.style.position='fixed'; c.style.right='22px'; c.style.bottom='22px'; c.style.padding='10px 14px'; c.style.borderRadius='10px'; c.style.background='linear-gradient(90deg,var(--neon1),var(--neon2))'; c.style.color='#021124'; c.style.fontWeight='700'; c.style.boxShadow='0 6px 30px rgba(0,0,0,0.5)'; document.body.appendChild(c); setTimeout(()=>c.remove(),1400);
+    }
+
+    function loadToEditor(id){ const list = loadPresets(); const p = list.find(x=>x.id===id); if(!p) return; document.getElementById('promptText').value = p.text; document.getElementById('presetName').value = p.name; document.getElementById('presetTags').value = p.tags || ''; updateCount(); }
+
+    function copyText(text){ navigator.clipboard.writeText(text).then(()=>{ const c=document.createElement('div'); c.textContent='Copied ✓'; c.style.position='fixed'; c.style.right='22px'; c.style.bottom='30px'; c.style.padding='8px 12px'; c.style.borderRadius='8px'; c.style.background='rgba(0,0,0,0.6)'; c.style.color='#dff0ff'; document.body.appendChild(c); setTimeout(()=>c.remove(),900) }) }
+
+    function deletePreset(id){ if(!confirm('Delete this preset?')) return; const list = loadPresets().filter(x=>x.id!==id); savePresets(list); renderList(document.getElementById('search').value||''); }
+
+    function clearAll(){ if(!confirm('Clear ALL presets from this browser?')) return; localStorage.removeItem(LS_KEY); renderList(); }
+
+    function downloadJSON(obj, name='data.json'){ const blob = new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+    // export all
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const list = loadPresets(); if(list.length===0){ alert('No presets to export.'); return };
+      downloadJSON(list, 'prompt-presets.json');
+    });
+
+    document.getElementById('importFile').addEventListener('change', (ev)=>{
+      const f = ev.target.files[0]; if(!f) return; const reader = new FileReader(); reader.onload = (e)=>{
+        try{
+          const data = JSON.parse(e.target.result);
+          if(Array.isArray(data)){
+            // merge but avoid id collisions
+            const existing = loadPresets();
+            const merged = existing.concat(data.map(d=>({...d, id: d.id||uid()})));
+            savePresets(merged); renderList(); alert('Imported '+data.length+' presets.');
+          }else if(typeof data === 'object'){
+            const existing = loadPresets(); existing.push({...data, id:data.id||uid()}); savePresets(existing); renderList(); alert('Imported 1 preset.');
+          }else{ alert('Invalid JSON file.'); }
+        }catch(err){ alert('Failed to import: '+err.message) }
+      };
+      reader.readAsText(f);
+      ev.target.value='';
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', saveCurrent);
+    document.getElementById('copyBtn').addEventListener('click', ()=>{ copyText(document.getElementById('promptText').value) });
+    document.getElementById('clearBtn').addEventListener('click', ()=>{ if(confirm('Clear editor?')){ document.getElementById('promptText').value=''; updateCount(); } });
+    document.getElementById('clearAll').addEventListener('click', clearAll);
+
+    document.getElementById('search').addEventListener('input', (e)=> renderList(e.target.value) );
+
+    document.getElementById('promptText').addEventListener('input', updateCount);
+    function updateCount(){ const n = document.getElementById('promptText').value.length; document.getElementById('countTag').textContent = n + ' chars'; }
+
+    // keyboard shortcuts
+    window.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key==='s'){ e.preventDefault(); saveCurrent(); }
+      if((e.ctrlKey||e.metaKey) && e.key==='i'){ e.preventDefault(); document.getElementById('importFile').click(); }
+    });
+
+    // init
+    renderList(); updateCount();
+  </script>
+</body>
+</html>
