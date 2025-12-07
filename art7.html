@@ -1,368 +1,424 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Art Prompt Composer — Advanced</title>
-  <style>
-    :root{--bg:#0b1220;--panel:#0f1724;--muted:#9aa4b2;--accent:#7c3aed;--glass:rgba(255,255,255,0.03);--card:#0b1220}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#05060a 0%,#071228 60%)}
-    .container{max-width:1100px;margin:26px auto;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{margin:0;font-size:20px}
-    p.lead{margin:6px 0 18px;color:var(--muted)}
-    .layout{display:grid;grid-template-columns:1fr 380px;gap:18px}
-    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
-    label{font-size:13px;color:var(--muted)}
-    textarea{width:100%;min-height:100px;background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:#e6eef8;padding:10px;border-radius:8px;resize:vertical;margin-top:8px}
-    .row{display:flex;gap:8px;align-items:center}
-    button{background:linear-gradient(180deg,var(--accent),#5b21b6);color:white;border:0;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
-    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
-    .small{font-size:12px;color:var(--muted)}
-    .section{margin-top:12px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .preview{min-height:160px;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);overflow:auto}
-    .weights{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    .weight{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
-    .footer{margin-top:12px;color:var(--muted);font-size:13px}
-    .toggle{transform:scale(1.06)}
-    .top-row{display:flex;gap:12px;align-items:center}
-    .controls .pill{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:999px;font-size:13px}
-    @media (max-width:980px){.layout{grid-template-columns:1fr}.weights{flex-direction:column}}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Art Prompt Generator — Advanced</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1020;--card:#0f1726;--muted:#9aa4b2;--accent:#7c3aed;--glass:rgba(255,255,255,0.03);
+    --surface:#0d1422;--glass-2:rgba(255,255,255,0.02);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#060712 0%,#0b1020 100%);color:#e6eef8}
+  .app{max-width:1100px;margin:28px auto;padding:18px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{font-size:20px;margin:0}
+  p.lead{margin:6px 0 18px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:16px}
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+  label{font-size:13px;color:var(--muted)}
+  textarea{width:100%;min-height:100px;background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:inherit;padding:10px;border-radius:8px;margin-top:8px;resize:vertical}
+  .row{display:flex;gap:8px;align-items:center}
+  button{background:linear-gradient(180deg,var(--accent),#5b21b6);color:white;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  .preview{padding:12px;min-height:180px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px;overflow:auto}
+  .muted{color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .section{margin-bottom:12px}
+  .inline{display:inline-flex;align-items:center;gap:8px}
+  .small{font-size:12px;color:var(--muted)}
+  .weights{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  input[type=range]{width:110px}
+  footer{margin-top:12px;color:var(--muted);font-size:13px}
+  .fetchStatus{font-size:12px;color:var(--muted)}
+  .topbar{display:flex;gap:8px;align-items:center}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}.preview{min-height:140px}}
+</style>
 </head>
 <body>
-  <div class="container">
+  <div class="app">
     <header>
       <div>
-        <h1>Art Prompt Composer — Advanced</h1>
-        <div class="small">Weighted randomization • remote attribute extraction (best-effort) • dark mode-ready UI</div>
+        <h1>Art Prompt Generator — Advanced</h1>
+        <div class="lead muted">Weighted randomizer • remote attribute extraction (best-effort) • dark-mode-ready UI • mobile-first layout</div>
       </div>
-      <div class="top-row">
-        <div class="controls">
-          <button id="composeBtn">Compose</button>
-          <button id="randomBtn" class="ghost">Smart Randomize</button>
-          <button id="clearBtn" class="ghost">Clear</button>
-        </div>
+      <div class="topbar">
+        <label class="small"><input id="darkModeToggle" type="checkbox"> Dark Mode (visual)</label>
       </div>
     </header>
 
-    <p class="lead">This upgraded composer attempts to pull candidate attributes from the linked TexEyes pages (if allowed by CORS), supports weighted category selection, and lets you randomize with partial disabling of filters. If a remote fetch fails due to CORS, it falls back to built-in seeds.</p>
+    <div class="grid">
+      <div class="card" id="leftCard">
 
-    <div class="layout">
-      <div>
-        <div class="card">
-          <!-- Sections -->
-          <div class="section">
-            <label><input type="checkbox" id="useCharacter" class="toggle" checked> Character (art6)</label>
-            <textarea id="character" placeholder="Paste character text here or let smart random fill it"></textarea>
-            <div class="weights">
-              <div class="weight small">Weight: <input id="wCharacter" type="range" min="0" max="100" value="80"></div>
-              <div class="weight small">Off chance: <input id="offCharacter" type="range" min="0" max="100" value="20"></div>
-            </div>
-          </div>
-
-          <div class="section">
-            <label><input type="checkbox" id="useScene" class="toggle" checked> Scene (art1)</label>
-            <textarea id="scene" placeholder="Paste scene text here or let smart random fill it"></textarea>
-            <div class="weights">
-              <div class="weight small">Weight: <input id="wScene" type="range" min="0" max="100" value="70"></div>
-              <div class="weight small">Off chance: <input id="offScene" type="range" min="0" max="100" value="25"></div>
-            </div>
-          </div>
-
-          <div class="section">
-            <label><input type="checkbox" id="useBackground" class="toggle" checked> Background (art3)</label>
-            <textarea id="background" placeholder="Paste background text here or let smart random fill it"></textarea>
-            <div class="weights">
-              <div class="weight small">Weight: <input id="wBackground" type="range" min="0" max="100" value="65"></div>
-              <div class="weight small">Off chance: <input id="offBackground" type="range" min="0" max="100" value="30"></div>
-            </div>
-          </div>
-
-          <div class="section">
-            <label><input type="checkbox" id="useArtstyle" class="toggle" checked> Art Form / Style (art4)</label>
-            <textarea id="artstyle" placeholder="Paste art style here or let smart random fill it"></textarea>
-            <div class="weights">
-              <div class="weight small">Weight: <input id="wArtstyle" type="range" min="0" max="100" value="50"></div>
-              <div class="weight small">Off chance: <input id="offArtstyle" type="range" min="0" max="100" value="35"></div>
-            </div>
-          </div>
-
+        <!-- Sections -->
+        <div class="section">
+          <label><input type="checkbox" id="useCharacter" checked> Character (art6)</label>
+          <textarea id="character" placeholder="Paste or generate character attributes..."></textarea>
+          <div class="small">Tip: character examples use the art6 format: physiology, body-type, age, mood, features.</div>
         </div>
 
-        <div class="card" style="margin-top:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <strong>Remote fetch settings</strong>
-              <div class="small">Try to fetch attribute candidates from the linked pages. If blocked, built-in seeds are used.</div>
-            </div>
-            <div class="small">Timeout: <input type="number" id="fetchTimeout" value="2500" style="width:80px"></div>
-          </div>
+        <div class="section">
+          <label><input type="checkbox" id="useScene" checked> Scene (art1)</label>
+          <textarea id="scene" placeholder="Paste or generate scene description..."></textarea>
+        </div>
 
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <button id="fetchNow" class="ghost">Fetch Remote Candidates</button>
-            <button id="downloadTxt" class="ghost">Download Prompt .txt</button>
-            <button id="downloadJson" class="ghost">Download JSON</button>
-          </div>
+        <div class="section">
+          <label><input type="checkbox" id="useBackground" checked> Background (art3)</label>
+          <textarea id="background" placeholder="Paste or generate background description..."></textarea>
+        </div>
 
-          <div class="footer">Remote sources: art6 (character), art1 (scene), art3 (background), art4 (artstyle).</div>
+        <div class="section">
+          <label><input type="checkbox" id="useArtstyle" checked> Art Style (art4)</label>
+          <textarea id="artstyle" placeholder="Paste or generate art style/medium..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button id="composeBtn">Compose</button>
+          <button id="randomBtn" class="ghost">Randomize (weighted)</button>
+          <button id="pullRemoteBtn" class="ghost">Pull remote attributes</button>
+          <button id="clearBtn" class="ghost">Clear</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="small">Weighted randomness — adjust how likely each section is to be used when randomly generating.</div>
+          <div class="weights">
+            <label class="small inline">Character <input type="range" id="wCharacter" min="0" max="100" value="90"></label>
+            <label class="small inline">Scene <input type="range" id="wScene" min="0" max="100" value="80"></label>
+            <label class="small inline">Background <input type="range" id="wBackground" min="0" max="100" value="70"></label>
+            <label class="small inline">Art Style <input type="range" id="wArtstyle" min="0" max="100" value="60"></label>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="small">
+          Notes: Remote pulls are best-effort and depend on cross-origin policies. If a direct fetch fails, the app will fall back to internal example data. "Pull remote attributes" will try to extract candidate phrases from the linked TexEyes pages.
         </div>
 
       </div>
 
-      <div>
-        <div class="card">
-          <label class="small">Final Prompt</label>
-          <div id="finalPreview" class="preview">(Compose to generate)</div>
+      <div class="card">
+        <label class="small">Final Prompt</label>
+        <div id="finalPreview" class="preview">(Compose to see prompt)</div>
 
-          <div class="section" style="margin-top:10px">
-            <div class="row" style="justify-content:space-between">
-              <div style="display:flex;gap:8px">
-                <button id="copyPrompt">Copy Prompt</button>
-                <button id="copyJson" class="ghost">Copy JSON</button>
-                <button id="clearPreview" class="ghost">Clear Preview</button>
-              </div>
-              <div class="small">Prompt length: <span id="promptLen">0</span></div>
-            </div>
-          </div>
-
-          <div class="section">
-            <label class="small">Preview Options</label>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button id="addHd" class="ghost">Add: photorealistic, 8k</button>
-              <button id="addSoft" class="ghost">Add: film grain, warm tones</button>
-            </div>
-          </div>
-
+        <div class="controls" style="margin-top:10px">
+          <button id="copyBtn">Copy Prompt</button>
+          <button id="copyJsonBtn" class="ghost">Copy JSON</button>
+          <button id="downloadTxt" class="ghost">Download .txt</button>
         </div>
 
-        <div class="card" style="margin-top:12px">
-          <strong>Candidates</strong>
-          <div class="small" style="margin-top:8px">These lists are filled from remote pages when possible (or from built-in seeds). You can click any candidate to add it to its field.</div>
-          <div id="candidates" style="margin-top:10px;display:grid;gap:8px"></div>
+        <div style="margin-top:12px">
+          <div class="small">Fetch status: <span id="fetchStatus" class="fetchStatus">Idle</span></div>
+          <div style="margin-top:8px"><button id="showCandidates" class="ghost">Show fetched candidates</button></div>
         </div>
+
+        <footer>
+          <div class="small">Save this file as <code>index.html</code> and host via GitHub Pages. Remote pulls require the site to be served over HTTPS and may be blocked by CORS on the remote site.</div>
+        </footer>
       </div>
     </div>
+
+    <section style="margin-top:14px" class="card">
+      <h3 style="margin:0 0 8px 0">Fetched Candidates (editable) — Click an item to copy into its section</h3>
+      <div id="candidates" class="small" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:240px;overflow:auto;padding-top:8px"></div>
+    </section>
   </div>
 
-  <script>
-    // Built-in fallback seeds
-    const seeds = {
-      character: [
-        'physiology: humanoid-dominant hybrid; body-type: compact mascot; age: timeless; mood: inviting confidence; features: expressive eyes, sculpted silhouette',
-        'physiology: soft-organic construct; body-type: plush-round; age: youthful; mood: playful serenity; features: oversized head ratio, symbolic markings',
-        'physiology: ancient ceremonial entity; body-type: lean-elegant; age: ageless; mood: stoic presence; features: carved patterns, metallic filigree',
-        'physiology: mechanical-organic fusion; body-type: sturdy-medium; age: veteran; mood: focused determination; features: layered plating, glowing accents',
-        'physiology: mythical humanoid; body-type: elongated-balanced; age: ethereal; mood: curious wonder; features: subtle bioluminescence, soft contours'
-      ],
-      scene: [
-        'floating midair among drifting petals, dynamic pose, slight motion blur',
-        'charging across cracked concrete, motion lines, dynamic angle',
-        'hovering through shattered glass with postcards swirling',
-        'emerging from drifting fog under a single spotlight'
-      ],
-      background: [
-        'abandoned warehouse with broken windows, moonlit, soft fog, distant city skyline',
-        'neon alleyway with steam vents and wet pavement reflections',
-        'sunken cathedral ruins overtaken by vines and moss',
-        'dystopian skyline at night with distant drones'
-      ],
-      artstyle: [
-        'engraved halftone, artisanal modernism, monochromatic drama',
-        'oil-painted surrealism with loose brushwork',
-        'hyper-realistic chiaroscuro, cinematic lighting',
-        'bold graphic novel style, high contrast, ink textures'
-      ]
+<script>
+// ---------------------
+// Configuration
+// ---------------------
+const remotes = {
+  character: 'https://texeyes.github.io/ImagePrompt/art6.html',
+  scene: 'https://texeyes.github.io/ImagePrompt/art1.html',
+  background: 'https://texeyes.github.io/ImagePrompt/art3.html',
+  artstyle: 'https://texeyes.github.io/ImagePrompt/art4.html'
+}
+
+// Internal fallback candidates (aligned to art6 style for characters)
+const fallback = {
+  character: [
+    'physiology: humanoid-dominant hybrid; body-type: compact mascot; age: timeless; mood: inviting confidence; features: expressive eyes, sculpted silhouette',
+    'physiology: soft-organic construct; body-type: plush-round; age: youthful; mood: playful serenity; features: oversized head, symbolic markings',
+    'physiology: ancient ceremonial entity; body-type: lean-elegant; age: ageless; mood: stoic presence; features: carved patterns, metallic filigree',
+    'physiology: mechanical-organic fusion; body-type: sturdy-medium; age: veteran; mood: focused determination; features: layered plating, glowing accents'
+  ],
+  scene: [
+    'floating midair among drifting petals, dynamic pose, motion blur',
+    'charging across cracked concrete, sparks and dust, low camera angle',
+    'hovering through shattered glass with slowed particles, cinematic framing',
+    'emerging from drifting fog into a focused beam of light'
+  ],
+  background: [
+    'abandoned warehouse with broken windows, moonlit fog, distant city skyline',
+    'dystopian neon alleyway with steam vents and wet pavement reflections',
+    'sunken cathedral ruins with overgrown vegetation and shafts of light',
+    'rusted factory corridor with dangling cables and diffused rim light'
+  ],
+  artstyle: [
+    'engraved halftone, artisanal modernism, monochromatic drama',
+    'oil-painted surrealism, rich impasto, dreamlike color palette',
+    'hyper-realistic chiaroscuro, dramatic lighting, cinematic grain',
+    'bold graphic-novel style, heavy linework, high contrast'
+  ]
+}
+
+// ---------------------
+// DOM helpers
+// ---------------------
+const el = id => document.getElementById(id)
+const fields = {
+  character: el('character'),
+  scene: el('scene'),
+  background: el('background'),
+  artstyle: el('artstyle')
+}
+const toggles = {
+  character: el('useCharacter'),
+  scene: el('useScene'),
+  background: el('useBackground'),
+  artstyle: el('useArtstyle')
+}
+const weights = {
+  character: el('wCharacter'),
+  scene: el('wScene'),
+  background: el('wBackground'),
+  artstyle: el('wArtstyle')
+}
+
+const finalPreview = el('finalPreview')
+const fetchStatus = el('fetchStatus')
+const candidatesDiv = el('candidates')
+
+let fetchedCandidates = {character:[],scene:[],background:[],artstyle:[]}
+
+// ---------------------
+// Compose logic (robust)
+// ---------------------
+function compose(){
+  const parts = []
+  if(toggles.character.checked && fields.character.value.trim()) parts.push(fields.character.value.trim())
+  if(toggles.scene.checked && fields.scene.value.trim()) parts.push(fields.scene.value.trim())
+  if(toggles.background.checked && fields.background.value.trim()) parts.push(fields.background.value.trim())
+  if(toggles.artstyle.checked && fields.artstyle.value.trim()) parts.push(fields.artstyle.value.trim())
+
+  const prompt = parts.join(', ').replace(/\s+,/g,',').replace(/,{2,}/g,',').trim()
+  finalPreview.textContent = prompt || '(No enabled sections with text)'
+  return prompt
+}
+
+el('composeBtn').addEventListener('click', compose)
+
+// ---------------------
+// Copy / Download
+// ---------------------
+el('copyBtn').addEventListener('click', async ()=>{
+  const txt = compose()
+  try{ await navigator.clipboard.writeText(txt); alert('Prompt copied to clipboard') }catch{ alert('Copy failed') }
+})
+
+el('copyJsonBtn').addEventListener('click', async ()=>{
+  const payload = {
+    used: {
+      character: toggles.character.checked,
+      scene: toggles.scene.checked,
+      background: toggles.background.checked,
+      artstyle: toggles.artstyle.checked
+    },
+    inputs: {
+      character: fields.character.value,
+      scene: fields.scene.value,
+      background: fields.background.value,
+      artstyle: fields.artstyle.value
+    },
+    prompt: compose()
+  }
+  try{ await navigator.clipboard.writeText(JSON.stringify(payload,null,2)); alert('JSON copied') }catch{ alert('JSON copy failed') }
+})
+
+el('downloadTxt').addEventListener('click', ()=>{
+  const txt = compose();
+  const blob = new Blob([txt],{type:'text/plain'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'prompt.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+})
+
+el('clearBtn').addEventListener('click', ()=>{
+  for(const k of Object.keys(fields)) fields[k].value = ''
+  for(const k of Object.keys(toggles)) toggles[k].checked = true
+  compose()
+})
+
+// ---------------------
+// Random weighted generator
+// ---------------------
+function weightedBool(weight){ // weight 0-100
+  return Math.random()*100 < Number(weight)
+}
+
+function pickFrom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+async function randomizeWeighted(){
+  // decide per section whether to use it
+  const use = {
+    character: weightedBool(weights.character.value),
+    scene: weightedBool(weights.scene.value),
+    background: weightedBool(weights.background.value),
+    artstyle: weightedBool(weights.artstyle.value)
+  }
+
+  // fill with fetchedCandidates if available, otherwise fallback
+  for(const key of Object.keys(fields)){
+    toggles[key].checked = use[key]
+    if(use[key]){
+      const pool = (fetchedCandidates[key] && fetchedCandidates[key].length) ? fetchedCandidates[key] : fallback[key]
+      fields[key].value = pickFrom(pool)
+    } else {
+      fields[key].value = ''
     }
+  }
+  compose()
+}
 
-    // DOM refs
-    const fields = {
-      character: document.getElementById('character'),
-      scene: document.getElementById('scene'),
-      background: document.getElementById('background'),
-      artstyle: document.getElementById('artstyle')
-    }
-    const toggles = {
-      character: document.getElementById('useCharacter'),
-      scene: document.getElementById('useScene'),
-      background: document.getElementById('useBackground'),
-      artstyle: document.getElementById('useArtstyle')
-    }
+el('randomBtn').addEventListener('click', randomizeWeighted)
 
-    const weights = {
-      character: document.getElementById('wCharacter'),
-      scene: document.getElementById('wScene'),
-      background: document.getElementById('wBackground'),
-      artstyle: document.getElementById('wArtstyle')
-    }
-    const offs = {
-      character: document.getElementById('offCharacter'),
-      scene: document.getElementById('offScene'),
-      background: document.getElementById('offBackground'),
-      artstyle: document.getElementById('offArtstyle')
-    }
+// ---------------------
+// Remote attribute extraction (best-effort)
+// ---------------------
+async function fetchText(url){
+  // try fetch; many sites block this; we'll handle failure gracefully
+  try{
+    const res = await fetch(url)
+    if(!res.ok) throw new Error('not ok')
+    const text = await res.text()
+    return text
+  }catch(e){
+    console.warn('fetch failed for',url,e)
+    return null
+  }
+}
 
-    const finalPreview = document.getElementById('finalPreview')
-    const promptLen = document.getElementById('promptLen')
-    const candidatesDiv = document.getElementById('candidates')
+function extractCandidatesFromHTML(html){
+  // naive heuristic: find long-ish text nodes, list items, meta description, and headings
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html,'text/html')
+  const candidates = new Set()
 
-    // Remote source URLs
-    const remote = {
-      character: 'https://texeyes.github.io/ImagePrompt/art6.html',
-      scene: 'https://texeyes.github.io/ImagePrompt/art1.html',
-      background: 'https://texeyes.github.io/ImagePrompt/art3.html',
-      artstyle: 'https://texeyes.github.io/ImagePrompt/art4.html'
-    }
+  // meta description
+  const meta = doc.querySelector('meta[name="description"]')
+  if(meta && meta.content) candidates.add(meta.content.trim())
 
-    // candidate lists
-    const candidates = {character:[], scene:[], background:[], artstyle:[]}
+  // list items
+  doc.querySelectorAll('li').forEach(li=>{
+    const t = li.textContent.trim()
+    if(t.length>20) candidates.add(t)
+  })
+  // paragraphs
+  doc.querySelectorAll('p').forEach(p=>{ const t=p.textContent.trim(); if(t.length>40) candidates.add(t) })
+  // headings
+  doc.querySelectorAll('h1,h2,h3').forEach(h=>{ const t=h.textContent.trim(); if(t.length>10) candidates.add(t) })
 
-    // Compose function — fixed and defensive
-    function compose(){
-      const parts = []
-      if(toggles.character.checked && fields.character.value.trim()) parts.push(fields.character.value.trim())
-      if(toggles.scene.checked && fields.scene.value.trim()) parts.push(fields.scene.value.trim())
-      if(toggles.background.checked && fields.background.value.trim()) parts.push(fields.background.value.trim())
-      if(toggles.artstyle.checked && fields.artstyle.value.trim()) parts.push(fields.artstyle.value.trim())
-      const prompt = parts.join(', ')
-      finalPreview.textContent = prompt || '(No parts selected or no text entered)'
-      promptLen.textContent = prompt.length
-      return prompt
-    }
+  // fallback: gather meaningful-looking comma-separated fragments
+  const bodyText = doc.body ? doc.body.innerText : ''
+  bodyText.split(/[\n\.,;]+/).forEach(chunk=>{ const s=chunk.trim(); if(s.length>30) candidates.add(s) })
 
-    document.getElementById('composeBtn').addEventListener('click', compose)
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      Object.values(fields).forEach(f=>f.value='')
-      Object.values(toggles).forEach(t=>t.checked=true)
-      compose()
-    })
+  // return as array and limit length
+  return Array.from(candidates).slice(0,40)
+}
 
-    // Add extras
-    document.getElementById('addHd')?.addEventListener('click', ()=>{ const p=compose(); finalPreview.textContent = (p? p + ', photorealistic, 8k, ultra-detailed' : 'photorealistic, 8k, ultra-detailed'); promptLen.textContent = finalPreview.textContent.length })
-    document.getElementById('addSoft')?.addEventListener('click', ()=>{ const p=compose(); finalPreview.textContent = (p? p + ', soft film grain, warm tones' : 'soft film grain, warm tones'); promptLen.textContent = finalPreview.textContent.length })
+async function pullRemoteAttributes(){
+  fetchStatus.textContent = 'Fetching...'
+  fetchedCandidates = {character:[],scene:[],background:[],artstyle:[]}
+  const mappings = {character:'character', scene:'scene', background:'background', artstyle:'artstyle'}
 
-    // Copy & download
-    document.getElementById('copyPrompt').addEventListener('click', async ()=>{
-      try{ await navigator.clipboard.writeText(finalPreview.textContent); alert('Prompt copied to clipboard') }catch{ alert('Copy failed') }
-    })
-    document.getElementById('copyJson').addEventListener('click', async ()=>{
-      const payload = makePayload();
-      try{ await navigator.clipboard.writeText(JSON.stringify(payload,null,2)); alert('JSON copied to clipboard') }catch{ alert('JSON copy failed') }
-    })
-
-    document.getElementById('downloadTxt').addEventListener('click', ()=>{
-      const p = compose(); downloadFile(p || '', 'prompt.txt', 'text/plain')
-    })
-    document.getElementById('downloadJson').addEventListener('click', ()=>{
-      downloadFile(JSON.stringify(makePayload(),null,2), 'prompt.json', 'application/json')
-    })
-
-    function downloadFile(content, filename, type){
-      const blob = new Blob([content],{type}); const url = URL.createObjectURL(blob)
-      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
-    }
-
-    function makePayload(){
-      return {
-        used: { character: toggles.character.checked, scene: toggles.scene.checked, background: toggles.background.checked, artstyle: toggles.artstyle.checked },
-        inputs: { character: fields.character.value, scene: fields.scene.value, background: fields.background.value, artstyle: fields.artstyle.value },
-        prompt: finalPreview.textContent
-      }
-    }
-
-    // Smart randomization using weights + off-chance
-    function pickWeighted(list, weight){
-      if(!list||!list.length) return ''
-      const idx = Math.floor(Math.random()*list.length)
-      return list[idx]
-    }
-
-    async function smartRandom(){
-      for(const key of ['character','scene','background','artstyle']){
-        const offChance = parseInt(offs[key].value,10)/100
-        const shouldOff = Math.random() < offChance
-        toggles[key].checked = !shouldOff
-      }
-
-      for(const key of ['character','scene','background','artstyle']){
-        const w = parseInt(weights[key].value,10)/100
-        const list = (candidates[key] && candidates[key].length) ? candidates[key] : seeds[key]
-        if(toggles[key].checked){
-          fields[key].value = pickWeighted(list, w) || ''
-        } else {
-          fields[key].value = ''
-        }
-      }
-      compose()
-    }
-
-    document.getElementById('randomBtn').addEventListener('click', smartRandom)
-
-    // Remote fetch & parsing (best-effort)
-    async function fetchCandidates(timeout=2500){
-      const controller = new AbortController();
-      const t = setTimeout(()=>controller.abort(), timeout)
+  for(const [key,url] of Object.entries(remotes)){
+    fetchStatus.textContent = `Fetching ${key}...`;
+    const html = await fetchText(url)
+    if(html){
       try{
-        const promises = Object.keys(remote).map(async (key)=>{
-          try{
-            const res = await fetch(remote[key], {signal: controller.signal, cache: 'no-store'})
-            const text = await res.text()
-            const cleaned = text.replace(/<script[\\s\\S]*?<\\/script>/gi,'').replace(/<style[\\s\\S]*?<\\/style>/gi,'')
-            const tmp = cleaned.replace(/<[^>]+>/g,' ')
-            const parts = tmp.split(/[\\n\\r,;\\t]+/).map(s=>s.trim()).filter(s=>s.length>6 && s.length<200)
-            const uniq = [...new Set(parts)].slice(0,40)
-            candidates[key] = uniq.length? uniq : seeds[key]
-          }catch(e){
-            candidates[key] = seeds[key]
-          }
-        })
-        await Promise.all(promises)
-        clearTimeout(t)
-        renderCandidates()
-        alert('Fetch complete (or fallback applied)')
+        const cands = extractCandidatesFromHTML(html)
+        // make small post-processing: if key=character, try to chunk out attribute-style lines
+        if(key==='character' && cands.length){
+          // further split long sentences by ' - ' or ' | ' or ';'
+          const expanded = []
+          cands.forEach(s=>{
+            s.split(/\|\||\-|;|\||\u2014/).forEach(part=>{ const t=part.trim(); if(t.length>20) expanded.push(t) })
+          })
+          fetchedCandidates.character = expanded.length?expanded.slice(0,60):cands
+        } else {
+          fetchedCandidates[key] = cands
+        }
       }catch(e){
-        clearTimeout(t)
-        Object.keys(seeds).forEach(k=>candidates[k]=seeds[k])
-        renderCandidates()
-        alert('Fetch timed out or blocked; using fallback seeds')
+        fetchedCandidates[key] = fallback[key]
       }
+    } else {
+      fetchedCandidates[key] = fallback[key]
     }
+  }
 
-    document.getElementById('fetchNow').addEventListener('click', ()=>{
-      const to = parseInt(document.getElementById('fetchTimeout').value,10) || 2500
-      fetchCandidates(to)
+  // build candidates UI
+  renderCandidates()
+  fetchStatus.textContent = 'Fetched (or used fallback)'
+}
+
+el('pullRemoteBtn').addEventListener('click', async ()=>{
+  await pullRemoteAttributes()
+})
+
+function renderCandidates(){
+  candidatesDiv.innerHTML = ''
+  for(const key of ['character','scene','background','artstyle']){
+    const box = document.createElement('div')
+    box.style.borderTop = '1px dashed rgba(255,255,255,0.03)'
+    box.style.paddingTop = '8px'
+    const title = document.createElement('div')
+    title.textContent = key.toUpperCase()
+    title.style.fontWeight = '700'
+    title.style.marginBottom = '6px'
+    box.appendChild(title)
+
+    const list = document.createElement('div')
+    const pool = fetchedCandidates[key].length ? fetchedCandidates[key] : fallback[key]
+    pool.slice(0,12).forEach(item=>{
+      const btn = document.createElement('button')
+      btn.className = 'ghost'
+      btn.style.width='100%'
+      btn.style.textAlign='left'
+      btn.style.marginBottom='6px'
+      btn.textContent = item.length>120 ? item.slice(0,117)+'...' : item
+      btn.title = item
+      btn.addEventListener('click', ()=>{
+        fields[key].value = item
+        toggles[key].checked = true
+        compose()
+      })
+      list.appendChild(btn)
     })
+    box.appendChild(list)
+    candidatesDiv.appendChild(box)
+  }
+}
 
-    function renderCandidates(){
-      candidatesDiv.innerHTML = ''
-      for(const key of ['character','scene','background','artstyle']){
-        const wrap = document.createElement('div')
-        wrap.style.marginBottom = '8px'
-        const title = document.createElement('div')
-        title.innerHTML = `<strong>${key}</strong>`
-        wrap.appendChild(title)
-        const list = document.createElement('div')
-        list.style.display='flex'; list.style.flexWrap='wrap'; list.style.gap='6px'; list.style.marginTop='6px'
-        const arr = candidates[key] || seeds[key]
-        arr.slice(0,18).forEach(item=>{
-          const b = document.createElement('button')
-          b.className='ghost'
-          b.style.padding='6px 8px'; b.style.fontSize='12px'
-          b.textContent = item.length>60? item.slice(0,60)+'…':item
-          b.title = item
-          b.addEventListener('click', ()=>{ fields[key].value = item; compose() })
-          list.appendChild(b)
-        })
-        wrap.appendChild(list)
-        candidatesDiv.appendChild(wrap)
-      }
-    }
+el('showCandidates').addEventListener('click', ()=>{
+  renderCandidates()
+  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})
+})
 
-    // Initial load: set candidates to seeds
-    Object.keys(seeds).forEach(k=>candidates[k]=seeds[k])
-    renderCandidates()
+// ---------------------
+// Dark mode toggle (visual only)
+// ---------------------
+el('darkModeToggle').addEventListener('change', (e)=>{
+  if(e.target.checked){
+    document.documentElement.style.setProperty('--bg','#f6f7fb')
+    // simple visual flip by inverting colors — keep subtle
+    document.body.style.filter = 'invert(0.03) hue-rotate(180deg)'
+  } else {
+    document.body.style.filter = ''
+  }
+})
 
-  </script>
+// init defaults
+compose()
+
+</script>
 </body>
 </html>
