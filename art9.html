@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Image Prompt Generator</title>
+    <style>
+        :root {
+            --color-primary: #2196F3;
+            --color-primary-hover: #1976D2;
+            --color-secondary: #FF9800;
+            --color-success: #4CAF50;
+            --color-danger: #f44336;
+            --color-bg: #f0f2f5;
+            --color-surface: #ffffff;
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-border: #dddddd;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding-bottom: 4rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .controls-top {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Panel Styling */
+        .panel {
+            background: var(--color-surface);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-top: 5px solid var(--color-primary);
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.3s ease;
+        }
+
+        .panel.disabled {
+            opacity: 0.6;
+            pointer-events: none; /* Optional: prevent interaction when disabled */
+        }
+        
+        .panel.disabled .panel-content {
+            display: none;
+        }
+
+        .panel-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .panel h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--color-success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .panel-content {
+            padding: 1.5rem;
+        }
+
+        /* Specific Border Colors */
+        .panel.character { border-top-color: #9C27B0; }
+        .panel.scene { border-top-color: #FF5722; }
+        .panel.background { border-top-color: #00BCD4; }
+        .panel.style { border-top-color: #FFEB3B; }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--color-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .output-section {
+            grid-column: 1 / -1;
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--color-border);
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            background: #fafafa;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary { background: var(--color-primary); color: white; }
+        .btn-primary:hover { background: var(--color-primary-hover); }
+
+        .btn-secondary { background: var(--color-secondary); color: white; }
+        .btn-secondary:hover { background: #e68900; }
+
+        .btn-dark { background: #333; color: white; }
+        .btn-dark:hover { background: #000; }
+
+        .btn-outline { background: transparent; border: 1px solid var(--color-border); color: var(--color-text); }
+        .btn-outline:hover { background: #f0f0f0; }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--color-text-light);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .btn-group { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎨 Ultimate ComfyUI Prompt Builder</h1>
+        <p>Generate precise, comma-separated prompts for AI image generation</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="controls-top">
+            <button class="btn btn-secondary" onclick="randomizeAll()">🎲 Randomize Prompt</button>
+            <button class="btn btn-outline" onclick="resetAll()">🔄 Reset All</button>
+        </div>
+
+        <div class="main-grid">
+            
+            <!-- CHARACTER SECTION -->
+            <div class="panel character" id="panel-character">
+                <div class="panel-header">
+                    <h2>👤 Character</h2>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleSection('character')" id="toggle-character">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="panel-content">
+                    <div class="form-group">
+                        <label>Base Model / Subject</label>
+                        <select id="charSubject" class="inp-char">
+                            <option value="">(None)</option>
+                            <option value="1girl">1girl (Female)</option>
+                            <option value="1boy">1boy (Male)</option>
+                            <option value="woman">Woman</option>
+                            <option value="man">Man</option>
+                            <option value="non-binary">Non-Binary Person</option>
+                            <option value="elf">Elf</option>
+                            <option value="dwarf">Dwarf</option>
+                            <option value="orc">Orc</option>
+                            <option value="robot">Robot/Android</option>
+                            <option value="alien">Alien</option>
+                            <option value="catgirl">Catgirl</option>
+                            <option value="demon">Demon</option>
+                            <option value="angel">Angel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Physique / Body Type</label>
+                        <select id="charBody" class="inp-char">
+                            <option value="">(Standard)</option>
+                            <option value="slim">Slim</option>
+                            <option value="athletic">Athletic</option>
+                            <option value="muscular">Muscular</option>
+                            <option value="curvy">Curvy</option>
+                            <option value="chubby">Chubby</option>
+                            <option value="tall">Tall</option>
+                            <option value="short">Short</option>
+                            <option value="gigantic">Gigantic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Skin</label>
+                        <input type="text" id="charSkin" class="inp-char" placeholder="e.g. pale skin, dark skin, blue skin, metal skin">
+                    </div>
+                    <div class="form-group">
+                        <label>Hair Style & Color</label>
+                        <input type="text" id="charHair" class="inp-char" placeholder="e.g. long flowing blonde hair, short messy black hair">
+                    </div>
+                    <div class="form-group">
+                        <label>Face & Eyes</label>
+                        <input type="text" id="charFace" class="inp-char" placeholder="e.g. sharp features, blue eyes, freckles, scar on cheek">
+                    </div>
+                    <div class="form-group">
+                        <label>Outfit / Clothing</label>
+                        <textarea id="charOutfit" class="inp-char" placeholder="e.g. ornate plate armor, casual hoodie and jeans, wizard robes"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE SECTION -->
+            <div class="panel scene" id="panel-scene">
+                <div class="panel-header">
+                    <h2>🎬 Scene & Action</h2>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleSection('scene')" id="toggle-scene">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="panel-content">
+                    <div class="form-group">
+                        <label>Pose / Action</label>
+                        <select id="sceneAction" class="inp-scene">
+                            <option value="">(Static)</option>
+                            <option value="standing">Standing</option>
+                            <option value="sitting">Sitting</option>
+                            <option value="walking">Walking</option>
+                            <option value="running">Running</option>
+                            <option value="flying">Flying</option>
+                            <option value="fighting stance">Fighting Stance</option>
+                            <option value="kneeling">Kneeling</option>
+                            <option value="laying down">Laying Down</option>
+                            <option value="dynamic pose">Dynamic Pose</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Framing / Camera</label>
+                        <select id="sceneCamera" class="inp-scene">
+                            <option value="">(Default)</option>
+                            <option value="portrait">Portrait</option>
+                            <option value="close up">Close Up</option>
+                            <option value="upper body">Upper Body</option>
+                            <option value="full body">Full Body</option>
+                            <option value="wide shot">Wide Shot</option>
+                            <option value="from below">From Below (Low Angle)</option>
+                            <option value="from above">From Above (High Angle)</option>
+                            <option value="dutch angle">Dutch Angle</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Lighting</label>
+                        <input type="text" id="sceneLighting" class="inp-scene" placeholder="e.g. cinematic lighting, volumetric lighting, bioluminescence">
+                    </div>
+                </div>
+            </div>
+
+            <!-- BACKGROUND SECTION -->
+            <div class="panel background" id="panel-background">
+                <div class="panel-header">
+                    <h2>🏞️ Background</h2>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleSection('background')" id="toggle-background">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="panel-content">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select id="bgLocation" class="inp-bg">
+                            <option value="">(None/Simple)</option>
+                            <option value="simple background">Simple Background</option>
+                            <option value="white background">White Background</option>
+                            <option value="forest">Forest</option>
+                            <option value="city street">City Street</option>
+                            <option value="cyberpunk city">Cyberpunk City</option>
+                            <option value="medieval castle">Medieval Castle</option>
+                            <option value="bedroom">Bedroom</option>
+                            <option value="beach">Beach</option>
+                            <option value="space station">Space Station</option>
+                            <option value="ruins">Ancient Ruins</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Environment Details</label>
+                        <textarea id="bgDetails" class="inp-bg" placeholder="e.g. raining, night time, neon signs, trees, flowers"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ART STYLE SECTION -->
+            <div class="panel style" id="panel-style">
+                <div class="panel-header">
+                    <h2>🎨 Art Style</h2>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onchange="toggleSection('style')" id="toggle-style">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="panel-content">
+                    <div class="form-group">
+                        <label>Medium</label>
+                        <select id="styleMedium" class="inp-style">
+                            <option value="photorealistic">Photorealistic / Photograph</option>
+                            <option value="anime">Anime / Manga</option>
+                            <option value="digital illustration">Digital Illustration</option>
+                            <option value="oil painting">Oil Painting</option>
+                            <option value="3D render">3D Render (Octane/Unreal)</option>
+                            <option value="concept art">Concept Art</option>
+                            <option value="pixel art">Pixel Art</option>
+                            <option value="pencil sketch">Pencil Sketch</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Visual Quality Tags</label>
+                        <input type="text" id="styleQuality" class="inp-style" value="masterpiece, best quality, highly detailed, 8k, sharp focus">
+                    </div>
+                    <div class="form-group">
+                        <label>Artist Inspiration (Optional)</label>
+                        <input type="text" id="styleArtist" class="inp-style" placeholder="e.g. style of Greg Rutkowski, Studio Ghibli">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- OUTPUT SECTION -->
+        <div class="output-section">
+            <div class="output-header">
+                <h2>Generated Prompt</h2>
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="switchTab('positive')">Positive</button>
+                    <button class="tab-btn" onclick="switchTab('negative')">Negative</button>
+                </div>
+            </div>
+
+            <div id="tab-positive" class="tab-content active">
+                <div class="prompt-box">
+                    <textarea id="finalPositive" class="prompt-textarea" readonly></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyText('finalPositive')">📋 Copy Text</button>
+                    <button class="btn btn-dark" onclick="copyJSON()">DATA Copy JSON</button>
+                </div>
+            </div>
+
+            <div id="tab-negative" class="tab-content">
+                <div class="prompt-box">
+                    <textarea id="finalNegative" class="prompt-textarea">nsfw, low quality, worst quality, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, jpeg artifacts, signature, watermark, username, blurry</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyText('finalNegative')">📋 Copy Text</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Data for Randomizer ---
+        const randomData = {
+            charSubject: ['1girl', '1boy', 'woman', 'man', 'elf', 'orc', 'cyberpunk android', 'wizard', 'knight'],
+            charBody: ['slim', 'athletic', 'muscular', 'curvy', 'tall'],
+            charSkin: ['pale skin', 'tan skin', 'dark skin', 'rough skin'],
+            charHair: ['long blonde hair', 'short black hair', 'messy red hair', 'white braided hair', 'blue bob cut'],
+            charFace: ['blue eyes', 'red eyes', 'heterochromia', 'scar on face', 'freckles', 'makeup'],
+            charOutfit: ['casual clothes', 'heavy armor', 'sci-fi suit', 'wizard robes', 'summer dress', 'tactical gear'],
+            
+            sceneAction: ['standing', 'sitting', 'fighting stance', 'walking', 'looking at viewer'],
+            sceneCamera: ['upper body', 'full body', 'close up', 'cinematic shot', 'wide shot'],
+            sceneLighting: ['cinematic lighting', 'soft lighting', 'golden hour', 'neon lights', 'dark moody lighting'],
+            
+            bgLocation: ['forest', 'city street', 'space station', 'fantasy ruins', 'bedroom', 'castle throne room'],
+            bgDetails: ['rain', 'snow', 'cherry blossoms', 'fire particles', 'fog', 'sunset'],
+            
+            styleMedium: ['photorealistic', 'anime', 'digital illustration', 'oil painting', '3D render'],
+            styleArtist: ['style of Greg Rutkowski', 'style of Artgerm', 'Studio Ghibli style', 'Cyberpunk 2077 style', '']
+        };
+
+        // --- Core Logic ---
+
+        function toggleSection(section) {
+            const checkbox = document.getElementById(`toggle-${section}`);
+            const panel = document.getElementById(`panel-${section}`);
+            
+            if (checkbox.checked) {
+                panel.classList.remove('disabled');
+            } else {
+                panel.classList.add('disabled');
+            }
+            generatePrompt();
+        }
+
+        function collectValues(className) {
+            const inputs = document.querySelectorAll(`.${className}`);
+            let tags = [];
+            inputs.forEach(input => {
+                if (input.value.trim() !== "") {
+                    // Split by comma in case user typed "red hair, blue eyes"
+                    const parts = input.value.split(',').map(s => s.trim()).filter(s => s !== "");
+                    tags.push(...parts);
+                }
+            });
+            return tags;
+        }
+
+        function generatePrompt() {
+            let finalTags = [];
+
+            // Character
+            if (document.getElementById('toggle-character').checked) {
+                finalTags.push(...collectValues('inp-char'));
+            }
+
+            // Scene
+            if (document.getElementById('toggle-scene').checked) {
+                finalTags.push(...collectValues('inp-scene'));
+            }
+
+            // Background
+            if (document.getElementById('toggle-background').checked) {
+                finalTags.push(...collectValues('inp-bg'));
+            }
+
+            // Style
+            if (document.getElementById('toggle-style').checked) {
+                finalTags.push(...collectValues('inp-style'));
+            }
+
+            // Join with comma + space
+            const promptString = finalTags.join(', ');
+            document.getElementById('finalPositive').value = promptString;
+        }
+
+        function randomizeAll() {
+            // Helper to pick random array element
+            const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            
+            // 1. Randomize Toggles (Weighted: 80% chance to be ON)
+            ['character', 'scene', 'background', 'style'].forEach(sec => {
+                const toggle = document.getElementById(`toggle-${sec}`);
+                // Always keep Style on mostly, others vary
+                const chance = sec === 'style' ? 0.95 : 0.8; 
+                toggle.checked = Math.random() < chance;
+                toggleSection(sec);
+            });
+
+            // 2. Fill Fields (with chance to skip optional ones)
+            
+            // Character
+            document.getElementById('charSubject').value = pick(randomData.charSubject);
+            document.getElementById('charBody').value = Math.random() > 0.3 ? pick(randomData.charBody) : "";
+            document.getElementById('charSkin').value = Math.random() > 0.5 ? pick(randomData.charSkin) : "";
+            document.getElementById('charHair').value = pick(randomData.charHair);
+            document.getElementById('charFace').value = Math.random() > 0.4 ? pick(randomData.charFace) : "";
+            document.getElementById('charOutfit').value = pick(randomData.charOutfit);
+
+            // Scene
+            document.getElementById('sceneAction').value = Math.random() > 0.2 ? pick(randomData.sceneAction) : "";
+            document.getElementById('sceneCamera').value = Math.random() > 0.3 ? pick(randomData.sceneCamera) : "";
+            document.getElementById('sceneLighting').value = Math.random() > 0.3 ? pick(randomData.sceneLighting) : "";
+
+            // Background
+            document.getElementById('bgLocation').value = pick(randomData.bgLocation);
+            document.getElementById('bgDetails').value = Math.random() > 0.4 ? pick(randomData.bgDetails) : "";
+
+            // Style
+            document.getElementById('styleMedium').value = pick(randomData.styleMedium);
+            document.getElementById('styleArtist').value = Math.random() > 0.6 ? pick(randomData.styleArtist) : "";
+            
+            // Always reset quality to default high standard
+            document.getElementById('styleQuality').value = "masterpiece, best quality, highly detailed, 8k";
+
+            generatePrompt();
+        }
+
+        function resetAll() {
+            const inputs = document.querySelectorAll('input[type="text"], textarea, select');
+            inputs.forEach(input => {
+                // Don't clear the negative prompt
+                if(input.id !== 'finalNegative' && input.id !== 'styleQuality') input.value = "";
+            });
+            document.getElementById('styleQuality').value = "masterpiece, best quality, highly detailed, 8k";
+            
+            // Reset Toggles
+            ['character', 'scene', 'background', 'style'].forEach(sec => {
+                document.getElementById(`toggle-${sec}`).checked = true;
+                toggleSection(sec);
+            });
+            
+            generatePrompt();
+        }
+
+        // --- Output Functions ---
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function copyText(id) {
+            const text = document.getElementById(id).value;
+            try {
+                await navigator.clipboard.writeText(text);
+                alert("Copied to clipboard!");
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+        }
+
+        async function copyJSON() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                positive: document.getElementById('finalPositive').value,
+                negative: document.getElementById('finalNegative').value,
+                sections_enabled: {
+                    character: document.getElementById('toggle-character').checked,
+                    scene: document.getElementById('toggle-scene').checked,
+                    background: document.getElementById('toggle-background').checked,
+                    style: document.getElementById('toggle-style').checked
+                }
+            };
+            
+            const jsonString = JSON.stringify(data, null, 2);
+            try {
+                await navigator.clipboard.writeText(jsonString);
+                alert("JSON copied to clipboard!");
+            } catch (err) {
+                console.error('Failed to copy JSON', err);
+            }
+        }
+
+        // Initialize listeners
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('input', generatePrompt);
+        });
+
+        // Initial Generation
+        generatePrompt();
+
+    </script>
+</body>
+</html>
