@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Image Prompt Generator</title>
+    <style>
+        :root {
+            --color-primary: #2196F3;
+            --color-primary-hover: #1976D2;
+            --color-secondary: #FF9800;
+            --color-success: #4CAF50;
+            --color-danger: #f44336;
+            --color-bg: #f5f5f5;
+            --color-surface: #ffffff;
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-border: #dddddd;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .panel.character {
+            border-left-color: #9C27B0;
+        }
+
+        .panel.scene {
+            border-left-color: #FF5722;
+        }
+
+        .panel.background {
+            border-left-color: #00BCD4;
+        }
+
+        .panel.style {
+            border-left-color: #FFEB3B;
+        }
+
+        .panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #F57C00;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-copy {
+            background-color: #2196F3;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-copy:hover {
+            background-color: #1976D2;
+        }
+
+        .btn-clear {
+            background-color: #999;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #777;
+        }
+
+        .output-section {
+            grid-column: 1 / -1;
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--color-success);
+        }
+
+        .output-section h2 {
+            margin-bottom: 1rem;
+            color: var(--color-success);
+            font-size: 1.5rem;
+        }
+
+        .prompt-display {
+            background: #f9f9f9;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+            word-break: break-word;
+            min-height: 120px;
+        }
+
+        .prompt-display.empty {
+            color: var(--color-text-light);
+            font-style: italic;
+        }
+
+        .preview-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .preview-section h3 {
+            margin-bottom: 0.5rem;
+            color: var(--color-primary);
+        }
+
+        .preview-text {
+            font-size: 0.95rem;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .copy-success {
+            color: var(--color-success);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .section-divider {
+            grid-column: 1 / -1;
+            border-top: 2px solid var(--color-border);
+            margin: 1rem 0;
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--color-text-light);
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-button:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+
+        footer {
+            background-color: var(--color-text);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg: #1e1e1e;
+                --color-surface: #2d2d2d;
+                --color-text: #e0e0e0;
+                --color-text-light: #aaaaaa;
+                --color-border: #444444;
+            }
+
+            .prompt-display {
+                background: #1a1a1a;
+                color: #e0e0e0;
+            }
+
+            .preview-section {
+                background: #1a2a3a;
+                color: #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎨 Complete Image Prompt Generator</h1>
+        <p>Create amazing AI art prompts by combining character, scene, background, and style</p>
+    </header>
+
+    <div class="container">
+        <div class="alert alert-info">
+            <strong>How it works:</strong> Fill in each section below, then click "Generate Complete Prompt" to create your final image prompt. Copy and use it with ComfyUI, Stable Diffusion, or any AI image generator!
+        </div>
+
+        <div class="main-grid">
+            <!-- CHARACTER SECTION -->
+            <div class="panel character">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">👤 Character</h2>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="toggleCharacter" checked onchange="generatePrompt()">
+                        <span style="font-size: 0.9rem;">Enable</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="charRace">Race/Species</label>
+                    <select id="charRace">
+                        <option value="">Select a race...</option>
+                        <option value="human">Human</option>
+                        <option value="elf">Elf</option>
+                        <option value="dwarf">Dwarf</option>
+                        <option value="orc">Orc</option>
+                        <option value="tiefling">Tiefling</option>
+                        <option value="dragonborn">Dragonborn</option>
+                        <option value="halfling">Halfling</option>
+                        <option value="gnome">Gnome</option>
+                        <option value="half-orc">Half-Orc</option>
+                        <option value="half-elf">Half-Elf</option>
+                        <option value="fairy">Fairy</option>
+                        <option value="demon">Demon</option>
+                        <option value="angel">Angel</option>
+                        <option value="undead">Undead</option>
+                        <option value="android">Android</option>
+                        <option value="alien">Alien</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="charGender">Gender/Appearance</label>
+                    <select id="charGender">
+                        <option value="">Select appearance...</option>
+                        <option value="masculine">Masculine</option>
+                        <option value="feminine">Feminine</option>
+                        <option value="androgynous">Androgynous</option>
+                        <option value="non-binary">Non-binary</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="charAge">Age Group</label>
+                    <select id="charAge">
+                        <option value="">Select age...</option>
+                        <option value="child">Child</option>
+                        <option value="young adult">Young Adult</option>
+                        <option value="adult">Adult</option>
+                        <option value="middle-aged">Middle-aged</option>
+                        <option value="elder">Elder</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="charClass">Class/Profession</label>
+                    <select id="charClass">
+                        <option value="">Select class...</option>
+                        <option value="warrior">Warrior</option>
+                        <option value="mage">Mage</option>
+                        <option value="rogue">Rogue</option>
+                        <option value="paladin">Paladin</option>
+                        <option value="ranger">Ranger</option>
+                        <option value="cleric">Cleric</option>
+                        <option value="bard">Bard</option>
+                        <option value="sorcerer">Sorcerer</option>
+                        <option value="monk">Monk</option>
+                        <option value="warlock">Warlock</option>
+                        <option value="merchant">Merchant</option>
+                        <option value="peasant">Peasant</option>
+                        <option value="noble">Noble</option>
+                        <option value="assassin">Assassin</option>
+                        <option value="scholar">Scholar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="charAppearance">Physical Traits</label>
+                    <textarea id="charAppearance" placeholder="e.g., scarred face, blue eyes, long silver hair, muscular build"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="charExpression">Expression/Mood</label>
+                    <select id="charExpression">
+                        <option value="">Select expression...</option>
+                        <option value="serious">Serious</option>
+                        <option value="smiling">Smiling</option>
+                        <option value="angry">Angry</option>
+                        <option value="sad">Sad</option>
+                        <option value="surprised">Surprised</option>
+                        <option value="confident">Confident</option>
+                        <option value="mysterious">Mysterious</option>
+                        <option value="peaceful">Peaceful</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SCENE SECTION -->
+            <div class="panel scene">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">🎬 Scene & Action</h2>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="toggleScene" checked onchange="generatePrompt()">
+                        <span style="font-size: 0.9rem;">Enable</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="sceneAction">Primary Action</label>
+                    <select id="sceneAction">
+                        <option value="">Select action...</option>
+                        <option value="standing">Standing</option>
+                        <option value="walking">Walking</option>
+                        <option value="running">Running</option>
+                        <option value="sitting">Sitting</option>
+                        <option value="lying down">Lying Down</option>
+                        <option value="fighting">Fighting</option>
+                        <option value="casting spell">Casting Spell</option>
+                        <option value="meditating">Meditating</option>
+                        <option value="dancing">Dancing</option>
+                        <option value="crafting">Crafting</option>
+                        <option value="riding">Riding</option>
+                        <option value="flying">Flying</option>
+                        <option value="swimming">Swimming</option>
+                        <option value="climbing">Climbing</option>
+                        <option value="sleeping">Sleeping</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sceneTime">Time of Day</label>
+                    <select id="sceneTime">
+                        <option value="">Select time...</option>
+                        <option value="dawn">Dawn</option>
+                        <option value="morning">Morning</option>
+                        <option value="midday">Midday</option>
+                        <option value="afternoon">Afternoon</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="dusk">Dusk</option>
+                        <option value="night">Night</option>
+                        <option value="midnight">Midnight</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sceneWeather">Weather/Atmosphere</label>
+                    <select id="sceneWeather">
+                        <option value="">Select weather...</option>
+                        <option value="clear">Clear</option>
+                        <option value="cloudy">Cloudy</option>
+                        <option value="rainy">Rainy</option>
+                        <option value="stormy">Stormy</option>
+                        <option value="snowy">Snowy</option>
+                        <option value="foggy">Foggy</option>
+                        <option value="misty">Misty</option>
+                        <option value="magical aurora">Magical Aurora</option>
+                        <option value="dusty">Dusty</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sceneLighting">Lighting</label>
+                    <select id="sceneLighting">
+                        <option value="">Select lighting...</option>
+                        <option value="bright daylight">Bright Daylight</option>
+                        <option value="soft light">Soft Light</option>
+                        <option value="golden hour">Golden Hour</option>
+                        <option value="blue hour">Blue Hour</option>
+                        <option value="dim">Dim</option>
+                        <option value="dark">Dark</option>
+                        <option value="torch light">Torch Light</option>
+                        <option value="neon">Neon</option>
+                        <option value="magical glow">Magical Glow</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sceneDetails">Scene Details & Composition</label>
+                    <textarea id="sceneDetails" placeholder="e.g., standing on a cliff overlooking mountains, holding a sword, with companions nearby"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="sceneMood">Mood/Atmosphere</label>
+                    <select id="sceneMood">
+                        <option value="">Select mood...</option>
+                        <option value="peaceful">Peaceful</option>
+                        <option value="chaotic">Chaotic</option>
+                        <option value="tense">Tense</option>
+                        <option value="magical">Magical</option>
+                        <option value="dark">Dark</option>
+                        <option value="epic">Epic</option>
+                        <option value="mystical">Mystical</option>
+                        <option value="romantic">Romantic</option>
+                        <option value="ominous">Ominous</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- BACKGROUND SECTION -->
+            <div class="panel background">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">🏞️ Background & Location</h2>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="toggleBackground" checked onchange="generatePrompt()">
+                        <span style="font-size: 0.9rem;">Enable</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="bgLocation">Location Type</label>
+                    <select id="bgLocation">
+                        <option value="">Select location...</option>
+                        <option value="forest">Forest</option>
+                        <option value="mountain">Mountain</option>
+                        <option value="castle">Castle</option>
+                        <option value="city">City</option>
+                        <option value="desert">Desert</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="cave">Cave</option>
+                        <option value="temple">Temple</option>
+                        <option value="village">Village</option>
+                        <option value="dungeon">Dungeon</option>
+                        <option value="tavern">Tavern</option>
+                        <option value="marketplace">Marketplace</option>
+                        <option value="throne room">Throne Room</option>
+                        <option value="observatory">Observatory</option>
+                        <option value="gardens">Gardens</option>
+                        <option value="cemetery">Cemetery</option>
+                        <option value="portal">Portal/Dimension</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bgEra">Era/Period</label>
+                    <select id="bgEra">
+                        <option value="">Select era...</option>
+                        <option value="medieval">Medieval</option>
+                        <option value="renaissance">Renaissance</option>
+                        <option value="victorian">Victorian</option>
+                        <option value="steampunk">Steampunk</option>
+                        <option value="modern">Modern</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="post-apocalyptic">Post-apocalyptic</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="sci-fi">Sci-fi</option>
+                        <option value="ancient">Ancient</option>
+                        <option value="timeless">Timeless</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bgDetails">Detailed Environment</label>
+                    <textarea id="bgDetails" placeholder="e.g., ancient stone ruins covered in moss, glowing runes on walls, magical crystals emitting blue light"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="bgElements">Background Elements</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bgStructures" value="structures">
+                            <label for="bgStructures">Structures</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bgNature" value="nature">
+                            <label for="bgNature">Nature</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bgWater" value="water">
+                            <label for="bgWater">Water</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bgSky" value="sky">
+                            <label for="bgSky">Sky</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bgParticles" value="particles">
+                            <label for="bgParticles">Particles/Effects</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bgCreatures" value="creatures">
+                            <label for="bgCreatures">Creatures</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bgPerspective">Perspective/Depth</label>
+                    <select id="bgPerspective">
+                        <option value="">Select perspective...</option>
+                        <option value="close-up">Close-up</option>
+                        <option value="medium shot">Medium Shot</option>
+                        <option value="wide shot">Wide Shot</option>
+                        <option value="panoramic">Panoramic</option>
+                        <option value="bird's eye">Bird's Eye</option>
+                        <option value="worm's eye">Worm's Eye</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- STYLE SECTION -->
+            <div class="panel style">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">🎨 Art Style</h2>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; margin: 0;">
+                        <input type="checkbox" id="toggleStyle" checked onchange="generatePrompt()">
+                        <span style="font-size: 0.9rem;">Enable</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="styleArtist">Art Style/Artist</label>
+                    <select id="styleArtist">
+                        <option value="">Select style...</option>
+                        <option value="photorealistic">Photorealistic</option>
+                        <option value="oil painting">Oil Painting</option>
+                        <option value="watercolor">Watercolor</option>
+                        <option value="digital painting">Digital Painting</option>
+                        <option value="anime">Anime</option>
+                        <option value="manga">Manga</option>
+                        <option value="comic book">Comic Book</option>
+                        <option value="concept art">Concept Art</option>
+                        <option value="illustration">Illustration</option>
+                        <option value="3D render">3D Render</option>
+                        <option value="pixelart">Pixelart</option>
+                        <option value="pencil sketch">Pencil Sketch</option>
+                        <option value="charcoal">Charcoal</option>
+                        <option value="ink">Ink</option>
+                        <option value="fantasy art">Fantasy Art</option>
+                        <option value="steampunk art">Steampunk Art</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="styleArtistName">Inspired By Artist</label>
+                    <input type="text" id="styleArtistName" placeholder="e.g., Greg Rutkowski, Artgerm, trending on ArtStation">
+                </div>
+
+                <div class="form-group">
+                    <label for="styleQuality">Quality/Detail Level</label>
+                    <select id="styleQuality">
+                        <option value="">Select quality...</option>
+                        <option value="rough sketch">Rough Sketch</option>
+                        <option value="sketch">Sketch</option>
+                        <option value="painting">Painting</option>
+                        <option value="detailed">Detailed</option>
+                        <option value="highly detailed">Highly Detailed</option>
+                        <option value="ultra detailed">Ultra Detailed</option>
+                        <option value="masterpiece">Masterpiece</option>
+                        <option value="8k">8K</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="styleColors">Color Palette</label>
+                    <select id="styleColors">
+                        <option value="">Select colors...</option>
+                        <option value="vibrant colors">Vibrant Colors</option>
+                        <option value="pastel colors">Pastel Colors</option>
+                        <option value="muted colors">Muted Colors</option>
+                        <option value="warm colors">Warm Colors</option>
+                        <option value="cool colors">Cool Colors</option>
+                        <option value="black and white">Black and White</option>
+                        <option value="sepia tone">Sepia Tone</option>
+                        <option value="neon colors">Neon Colors</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="styleMood">Visual Mood</label>
+                    <select id="styleMood">
+                        <option value="">Select mood...</option>
+                        <option value="bright">Bright</option>
+                        <option value="dark">Dark</option>
+                        <option value="moody">Moody</option>
+                        <option value="ethereal">Ethereal</option>
+                        <option value="cinematic">Cinematic</option>
+                        <option value="dreamlike">Dreamlike</option>
+                        <option value="surreal">Surreal</option>
+                        <option value="cyberpunk neon">Cyberpunk Neon</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="styleModifiers">Additional Modifiers</label>
+                    <textarea id="styleModifiers" placeholder="e.g., ray tracing, volumetric lighting, subsurface scattering, depth of field"></textarea>
+                </div>
+            </div>
+
+            <!-- OUTPUT SECTION -->
+            <div class="output-section">
+                <h2>✨ Your Complete Prompt</h2>
+                
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab(event, 'positive')">📝 Positive Prompt</button>
+                    <button class="tab-button" onclick="switchTab(event, 'negative')">🚫 Negative Prompt</button>
+                    <button class="tab-button" onclick="switchTab(event, 'preview')">👁️ Preview</button>
+                </div>
+
+                <div id="positive" class="tab-content active">
+                    <div class="prompt-display empty" id="positivePrompt">Your positive prompt will appear here...</div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn-primary btn-copy" onclick="copyToClipboard('positivePrompt')">📋 Copy Text</button>
+                        <button class="btn-primary btn-copy" onclick="copyAsJSON('positivePrompt', 'negativePrompt')">📦 Copy as JSON</button>
+                    </div>
+                    <div class="copy-success" id="copySucess1"></div>
+                </div>
+
+                <div id="negative" class="tab-content">
+                    <div class="prompt-display empty" id="negativePrompt">Your negative prompt will appear here...</div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn-primary btn-copy" onclick="copyToClipboard('negativePrompt')">📋 Copy Text</button>
+                        <button class="btn-primary btn-copy" onclick="copyAsJSON('negativePrompt')">📦 Copy as JSON</button>
+                    </div>
+                    <div class="copy-success" id="copySucess2"></div>
+                </div>
+
+                <div id="preview" class="tab-content">
+                    <div class="preview-section">
+                        <h3>Summary of Your Creation</h3>
+                        <div class="preview-text" id="previewText">Your preview will appear here...</div>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Positive Words</div>
+                        <div class="stat-value" id="positiveWords">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Negative Words</div>
+                        <div class="stat-value" id="negativeWords">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Total Length</div>
+                        <div class="stat-value" id="totalLength">0</div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-success" onclick="generatePrompt()">🚀 Generate Complete Prompt</button>
+                    <button class="btn-secondary" onclick="generateRandomPrompt()">🎲 Random Prompt</button>
+                    <button class="btn-clear" onclick="clearAll()">🔄 Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Complete Image Prompt Generator • Perfect for ComfyUI, Stable Diffusion, DALL-E, and Midjourney</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">Built for AI creators • <a href="https://github.com">Open Source</a></p>
+    </footer>
+
+    <script>
+        // Default negative prompt terms
+        const DEFAULT_NEGATIVE = [
+            "blurry", "low quality", "distorted", "disfigured", 
+            "deformed", "ugly", "bad anatomy", "bad proportions",
+            "missing limbs", "extra limbs", "mutated", "unnatural",
+            "poorly drawn", "bad hands", "bad feet", "bad face",
+            "text", "watermark", "signature", "grainy", "pixelated"
+        ];
+
+        function generatePrompt() {
+            // Check which sections are enabled
+            const charEnabled = document.getElementById('toggleCharacter').checked;
+            const sceneEnabled = document.getElementById('toggleScene').checked;
+            const bgEnabled = document.getElementById('toggleBackground').checked;
+            const styleEnabled = document.getElementById('toggleStyle').checked;
+
+            // Character
+            const charRace = charEnabled ? document.getElementById('charRace').value : '';
+            const charGender = charEnabled ? document.getElementById('charGender').value : '';
+            const charAge = charEnabled ? document.getElementById('charAge').value : '';
+            const charClass = charEnabled ? document.getElementById('charClass').value : '';
+            const charAppearance = charEnabled ? document.getElementById('charAppearance').value : '';
+            const charExpression = charEnabled ? document.getElementById('charExpression').value : '';
+
+            // Scene
+            const sceneAction = sceneEnabled ? document.getElementById('sceneAction').value : '';
+            const sceneTime = sceneEnabled ? document.getElementById('sceneTime').value : '';
+            const sceneWeather = sceneEnabled ? document.getElementById('sceneWeather').value : '';
+            const sceneLighting = sceneEnabled ? document.getElementById('sceneLighting').value : '';
+            const sceneDetails = sceneEnabled ? document.getElementById('sceneDetails').value : '';
+            const sceneMood = sceneEnabled ? document.getElementById('sceneMood').value : '';
+
+            // Background
+            const bgLocation = bgEnabled ? document.getElementById('bgLocation').value : '';
+            const bgEra = bgEnabled ? document.getElementById('bgEra').value : '';
+            const bgDetails = bgEnabled ? document.getElementById('bgDetails').value : '';
+            const bgElements = bgEnabled ? Array.from(document.querySelectorAll('input[id^="bg"]:checked')).map(el => el.value).join(', ') : '';
+            const bgPerspective = bgEnabled ? document.getElementById('bgPerspective').value : '';
+
+            // Style
+            const styleArtist = styleEnabled ? document.getElementById('styleArtist').value : '';
+            const styleArtistName = styleEnabled ? document.getElementById('styleArtistName').value : '';
+            const styleQuality = styleEnabled ? document.getElementById('styleQuality').value : '';
+            const styleColors = styleEnabled ? document.getElementById('styleColors').value : '';
+            const styleMood = styleEnabled ? document.getElementById('styleMood').value : '';
+            const styleModifiers = styleEnabled ? document.getElementById('styleModifiers').value : '';
+
+            // Build positive prompt
+            let positivePrompt = [];
+
+            if (charRace) positivePrompt.push(charRace);
+            if (charGender) positivePrompt.push(charGender);
+            if (charAge) positivePrompt.push(charAge);
+            if (charClass) positivePrompt.push(charClass + " character");
+            if (charAppearance) positivePrompt.push(charAppearance);
+            if (charExpression) positivePrompt.push(charExpression + " expression");
+
+            if (positivePrompt.length > 0) positivePrompt.push("|");
+
+            if (sceneAction) positivePrompt.push(sceneAction);
+            if (sceneMood) positivePrompt.push(sceneMood + " atmosphere");
+            if (sceneDetails) positivePrompt.push(sceneDetails);
+            if (sceneTime) positivePrompt.push(sceneTime);
+            if (sceneLighting) positivePrompt.push(sceneLighting);
+            if (sceneWeather && sceneWeather !== "clear") positivePrompt.push(sceneWeather + " weather");
+
+            if (positivePrompt[positivePrompt.length - 1] !== "|") positivePrompt.push("|");
+
+            if (bgLocation) positivePrompt.push(bgLocation);
+            if (bgEra) positivePrompt.push(bgEra + " setting");
+            if (bgDetails) positivePrompt.push(bgDetails);
+            if (bgElements) positivePrompt.push(bgElements);
+            if (bgPerspective) positivePrompt.push(bgPerspective + " shot");
+
+            if (positivePrompt[positivePrompt.length - 1] !== "|") positivePrompt.push("|");
+
+            if (styleQuality) positivePrompt.push(styleQuality);
+            if (styleArtist) positivePrompt.push(styleArtist);
+            if (styleArtistName) positivePrompt.push("by " + styleArtistName);
+            if (styleColors) positivePrompt.push(styleColors);
+            if (styleMood) positivePrompt.push(styleMood + " lighting");
+            if (styleModifiers) positivePrompt.push(styleModifiers);
+
+            const positive = positivePrompt.filter(item => item && item !== "|").join(", ");
+            const negative = DEFAULT_NEGATIVE.join(", ");
+
+            // Create preview text
+            const previewParts = [
+                charRace && `<strong>Character:</strong> ${charRace}${charGender ? ', ' + charGender : ''}${charClass ? ', ' + charClass : ''}`,
+                sceneAction && `<strong>Action:</strong> ${sceneAction}${sceneTime ? ' at ' + sceneTime : ''}`,
+                bgLocation && `<strong>Location:</strong> ${bgLocation}${bgEra ? ' (' + bgEra + ')' : ''}`,
+                styleArtist && `<strong>Style:</strong> ${styleArtist}${styleQuality ? ', ' + styleQuality : ''}`
+            ].filter(Boolean);
+
+            // Update display
+            document.getElementById('positivePrompt').textContent = positive;
+            document.getElementById('positivePrompt').classList.remove('empty');
+            document.getElementById('negativePrompt').textContent = negative;
+            document.getElementById('negativePrompt').classList.remove('empty');
+            document.getElementById('previewText').innerHTML = previewParts.join('<br><br>');
+
+            // Update stats
+            const positiveWordsCount = positive.split(/\s+/).length;
+            const negativeWordsCount = negative.split(/\s+/).length;
+            document.getElementById('positiveWords').textContent = positiveWordsCount;
+            document.getElementById('negativeWords').textContent = negativeWordsCount;
+            document.getElementById('totalLength').textContent = positiveWordsCount + negativeWordsCount;
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const successEl = elementId === 'positivePrompt' ? document.getElementById('copySucess1') : document.getElementById('copySucess2');
+                successEl.textContent = '✓ Copied to clipboard!';
+                setTimeout(() => {
+                    successEl.textContent = '';
+                }, 2000);
+            });
+        }
+
+        function clearAll() {
+            document.querySelectorAll('select').forEach(el => el.value = '');
+            document.querySelectorAll('textarea').forEach(el => el.value = '');
+            document.querySelectorAll('input[type="checkbox"]:not([id^="toggle"])').forEach(el => el.checked = false);
+            
+            document.getElementById('positivePrompt').textContent = 'Your positive prompt will appear here...';
+            document.getElementById('positivePrompt').classList.add('empty');
+            document.getElementById('negativePrompt').textContent = 'Your negative prompt will appear here...';
+            document.getElementById('negativePrompt').classList.add('empty');
+            document.getElementById('previewText').textContent = 'Your preview will appear here...';
+            
+            document.getElementById('positiveWords').textContent = '0';
+            document.getElementById('negativeWords').textContent = '0';
+            document.getElementById('totalLength').textContent = '0';
+        }
+
+        function generateRandomPrompt() {
+            // Randomly decide which sections to enable (70% chance each section is enabled)
+            document.getElementById('toggleCharacter').checked = Math.random() > 0.3;
+            document.getElementById('toggleScene').checked = Math.random() > 0.3;
+            document.getElementById('toggleBackground').checked = Math.random() > 0.3;
+            document.getElementById('toggleStyle').checked = Math.random() > 0.3;
+
+            // Character
+            const charRaces = ['human', 'elf', 'dwarf', 'orc', 'tiefling', 'dragonborn', 'halfling', 'gnome', 'fairy', 'android'];
+            const charGenders = ['masculine', 'feminine', 'androgynous', 'non-binary'];
+            const charAges = ['child', 'young adult', 'adult', 'middle-aged', 'elder'];
+            const charClasses = ['warrior', 'mage', 'rogue', 'paladin', 'ranger', 'cleric', 'bard', 'sorcerer', 'monk', 'warlock', 'merchant', 'noble', 'scholar'];
+            const charExpressions = ['serious', 'smiling', 'angry', 'mysterious', 'confident', 'peaceful'];
+
+            const sceneActions = ['standing', 'walking', 'fighting', 'casting spell', 'meditating', 'dancing', 'flying', 'swimming', 'climbing', 'riding'];
+            const sceneTimes = ['dawn', 'morning', 'afternoon', 'sunset', 'night', 'midnight'];
+            const sceneWeathers = ['clear', 'rainy', 'stormy', 'snowy', 'foggy', 'misty'];
+            const sceneLightings = ['bright daylight', 'soft light', 'golden hour', 'blue hour', 'dim', 'torch light', 'neon', 'magical glow'];
+            const sceneMoods = ['peaceful', 'chaotic', 'tense', 'magical', 'dark', 'epic', 'mystical', 'romantic'];
+
+            const bgLocations = ['forest', 'mountain', 'castle', 'city', 'desert', 'ocean', 'cave', 'temple', 'village', 'dungeon', 'tavern', 'marketplace', 'gardens'];
+            const bgEras = ['medieval', 'renaissance', 'steampunk', 'modern', 'cyberpunk', 'post-apocalyptic', 'fantasy', 'sci-fi', 'ancient'];
+            const bgPerspectives = ['close-up', 'medium shot', 'wide shot', 'panoramic', 'bird\'s eye'];
+
+            const styleArtists = ['photorealistic', 'oil painting', 'watercolor', 'digital painting', 'anime', 'comic book', 'concept art', '3D render', 'fantasy art'];
+            const styleQualities = ['sketch', 'detailed', 'highly detailed', 'ultra detailed', 'masterpiece', '8k'];
+            const styleColors = ['vibrant colors', 'pastel colors', 'muted colors', 'warm colors', 'cool colors', 'neon colors'];
+            const styleMoods = ['bright', 'dark', 'moody', 'ethereal', 'cinematic', 'dreamlike', 'surreal'];
+
+            // Set random values
+            if (document.getElementById('toggleCharacter').checked) {
+                document.getElementById('charRace').value = charRaces[Math.floor(Math.random() * charRaces.length)];
+                if (Math.random() > 0.3) document.getElementById('charGender').value = charGenders[Math.floor(Math.random() * charGenders.length)];
+                if (Math.random() > 0.4) document.getElementById('charAge').value = charAges[Math.floor(Math.random() * charAges.length)];
+                if (Math.random() > 0.3) document.getElementById('charClass').value = charClasses[Math.floor(Math.random() * charClasses.length)];
+                if (Math.random() > 0.5) document.getElementById('charExpression').value = charExpressions[Math.floor(Math.random() * charExpressions.length)];
+            }
+
+            if (document.getElementById('toggleScene').checked) {
+                if (Math.random() > 0.2) document.getElementById('sceneAction').value = sceneActions[Math.floor(Math.random() * sceneActions.length)];
+                if (Math.random() > 0.3) document.getElementById('sceneTime').value = sceneTimes[Math.floor(Math.random() * sceneTimes.length)];
+                if (Math.random() > 0.4) document.getElementById('sceneWeather').value = sceneWeathers[Math.floor(Math.random() * sceneWeathers.length)];
+                if (Math.random() > 0.3) document.getElementById('sceneLighting').value = sceneLightings[Math.floor(Math.random() * sceneLightings.length)];
+                if (Math.random() > 0.3) document.getElementById('sceneMood').value = sceneMoods[Math.floor(Math.random() * sceneMoods.length)];
+            }
+
+            if (document.getElementById('toggleBackground').checked) {
+                if (Math.random() > 0.1) document.getElementById('bgLocation').value = bgLocations[Math.floor(Math.random() * bgLocations.length)];
+                if (Math.random() > 0.3) document.getElementById('bgEra').value = bgEras[Math.floor(Math.random() * bgEras.length)];
+                if (Math.random() > 0.4) document.getElementById('bgPerspective').value = bgPerspectives[Math.floor(Math.random() * bgPerspectives.length)];
+            }
+
+            if (document.getElementById('toggleStyle').checked) {
+                if (Math.random() > 0.2) document.getElementById('styleArtist').value = styleArtists[Math.floor(Math.random() * styleArtists.length)];
+                if (Math.random() > 0.3) document.getElementById('styleQuality').value = styleQualities[Math.floor(Math.random() * styleQualities.length)];
+                if (Math.random() > 0.3) document.getElementById('styleColors').value = styleColors[Math.floor(Math.random() * styleColors.length)];
+                if (Math.random() > 0.4) document.getElementById('styleMood').value = styleMoods[Math.floor(Math.random() * styleMoods.length)];
+            }
+
+            generatePrompt();
+        }
+
+        function copyAsJSON(positiveId, negativeId = null) {
+            const positiveText = document.getElementById(positiveId).textContent;
+            const negativeText = negativeId ? document.getElementById(negativeId).textContent : '';
+            
+            const jsonData = {
+                positive_prompt: positiveText,
+                negative_prompt: negativeText,
+                generated_at: new Date().toISOString()
+            };
+
+            const jsonString = JSON.stringify(jsonData, null, 2);
+            navigator.clipboard.writeText(jsonString).then(() => {
+                const successEl = positiveId === 'positivePrompt' ? document.getElementById('copySucess1') : document.getElementById('copySucess2');
+                successEl.textContent = '✓ JSON copied to clipboard!';
+                setTimeout(() => {
+                    successEl.textContent = '';
+                }, 2000);
+            });
+        }
+
+        function switchTab(event, tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab and mark button as active
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Auto-generate prompt on input changes
+        document.querySelectorAll('select, textarea').forEach(el => {
+            el.addEventListener('change', generatePrompt);
+        });
+    </script>
+</body>
+</html>
