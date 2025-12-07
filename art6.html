@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Design Prompt Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(180deg, #0a0e1a 0%, #1a1f35 100%);
+        min-height: 100vh;
+        padding: 1.5rem;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+    }
+
+    .header h1 {
+        color: #ffffff;
+        font-size: 2.75rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+    }
+
+    .header p {
+        color: #fce7f3;
+        font-size: 1.125rem;
+        font-weight: 400;
+        opacity: 0.95;
+    }
+
+    .prompt-section {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .prompt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .prompt-header h2 {
+        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .controls-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .random-settings {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .random-settings label {
+        color: #fce7f3;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .icon-btn {
+        padding: 0.875rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.9375rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        letter-spacing: -0.01em;
+    }
+
+    .icon-btn:active {
+        transform: scale(0.96);
+    }
+
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .btn-randomize {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+    }
+
+    .btn-clear {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-copy {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .btn-json {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .prompt-display {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 16px;
+        padding: 1.5rem;
+        min-height: 100px;
+        color: #e9d5ff;
+        font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        font-size: 0.9375rem;
+        line-height: 1.7;
+        max-height: 400px;
+        overflow-y: auto;
+        transition: all 0.3s ease;
+    }
+
+    .prompt-display::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .prompt-display::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+    }
+
+    .prompt-display::-webkit-scrollbar-thumb {
+        background: rgba(139, 92, 246, 0.5);
+        border-radius: 10px;
+    }
+
+    .prompt-display::-webkit-scrollbar-thumb:hover {
+        background: rgba(139, 92, 246, 0.7);
+    }
+
+    .prompt-stats {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(139, 92, 246, 0.2);
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #a78bfa;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .copy-alert {
+        margin-top: 1rem;
+        padding: 1rem;
+        text-align: center;
+        color: #6ee7b7;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .filters-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .filters-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .filter-card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .filter-card:hover {
+        border-color: rgba(139, 92, 246, 0.4);
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+    }
+
+    .filter-card.disabled {
+        opacity: 0.5;
+        border-color: rgba(71, 85, 105, 0.3);
+    }
+
+    .filter-card.disabled:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    .filter-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+    }
+
+    .filter-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .filter-card h3 {
+        color: #ffffff;
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 51px;
+        height: 31px;
+        cursor: pointer;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(71, 85, 105, 0.6);
+        border-radius: 34px;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(71, 85, 105, 0.4);
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 23px;
+        width: 23px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .toggle-slider {
+        background-color: #8b5cf6;
+        border-color: #8b5cf6;
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+    .selected-badge {
+        background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+    }
+
+    .options-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.625rem;
+    }
+
+    .option-btn {
+        padding: 0.75rem 1.125rem;
+        border: 1.5px solid rgba(139, 92, 246, 0.3);
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(15, 23, 42, 0.6);
+        color: #e9d5ff;
+        letter-spacing: -0.01em;
+    }
+
+    .option-btn:hover:not(.selected):not(:disabled) {
+        background: rgba(139, 92, 246, 0.15);
+        border-color: rgba(139, 92, 246, 0.5);
+        transform: translateY(-1px);
+    }
+
+    .option-btn:active:not(:disabled) {
+        transform: scale(0.97);
+    }
+
+    .option-btn.selected {
+        background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+        color: white;
+        border-color: #ec4899;
+        transform: scale(1.02);
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+    }
+
+    .option-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding: 2rem;
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        color: #e9d5ff;
+        font-size: 0.9375rem;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        line-height: 1.6;
+    }
+
+    .footer-highlight {
+        color: #a78bfa;
+        font-weight: 600;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .button-group {
+            width: 100%;
+        }
+        
+        .icon-btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .controls-wrapper {
+            flex-direction: column;
+        }
+
+        .random-settings {
+            order: -1;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Character Design Prompt Generator</h1>
+            <p>Create stunning character prompts with 13 customizable filters</p>
+        </div>
+
+```
+    <div class="prompt-section">
+        <div class="prompt-header">
+            <h2>✨ Your Prompt</h2>
+        </div>
+        
+        <div class="controls-wrapper">
+            <div class="random-settings">
+                <label>
+                    <input type="checkbox" id="randomToggleFilters" checked onchange="updateRandomMode()">
+                    <span>Randomly toggle filters on/off when randomizing</span>
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button class="icon-btn btn-randomize" onclick="randomize()">🎲 Randomize</button>
+                <button class="icon-btn btn-clear" onclick="clearAll()">🗑️ Clear All</button>
+                <button class="icon-btn btn-copy" onclick="copyToClipboard()">📋 Copy Text</button>
+                <button class="icon-btn btn-json" onclick="copyJSON()">{ } Copy JSON</button>
+            </div>
+        </div>
+
+        <div class="prompt-display" id="promptDisplay">
+            Select options to build your character prompt...
+        </div>
+
+        <div class="prompt-stats" id="promptStats">
+            <div class="stat-item">
+                <span>Active Filters:</span>
+                <span class="stat-value" id="activeFilters">0</span>
+            </div>
+            <div class="stat-item">
+                <span>Selections:</span>
+                <span class="stat-value" id="selectionsCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span>Characters:</span>
+                <span class="stat-value" id="charCount">0</span>
+            </div>
+        </div>
+
+        <div class="copy-alert hidden" id="copyAlert"></div>
+    </div>
+
+    <div class="filters-grid" id="filtersContainer"></div>
+
+    <div class="footer">
+        <p>💡 <span class="footer-highlight">Pro tip:</span> Toggle filters on/off with switches • Click options to select • Use Randomize for instant inspiration</p>
+    </div>
+</div>
+
+<script>
+    let randomToggleFilters = true;
+
+    const filterStates = {
+        characterType: true,
+        textureStyle: true,
+        eyeStyle: true,
+        personalityVibe: true,
+        furHairQuality: true,
+        colorPalette: true,
+        lightingSetup: true,
+        cameraStyle: true,
+        expression: true,
+        proportion: true,
+        environment: true,
+        artMedium: true,
+        visualEffect: true
+    };
+
+    const selections = {
+        characterType: '',
+        textureStyle: '',
+        eyeStyle: '',
+        personalityVibe: '',
+        furHairQuality: '',
+        colorPalette: '',
+        lightingSetup: '',
+        cameraStyle: '',
+        expression: '',
+        proportion: '',
+        environment: '',
+        artMedium: '',
+        visualEffect: ''
+    };
+
+    const filters = {
+        characterType: {
+            title: '🦊 Character Type',
+            options: [
+                'Furry Creature', 'Robotic Being', 'Mythical Beast', 'Alien Species',
+                'Cartoon Animal', 'Monster Character', 'Magical Creature', 'Anthropomorphic',
+                'Woodland Critter', 'Sea Creature', 'Bird Character', 'Insect Being',
+                'Skull Character', 'Masked Figure', 'Elemental Being', 'Mechanical Dinosaur',
+                'Cowboy Character', 'Samurai Warrior', 'Victorian Person', 'Space Explorer',
+                'Desert Wanderer', 'Art Deco Figure'
+            ]
+        },
+        textureStyle: {
+            title: '✨ Texture Style',
+            options: [
+                'Fluffy Fur', 'Scraggly Hair', 'Smooth Skin', 'Scaly Surface',
+                'Feathered', 'Glossy Sheen', 'Matte Finish', 'Rough Texture',
+                'Velvet Soft', 'Wispy Strands', 'Coarse Bristles', 'Silky Smooth',
+                'Airbrushed Smooth', 'Paper Cutout', 'Fabric Textile', 'Metal Mechanical',
+                'Wooden Carved', 'Painted Canvas', 'Digital Flat', 'Psychedelic Pattern'
+            ]
+        },
+        eyeStyle: {
+            title: '👀 Eye Style',
+            options: [
+                'Huge Round Eyes', 'Beady Small Eyes', 'Glowing Eyes', 'Expressive Large',
+                'Sleepy Droopy', 'Wide Surprised', 'Narrow Suspicious', 'Cartoonish Big',
+                'Realistic Detailed', 'Sparkly Shiny', 'Different Sized', 'Half-Closed',
+                'Empty Sockets', 'Geometric Shapes', 'Button Eyes', 'Concentric Circles'
+            ]
+        },
+        personalityVibe: {
+            title: '🎭 Personality Vibe',
+            options: [
+                'Mischievous Trickster', 'Innocent Sweet', 'Wise Elder', 'Playful Child',
+                'Grumpy Curmudgeon', 'Anxious Nervous', 'Confident Bold', 'Shy Timid',
+                'Chaotic Wild', 'Gentle Kind', 'Mysterious Enigmatic', 'Energetic Hyper',
+                'Heroic Noble', 'Rugged Tough', 'Elegant Refined', 'Quirky Eccentric'
+            ]
+        },
+        furHairQuality: {
+            title: '💇 Fur/Hair Quality',
+            options: [
+                'Wild Unkempt', 'Perfectly Groomed', 'Spiky Messy', 'Flowing Elegant',
+                'Patchy Uneven', 'Thick Luxurious', 'Thin Sparse', 'Curly Twisted',
+                'Straight Sleek', 'Windswept', 'Matted Tangled', 'Pristine Clean',
+                'Geometric Patterns', 'Dotted Textured', 'Swirled Hypnotic', 'Layered Complex'
+            ]
+        },
+        colorPalette: {
+            title: '🎨 Color Palette',
+            options: [
+                'Pastel Soft', 'Vibrant Neon', 'Earth Tones', 'Monochrome Gray',
+                'Rainbow Multicolor', 'Dark Gothic', 'Warm Autumn', 'Cool Winter',
+                'Candy Bright', 'Muted Desaturated', 'Jewel Tones', 'Metallic Sheen',
+                'Neon Rainbow Spectrum', 'Turquoise & Pink', 'Yellow & Purple Duo',
+                'Black & White Bold', 'Coral & Teal', 'Retro 80s Palette', 'Sepia Vintage',
+                'Infrared False Color', 'Lime & Magenta', 'Gold & Cream'
+            ]
+        },
+        lightingSetup: {
+            title: '💡 Lighting Setup',
+            options: [
+                'Rim Light Glow', 'Dramatic Shadow', 'Soft Diffused', 'Studio Three-Point',
+                'Backlit Silhouette', 'Golden Hour', 'Neon Colored', 'Candlelight Warm',
+                'Moonlight Blue', 'Harsh Direct', 'Ambient Soft', 'Spotlight Focus',
+                'Firelight Flicker', 'Desert Sun Harsh', 'Mystical Glow', 'Vintage Motel Neon'
+            ]
+        },
+        cameraStyle: {
+            title: '📷 Camera Style',
+            options: [
+                'Close-up Portrait', 'Wide Angle', 'Macro Extreme', 'Medium Shot',
+                'Low Angle Hero', 'High Angle Down', 'Dutch Tilt', 'Eye Level',
+                'Over Shoulder', 'Profile Side', 'Three-Quarter View', 'Full Body',
+                'Centered Symmetrical', 'Dynamic Action', 'Intimate Close', 'Epic Landscape'
+            ]
+        },
+        expression: {
+            title: '😊 Expression/Emotion',
+            options: [
+                'Mischievous Grin', 'Wide-Eyed Wonder', 'Sinister Smirk', 'Innocent Joy',
+                'Confused Bewilderment', 'Maniacal Laughter', 'Shy Timid', 'Angry Scowl',
+                'Playful Cheeky', 'Surprised Shock', 'Melancholic Sad', 'Determined Fierce',
+                'Skull Grin', 'Stoic Neutral', 'Peaceful Contemplative', 'Alien Mysterious',
+                'Joyful Exuberant', 'Thoughtful Pensive'
+            ]
+        },
+        proportion: {
+            title: '📏 Character Scale/Proportion',
+            options: [
+                'Chibi Miniature', 'Standard Proportions', 'Elongated Limbs', 'Big Head Small Body',
+                'Squat Compact', 'Lanky Stretched', 'Baby Proportions', 'Exaggerated Features',
+                'Realistic Anatomy', 'Stylized Caricature', 'Tiny Details', 'Oversized Parts',
+                'Geometric Simplified', 'Heroic Muscular', 'Delicate Fragile'
+            ]
+        },
+        environment: {
+            title: '🌍 Environment/Context',
+            options: [
+                'Bokeh City Lights', 'Forest Natural', 'Studio Isolated', 'Dark Alley',
+                'Magical Sparkles', 'Underwater Depths', 'Desert Wasteland', 'Neon Cyberpunk',
+                'Cozy Interior', 'Misty Atmospheric', 'Industrial Gritty', 'Celestial Starry',
+                'Art Gallery Wall', 'Desert Campfire', 'Vintage Motel', 'Ornate Palace',
+                'Abstract Void', 'Retro 80s Graphics', 'Western Landscape', 'Psychedelic Space',
+                'Beach Tropical', 'Mountain Vista', 'Urban Rooftop'
+            ]
+        },
+        artMedium: {
+            title: '🖼️ Art Medium/Technique',
+            options: [
+                'Folk Art Painted', 'Digital 3D Render', 'Vintage Airbrushed', 'Collage Mixed Media',
+                'Vector Illustration', 'Photorealistic CGI', 'Hand Drawn Sketch', 'Geometric Abstract',
+                'Pop Art Style', 'Tattoo Flash Art', 'Sticker Design', 'Gallery Canvas',
+                'Art Deco Poster', 'Anime/Manga Style', 'Surreal Photo Manipulation', 'Watercolor Painting',
+                'Oil Painting', 'Digital Illustration', 'Screen Print', 'Linocut Print'
+            ]
+        },
+        visualEffect: {
+            title: '✨ Visual Effect/Treatment',
+            options: [
+                'Double Exposure', 'Chromatic Aberration', 'Halftone Dots', 'Rainbow Gradient',
+                'Neon Glow', 'Vintage Grain', 'Prismatic Split', 'Kaleidoscope Pattern',
+                'Motion Blur', 'Sharp Crisp Focus', 'Soft Dreamy Haze', 'High Contrast Pop',
+                'Muted Faded', 'Glitch Effect', 'Bokeh Blur', 'Radial Burst', 'Starburst Effect'
+            ]
+        }
+    };
+
+    function updateRandomMode() {
+        randomToggleFilters = document.getElementById('randomToggleFilters').checked;
+    }
+
+    function toggleFilter(key) {
+        filterStates[key] = !filterStates[key];
+        if (!filterStates[key]) {
+            selections[key] = '';
+        }
+        updatePrompt();
+        renderFilters();
+    }
+
+    function handleSelect(category, value) {
+        if (!filterStates[category]) return;
+        selections[category] = selections[category] === value ? '' : value;
+        updatePrompt();
+        renderFilters();
+    }
+
+    function generatePrompt() {
+        const parts = [];
+        
+        Object.keys(filters).forEach(key => {
+            if (filterStates[key] && selections[key]) {
+                parts.push(selections[key].toLowerCase());
+            }
+        });
+        
+        return parts.length > 0 ? parts.join(', ') : 'Select options to build your character prompt...';
+    }
+
+    function updateStats() {
+        const activeCount = Object.values(filterStates).filter(v => v).length;
+        const selectionCount = Object.values(selections).filter(v => v).length;
+        const prompt = generatePrompt();
+        const charCount = prompt === 'Select options to build your character prompt...' ? 0 : prompt.length;
+
+        document.getElementById('activeFilters').textContent = activeCount;
+        document.getElementById('selectionsCount').textContent = selectionCount;
+        document.getElementById('charCount').textContent = charCount;
+    }
+
+    function updatePrompt() {
+        document.getElementById('promptDisplay').textContent = generatePrompt();
+        updateStats();
+    }
+
+    function copyToClipboard() {
+        const prompt = generatePrompt();
+        if (prompt !== 'Select options to build your character prompt...') {
+            navigator.clipboard.writeText(prompt).then(() => {
+                showAlert('✅ Text prompt copied to clipboard!');
+            });
+        }
+    }
+
+    function copyJSON() {
+        const jsonData = {
+            filters: {},
+            prompt: generatePrompt(),
+            metadata: {
+                activeFilters: Object.values(filterStates).filter(v => v).length,
+                totalSelections: Object.values(selections).filter(v => v).length,
+                timestamp: new Date().toISOString()
+            }
+        };
+
+        Object.keys(filters).forEach(key => {
+            jsonData.filters[key] = {
+                enabled: filterStates[key],
+                value: selections[key] || null
+            };
+        });
+
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        navigator.clipboard.writeText(jsonString).then(() => {
+            showAlert('✅ JSON data copied to clipboard!');
+        });
+    }
+
+    function showAlert(message) {
+        const alert = document.getElementById('copyAlert');
+        alert.textContent = message;
+        alert.classList.remove('hidden');
+        setTimeout(() => alert.classList.add('hidden'), 3000);
+    }
+
+    function clearAll() {
+        Object.keys(selections).forEach(key => selections[key] = '');
+        updatePrompt();
+        renderFilters();
+    }
+
+    function randomize() {
+        if (randomToggleFilters) {
+            // Randomly disable some filters (30% chance each)
+            Object.keys(filterStates).forEach(key => {
+                filterStates[key] = Math.random() > 0.3;
+            });
+        }
+
+        // For enabled filters, randomly select an option
+        Object.keys(filters).forEach(key => {
+            if (filterStates[key]) {
+                const options = filters[key].options;
+                selections[key] = options[Math.floor(Math.random() * options.length)];
+            } else {
+                selections[key] = '';
+            }
+        });
+
+        updatePrompt();
+        renderFilters();
+    }
+
+    function renderFilters() {
+        const container = document.getElementById('filtersContainer');
+        container.innerHTML = '';
+
+        Object.entries(filters).forEach(([key, filter]) => {
+            const card = document.createElement('div');
+            card.className = 'filter-card';
+            if (!filterStates[key]) {
+                card.classList.add('disabled');
+            }
+
+            const header = document.createElement('div');
+            header.className = 'filter-card-header';
+
+            const titleContainer = document.createElement('div');
+            titleContainer.className = 'filter-title';
+
+            const title = document.createElement('h3');
+            title.textContent = filter.title;
+            
+            if (filterStates[key] && selections[key]) {
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
+                badge.textContent = 'Selected';
+                title.appendChild(badge);
+            }
+
+            titleContainer.appendChild(title);
+
+            const toggle = document.createElement('label');
+            toggle.className = 'toggle-switch';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = filterStates[key];
+            checkbox.onchange = () => toggleFilter(key);
+
+            const slider = document.createElement('span');
+            slider.className = 'toggle-slider';
+
+            toggle.appendChild(checkbox);
+            toggle.appendChild(slider);
+
+            header.appendChild(titleContainer);
+            header.appendChild(toggle);
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            filter.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.disabled = !filterStates[key];
+                if (selections[key] === option) {
+                    btn.classList.add('selected');
+                }
+                btn.textContent = option;
+                btn.onclick = () => handleSelect(key, option);
+                optionsContainer.appendChild(btn);
+            });
+
+            card.appendChild(header);
+            card.appendChild(optionsContainer);
+            container.appendChild(card);
+        });
+    }
+
+    // Initial render
+    renderFilters();
+    updateStats();
+</script>
+```
+
+</body>
+</html>
