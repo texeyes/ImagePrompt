@@ -86,7 +86,7 @@
 
         .panel.disabled {
             opacity: 0.6;
-            pointer-events: none; /* Optional: prevent interaction when disabled */
+            pointer-events: none;
         }
         
         .panel.disabled .panel-content {
@@ -424,7 +424,7 @@
             <!-- BACKGROUND SECTION -->
             <div class="panel background" id="panel-background">
                 <div class="panel-header">
-                    <h2>🏞️ Background</h2>
+                    <h2>🏞️ Background (AETHER)</h2>
                     <label class="toggle-switch">
                         <input type="checkbox" checked onchange="toggleSection('background')" id="toggle-background">
                         <span class="slider"></span>
@@ -432,24 +432,120 @@
                 </div>
                 <div class="panel-content">
                     <div class="form-group">
-                        <label>Location</label>
-                        <select id="bgLocation" class="inp-bg">
-                            <option value="">(None/Simple)</option>
-                            <option value="simple background">Simple Background</option>
-                            <option value="white background">White Background</option>
-                            <option value="forest">Forest</option>
-                            <option value="city street">City Street</option>
-                            <option value="cyberpunk city">Cyberpunk City</option>
-                            <option value="medieval castle">Medieval Castle</option>
-                            <option value="bedroom">Bedroom</option>
-                            <option value="beach">Beach</option>
-                            <option value="space station">Space Station</option>
-                            <option value="ruins">Ancient Ruins</option>
+                        <label>Composition Complexity</label>
+                        <select id="bgComplexity" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Minimalist">Minimalist</option>
+                            <option value="Sparse">Sparse</option>
+                            <option value="Balanced">Balanced</option>
+                            <option value="Detailed">Detailed</option>
+                            <option value="Intricate">Intricate</option>
+                            <option value="Hyper-Maximalist">Hyper-Maximalist</option>
+                            <option value="Chaotic">Chaotic</option>
+                            <option value="Zen-like">Zen-like</option>
+                            <option value="Cluttered">Cluttered</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Environment Details</label>
-                        <textarea id="bgDetails" class="inp-bg" placeholder="e.g. raining, night time, neon signs, trees, flowers"></textarea>
+                        <label>Composition Type</label>
+                        <select id="bgCompType" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Golden Ratio">Golden Ratio</option>
+                            <option value="Rule of Thirds">Rule of Thirds</option>
+                            <option value="Symmetrical Center">Symmetrical Center</option>
+                            <option value="Asymmetrical">Asymmetrical</option>
+                            <option value="Diagonal Leading Lines">Diagonal Leading Lines</option>
+                            <option value="Fibonacci Spiral">Fibonacci Spiral</option>
+                            <option value="Framing within Frame">Framing within Frame</option>
+                            <option value="Negative Space">Negative Space</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Background Style</label>
+                        <select id="bgStyle" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Cyberpunk">Cyberpunk</option>
+                            <option value="Ukiyo-e">Ukiyo-e</option>
+                            <option value="Surrealism">Surrealism</option>
+                            <option value="Bauhaus">Bauhaus</option>
+                            <option value="Rococo">Rococo</option>
+                            <option value="Synthwave">Synthwave</option>
+                            <option value="Abstract Expressionism">Abstract Expressionism</option>
+                            <option value="Matte Painting">Matte Painting</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Design Trend</label>
+                        <select id="bgTrend" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Glassmorphism">Glassmorphism</option>
+                            <option value="Brutalism">Brutalism</option>
+                            <option value="Vaporwave">Vaporwave</option>
+                            <option value="Flat Design">Flat Design</option>
+                            <option value="Skeuomorphism">Skeuomorphism</option>
+                            <option value="Retro-Futurism">Retro-Futurism</option>
+                            <option value="Neo-Noire">Neo-Noire</option>
+                            <option value="Glitch Art">Glitch Art</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Visual Perspective</label>
+                        <select id="bgPerspective" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Isometric View">Isometric View</option>
+                            <option value="Bird's Eye View">Bird's Eye View</option>
+                            <option value="Worm's Eye View">Worm's Eye View</option>
+                            <option value="Macro Close-up">Macro Close-up</option>
+                            <option value="Wide Angle Fisheye">Wide Angle Fisheye</option>
+                            <option value="Telephoto">Telephoto</option>
+                            <option value="Drone Shot">Drone Shot</option>
+                            <option value="Cross-Section">Cross-Section</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Color & Mood</label>
+                        <select id="bgColor" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Pastel Palette">Pastel Palette</option>
+                            <option value="Neon Noir">Neon Noir</option>
+                            <option value="Monochromatic">Monochromatic</option>
+                            <option value="Sepia Tone">Sepia Tone</option>
+                            <option value="Vibrant Contrast">Vibrant Contrast</option>
+                            <option value="Muted Earth Tones">Muted Earth Tones</option>
+                            <option value="Cool Blues">Cool Blues</option>
+                            <option value="Warm Amber">Warm Amber</option>
+                            <option value="Psychadelic">Psychadelic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Lighting & Atmosphere</label>
+                        <select id="bgLight" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Cinematic Lighting">Cinematic Lighting</option>
+                            <option value="Bioluminescence">Bioluminescence</option>
+                            <option value="God Rays">God Rays</option>
+                            <option value="Softbox Studio">Softbox Studio</option>
+                            <option value="Golden Hour">Golden Hour</option>
+                            <option value="Blue Hour">Blue Hour</option>
+                            <option value="Volumetric Fog">Volumetric Fog</option>
+                            <option value="Harsh Shadows">Harsh Shadows</option>
+                            <option value="Neon Glow">Neon Glow</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Conceptual Framework</label>
+                        <select id="bgConcept" class="inp-bg">
+                            <option value="">(None)</option>
+                            <option value="Ethereal">Ethereal</option>
+                            <option value="Dystopian">Dystopian</option>
+                            <option value="Whimsical">Whimsical</option>
+                            <option value="Avant-garde">Avant-garde</option>
+                            <option value="Dreamscape">Dreamscape</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Post-Apocalyptic">Post-Apocalyptic</option>
+                            <option value="Mythological">Mythological</option>
+                            <option value="Occult">Occult</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -536,8 +632,15 @@
             sceneCamera: ['upper body', 'full body', 'close up', 'cinematic shot', 'wide shot'],
             sceneLighting: ['cinematic lighting', 'soft lighting', 'golden hour', 'neon lights', 'dark moody lighting'],
             
-            bgLocation: ['forest', 'city street', 'space station', 'fantasy ruins', 'bedroom', 'castle throne room'],
-            bgDetails: ['rain', 'snow', 'cherry blossoms', 'fire particles', 'fog', 'sunset'],
+            // New Background Random Data
+            bgComplexity: ['Detailed', 'Intricate', 'Hyper-Maximalist', 'Minimalist'],
+            bgCompType: ['Golden Ratio', 'Rule of Thirds', 'Symmetrical Center', 'Diagonal Leading Lines'],
+            bgStyle: ['Cyberpunk', 'Surrealism', 'Synthwave', 'Matte Painting', 'Ukiyo-e'],
+            bgTrend: ['Glassmorphism', 'Brutalism', 'Vaporwave', 'Neo-Noire'],
+            bgPerspective: ['Isometric View', 'Bird\'s Eye View', 'Wide Angle Fisheye', 'Drone Shot'],
+            bgColor: ['Neon Noir', 'Vibrant Contrast', 'Warm Amber', 'Cool Blues'],
+            bgLight: ['Cinematic Lighting', 'Volumetric Fog', 'God Rays', 'Neon Glow'],
+            bgConcept: ['Dystopian', 'Dreamscape', 'Ethereal', 'Industrial'],
             
             styleMedium: ['photorealistic', 'anime', 'digital illustration', 'oil painting', '3D render'],
             styleArtist: ['style of Greg Rutkowski', 'style of Artgerm', 'Studio Ghibli style', 'Cyberpunk 2077 style', '']
@@ -626,9 +729,16 @@
             document.getElementById('sceneCamera').value = Math.random() > 0.3 ? pick(randomData.sceneCamera) : "";
             document.getElementById('sceneLighting').value = Math.random() > 0.3 ? pick(randomData.sceneLighting) : "";
 
-            // Background
-            document.getElementById('bgLocation').value = pick(randomData.bgLocation);
-            document.getElementById('bgDetails').value = Math.random() > 0.4 ? pick(randomData.bgDetails) : "";
+            // Background (New Filters)
+            document.getElementById('bgComplexity').value = Math.random() > 0.3 ? pick(randomData.bgComplexity) : "";
+            document.getElementById('bgCompType').value = Math.random() > 0.5 ? pick(randomData.bgCompType) : "";
+            document.getElementById('bgStyle').value = Math.random() > 0.5 ? pick(randomData.bgStyle) : "";
+            document.getElementById('bgTrend').value = Math.random() > 0.6 ? pick(randomData.bgTrend) : "";
+            document.getElementById('bgPerspective').value = Math.random() > 0.4 ? pick(randomData.bgPerspective) : "";
+            document.getElementById('bgColor').value = Math.random() > 0.3 ? pick(randomData.bgColor) : "";
+            document.getElementById('bgLight').value = Math.random() > 0.3 ? pick(randomData.bgLight) : "";
+            document.getElementById('bgConcept').value = Math.random() > 0.4 ? pick(randomData.bgConcept) : "";
+
 
             // Style
             document.getElementById('styleMedium').value = pick(randomData.styleMedium);
