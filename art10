@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Image Prompt Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+      color: #f9fafb;
+    }
+    header {
+      padding: 1.5rem 1.75rem 0.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 {
+      font-size: 1.35rem;
+      margin: 0;
+    }
+    header p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 1.25rem;
+      padding: 0 1.75rem 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.94);
+      border-radius: 0.9rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 22px 60px rgba(0,0,0,0.65);
+      padding: 1.1rem 1.25rem 1.35rem;
+    }
+    .panel h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #e5e7eb;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 0.75rem;
+    }
+    .category-group {
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px dashed rgba(55, 65, 81, 0.9);
+    }
+    .category-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+      margin-bottom: 0.4rem;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .chip {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.18), rgba(15,23,42,0.95));
+      color: #e5e7eb;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.14s ease-out;
+      white-space: nowrap;
+    }
+    .chip:hover {
+      transform: translateY(-1px);
+      border-color: #f97316;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.25), 0 10px 25px rgba(0,0,0,0.7);
+    }
+    .chip.active {
+      background: linear-gradient(135deg, #f97316, #a855f7);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(248,250,252,0.18), 0 12px 32px rgba(15,23,42,0.95);
+    }
+    .image-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
+      gap: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .thumb {
+      position: relative;
+      border-radius: 0.6rem;
+      overflow: hidden;
+      border: 1px solid rgba(75,85,99,0.9);
+      height: 86px;
+      background: #020617;
+      cursor: pointer;
+      transition: all 0.13s ease-out;
+    }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .thumb span {
+      position: absolute;
+      bottom: 0.23rem;
+      left: 0.35rem;
+      right: 0.35rem;
+      font-size: 0.68rem;
+      padding: 0.16rem 0.3rem;
+      border-radius: 999px;
+      background: linear-gradient(to right, rgba(2,6,23,0.9), rgba(15,23,42,0.6));
+      color: #e5e7eb;
+      backdrop-filter: blur(4px);
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .thumb:hover {
+      transform: translateY(-1px) scale(1.01);
+      border-color: #f97316;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.9);
+    }
+    .thumb.active {
+      outline: 2px solid #f97316;
+      box-shadow: 0 16px 42px rgba(0,0,0,0.9);
+    }
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      resize: vertical;
+      border-radius: 0.6rem;
+      border: 1px solid rgba(75,85,99,0.9);
+      background: radial-gradient(circle at top, #020617, #020617 45%, #020617 100%);
+      color: #f9fafb;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      box-shadow: inset 0 0 0 1px rgba(15,23,42,0.95);
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.55), 0 18px 40px rgba(0,0,0,0.95);
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 0.65rem 0 0.4rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border-radius: 999px;
+      padding: 0.45rem 0.95rem;
+      font-size: 0.82rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: linear-gradient(135deg, #f97316, #a855f7);
+      color: #f9fafb;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+      transition: all 0.13s ease-out;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 45px rgba(0,0,0,1);
+      filter: brightness(1.08);
+    }
+    .btn.secondary {
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.55), rgba(15,23,42,1));
+      color: #e5e7eb;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.9);
+    }
+    .prompt-meta {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    .slider-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.25rem;
+    }
+    .slider-block {
+      flex: 1 1 120px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    .slider-block input[type="range"] {
+      width: 100%;
+    }
+    footer {
+      padding: 0.25rem 1.75rem 1rem;
+      font-size: 0.72rem;
+      color: #6b7280;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>AI Image Prompt Builder</h1>
+      <p>Tap styles and characters inspired by the gallery, then refine with mood, camera, and virality boosts.</p>
+    </div>
+    <div style="font-size:0.78rem;color:#9ca3af;">
+      Built for shorts, reels & viral covers.
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- LEFT: FILTERS -->
+    <section class="panel" id="filters-panel">
+      <h2>Style & Content Filters</h2>
+      <div class="subtitle">Choose one or more options in each section to assemble a detailed prompt.</div>
+
+      <!-- Reference Images (these will show your 10 uploads when you replace src values) -->
+      <div class="category-group">
+        <div class="category-label">Reference vibe (from gallery)</div>
+        <div class="image-strip" id="imageStrip">
+          <!-- Replace sample placeholder URLs with your 10 uploaded image URLs when hosting -->
+          <div class="thumb" data-prompt="stylized cyberpunk character portrait, vibrant neon gradients, anime-inspired, glowing tech accessories">
+            <img src="image1.jpeg" alt="Cyber anime style" />
+            <span>Neon Anime Hero</span>
+          </div>
+          <div class="thumb" data-prompt="3d cinematic scene of a knight riding a huge fluffy pink bear, candy kingdom environment, playful and epic">
+            <img src="image2.jpeg" alt="Pink bear rider" />
+            <span>Candy Knight</span>
+          </div>
+          <div class="thumb" data-prompt="octopus-headed ringmaster in a surreal candy gore carnival, dripping textures, saturated horror whimsy">
+            <img src="image3.jpeg" alt="Candy carnival alien" />
+            <span>Candy-Gore Carnival</span>
+          </div>
+          <div class="thumb" data-prompt="urban oracle robot in streetwear coat, shallow depth of field, moody city background">
+            <img src="image4.jpeg" alt="Urban oracle" />
+            <span>Urban Oracle</span>
+          </div>
+          <div class="thumb" data-prompt="hyper-realistic white yeti close-up, cinematic lighting, gold grill teeth, intense stare">
+            <img src="image5.jpeg" alt="Yeti closeup" />
+            <span>Grillmaster Yeti</span>
+          </div>
+          <div class="thumb" data-prompt="colossal glowing skeletal monster towering over city street, neon mist, epic scale">
+            <img src="image6.jpeg" alt="Neon monster" />
+            <span>Neon Titan</span>
+          </div>
+          <div class="thumb" data-prompt="whimsical alien with bouquet of eyeballs for hair, studio lighting, claymation vibe">
+            <img src="image7.jpeg" alt="Eyeball alien" />
+            <span>Eyebloom Alien</span>
+          </div>
+          <div class="thumb" data-prompt="cinematic desert wanderer with cephalopod head, high-detail 3d render, sunset backlight">
+            <img src="image8.jpeg" alt="Cephalopod nomad" />
+            <span>Desert Cthulhu</span>
+          </div>
+          <div class="thumb" data-prompt="ornate horror christmas wreath, rich textures, spooky yet festive, dark fantasy holiday vibe">
+            <img src="image9.jpeg" alt="Spooky wreath" />
+            <span>Spooky Christmas</span>
+          </div>
+          <div class="thumb" data-prompt="cinematic wuxia hero standing in bamboo forest, flowing robe, soft volumetric light">
+            <img src="image10.jpeg" alt="Wuxia hero" />
+            <span>Wuxia Cinema</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORY: SUBJECT -->
+      <div class="category-group" data-category="subject">
+        <div class="category-label">Subject</div>
+        <div class="chips">
+          <div class="chip" data-tag="solo character, full body">Solo character</div>
+          <div class="chip" data-tag="dramatic close-up portrait">Close-up portrait</div>
+          <div class="chip" data-tag="dynamic action pose">Action scene</div>
+          <div class="chip" data-tag="group of quirky characters">Character squad</div>
+          <div class="chip" data-tag="colossal creature towering over city">Kaiju scale</div>
+          <div class="chip" data-tag="mascot-style creature, toyetic design">Mascot creature</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY: STYLE -->
+      <div class="category-group" data-category="style">
+        <div class="category-label">Visual style</div>
+        <div class="chips">
+          <div class="chip" data-tag="hyper-realistic 3d render, octane style">Hyper-real 3D</div>
+          <div class="chip" data-tag="cinematic concept art, moody, filmic lighting">Cinematic concept art</div>
+          <div class="chip" data-tag="stylized anime illustration, bold line art">Anime stylized</div>
+          <div class="chip" data-tag="claymation stop-motion aesthetic, soft plastic material">Claymation</div>
+          <div class="chip" data-tag="toy photography look, collectible figure, studio shot">Toy collectible look</div>
+          <div class="chip" data-tag="dreamlike surrealism, exaggerated proportions">Dreamlike surrealism</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY: MOOD / COLOR -->
+      <div class="category-group" data-category="mood">
+        <div class="category-label">Mood & color</div>
+        <div class="chips">
+          <div class="chip" data-tag="neon synthwave colors, magenta and cyan glow">Neon synthwave</div>
+          <div class="chip" data-tag="dark fantasy, eerie shadows, rich reds and blacks">Dark fantasy</div>
+          <div class="chip" data-tag="playful candy-colored palette, pinks and pastels">Candycore</div>
+          <div class="chip" data-tag="high-contrast teal and orange cinematic grade">Teal and orange</div>
+          <div class="chip" data-tag="soft pastel tones, gentle ambient light">Soft pastel</div>
+          <div class="chip" data-tag="high energy, saturated colors, strong rim light">High-energy glow</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY: ENVIRONMENT -->
+      <div class="category-group" data-category="environment">
+        <div class="category-label">Environment</div>
+        <div class="chips">
+          <div class="chip" data-tag="busy futuristic city street at night">Futuristic city</div>
+          <div class="chip" data-tag="candy kingdom landscape, edible mountains and rivers">Candy kingdom</div>
+          <div class="chip" data-tag="foggy urban alley, moody atmosphere">Foggy alley</div>
+          <div class="chip" data-tag="laboratory interior, props and equipment in background">Sci-fi lab</div>
+          <div class="chip" data-tag="ancient bamboo forest, drifting mist">Bamboo forest</div>
+          <div class="chip" data-tag="holiday decorated room, spooky christmas ornaments">Haunted holiday room</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY: CAMERA / COMPOSITION -->
+      <div class="category-group" data-category="camera">
+        <div class="category-label">Camera & framing</div>
+        <div class="chips">
+          <div class="chip" data-tag="ultra wide-angle lens, dramatic perspective">Ultra wide angle</div>
+          <div class="chip" data-tag="50mm lens, shallow depth of field, creamy bokeh">Portrait lens</div>
+          <div class="chip" data-tag="low angle hero shot">Low angle hero shot</div>
+          <div class="chip" data-tag="high angle looking down slightly">High angle shot</div>
+          <div class="chip" data-tag="centered composition, subject dominating frame">Centered dominance</div>
+          <div class="chip" data-tag="rule of thirds composition, cinematic crop">Rule of thirds</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY: DETAIL / RENDER QUALITY -->
+      <div class="category-group" data-category="quality">
+        <div class="category-label">Detail & render</div>
+        <div class="chips">
+          <div class="chip" data-tag="extremely detailed, intricate textures, 8k render">Ultra detailed</div>
+          <div class="chip" data-tag="volumetric lighting, god rays, cinematic atmosphere">Volumetric lighting</div>
+          <div class="chip" data-tag="subsurface scattering, realistic skin and materials">Realistic materials</div>
+          <div class="chip" data-tag="motion blur and particles for energy and movement">Motion blur and particles</div>
+          <div class="chip" data-tag="soft studio lighting, subtle reflections">Studio lighting</div>
+          <div class="chip" data-tag="sharp focus on face, background softly blurred">Face in sharp focus</div>
+        </div>
+      </div>
+
+      <!-- EXTRA CATEGORY 1: VIRAL HOOK (POPULARTIY BOOST) -->
+      <div class="category-group" data-category="viral">
+        <div class="category-label">Viral hook</div>
+        <div class="chips">
+          <div class="chip" data-tag="unexpected mashup of cute and terrifying elements">Cute vs terrifying contrast</div>
+          <div class="chip" data-tag="expression that looks directly at viewer, intense eye contact">Direct eye contact</div>
+          <div class="chip" data-tag="strong meme potential, exaggerated expression">Memeable expression</div>
+          <div class="chip" data-tag="recognizable silhouette that reads clearly on small screens">Iconic silhouette</div>
+          <div class="chip" data-tag="bold central object framed tightly for vertical video cover">Bold vertical cover</div>
+          <div class="chip" data-tag="design that would look great as a collectible toy or figurine">Toyetic appeal</div>
+        </div>
+      </div>
+
+      <!-- EXTRA CATEGORY 2: SOCIAL MEDIA FORMAT -->
+      <div class="category-group" data-category="format">
+        <div class="category-label">Social media format</div>
+        <div class="chips">
+          <div class="chip" data-tag="composition optimized for vertical 9:16 aspect ratio, centered subject">Vertical 9:16 cover</div>
+          <div class="chip" data-tag="loopable scene concept, clear start and end point">Loopable scene idea</div>
+          <div class="chip" data-tag="clean space at top and bottom for titles and captions">Space for text overlays</div>
+          <div class="chip" data-tag="thumbnail-style framing, subject face filling most of frame">Face thumbnail framing</div>
+          <div class="chip" data-tag="high readability at very small sizes, minimal clutter">Minimal clutter for small screens</div>
+        </div>
+      </div>
+
+      <!-- EXTRA CATEGORY 3: TREND ALIGNMENT -->
+      <div class="category-group" data-category="trend">
+        <div class="category-label">Trend alignment</div>
+        <div class="chips">
+          <div class="chip" data-tag="inspired by dark whimsical holiday aesthetics, nightmare before christmas vibe">Dark whimsical holiday</div>
+          <div class="chip" data-tag="inspired by viral creature design challenges on social media">Viral creature design</div>
+          <div class="chip" data-tag="cinematic reinterpretation of classic film genres, wuxia and samurai films">Cinematic genre remix</div>
+          <div class="chip" data-tag="AI art showcase look, clearly digital but polished">AI art showcase</div>
+          <div class="chip" data-tag="highly shareable, surreal yet relatable scene">Shareable surreal moment</div>
+        </div>
+      </div>
+
+      <!-- SLIDERS -->
+      <div class="slider-row">
+        <div class="slider-block">
+          Prompt strength
+          <input type="range" id="strength" min="0" max="100" value="85" />
+        </div>
+        <div class="slider-block">
+          Weirdness
+          <input type="range" id="weirdness" min="0" max="100" value="60" />
+        </div>
+        <div class="slider-block">
+          Brightness
+          <input type="range" id="brightness" min="0" max="100" value="70" />
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: PROMPT OUTPUT -->
+    <section class="panel" id="output-panel">
+      <h2>Generated Prompt</h2>
+      <div class="subtitle">Edit freely after generation, then paste into Midjourney, Stable Diffusion, or your video workflow.</div>
+
+      <textarea id="promptBox" placeholder="Your combined prompt will appear here..."></textarea>
+
+      <div class="controls">
+        <button class="btn" id="generateBtn">
+          ⚡ Build prompt
+        </button>
+        <button class="btn secondary" id="copyBtn">
+          📋 Copy
+        </button>
+        <div class="prompt-meta" id="metaText">
+          0 words · Strength: 85 · Weirdness: 60 · Brightness: 70
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Tip: Start with one gallery vibe, add 3–5 chips, then tweak the text for your specific character or product.
+  </footer>
+
+  <script>
+    // Toggle chips
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        chip.classList.toggle("active");
+        buildPrompt();
+      });
+    });
+
+    // Toggle reference thumbnails
+    document.querySelectorAll(".thumb").forEach(thumb => {
+      thumb.addEventListener("click", () => {
+        thumb.classList.toggle("active");
+        buildPrompt();
+      });
+    });
+
+    // Sliders update meta + prompt
+    const strength = document.getElementById("strength");
+    const weirdness = document.getElementById("weirdness");
+    const brightness = document.getElementById("brightness");
+    const metaText = document.getElementById("metaText");
+    [strength, weirdness, brightness].forEach(slider => {
+      slider.addEventListener("input", () => {
+        updateMeta();
+        buildPrompt();
+      });
+    });
+
+    // Generate button
+    document.getElementById("generateBtn").addEventListener("click", buildPrompt);
+
+    // Copy button
+    document.getElementById("copyBtn").addEventListener("click", () => {
+      const box = document.getElementById("promptBox");
+      box.select();
+      document.execCommand("copy");
+      metaText.textContent = metaText.textContent.replace(/· Copied!.*/, "").trim() + " · Copied!";
+      setTimeout(updateMeta, 1500);
+    });
+
+    function buildPrompt() {
+      const activeThumbs = Array.from(document.querySelectorAll(".thumb.active"));
+      const activeChips = Array.from(document.querySelectorAll(".chip.active"));
+
+      const parts = [];
+
+      if (activeThumbs.length) {
+        const refs = activeThumbs.map(t => t.dataset.prompt.trim());
+        parts.push("inspired by: " + refs.join("; "));
+      }
+
+      if (activeChips.length) {
+        const tags = activeChips.map(c => c.dataset.tag.trim());
+        parts.push(tags.join(", "));
+      }
+
+      const strengthVal = strength.value;
+      const weirdVal = weirdness.value;
+      const brightVal = brightness.value;
+
+      parts.push(
+        "highly detailed, trending on social media, optimized for vertical shorts and reels, " +
+        "prompt strength " + strengthVal + "/100, creative weirdness " + weirdVal + "/100, visual brightness " + brightVal + "/100"
+      );
+
+      const finalPrompt = parts.join(", ").replace(/\s+,/g, ",").trim();
+      const box = document.getElementById("promptBox");
+      box.value = finalPrompt;
+      updateMeta();
+    }
+
+    function updateMeta() {
+      const text = document.getElementById("promptBox").value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      metaText.textContent =
+        words + " words · Strength: " + strength.value +
+        " · Weirdness: " + weirdness.value +
+        " · Brightness: " + brightness.value;
+    }
+  </script>
+</body>
+</html>
+
