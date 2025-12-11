@@ -549,7 +549,13 @@ document.getElementById("randomBtn").addEventListener("click", () => {
         "prompt strength " + strengthVal + "/100, creative weirdness " + weirdVal + "/100, visual brightness " + brightVal + "/100"
       );
 
-      const finalPrompt = parts.join(", ").replace(/\s+,/g, ",").trim();
+      const finalPrompt = parts.join(", ").const finalPrompt = parts.join(", ")
+  .replace(/,\s*,/g, ", ")   // collapse double commas
+  .trim();
+const box = document.getElementById("promptBox");
+box.value = finalPrompt;
+updateMeta();
+.trim();
       const box = document.getElementById("promptBox");
       box.value = finalPrompt;
       updateMeta();
