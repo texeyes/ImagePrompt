@@ -485,6 +485,44 @@
       metaText.textContent = metaText.textContent.replace(/· Copied!.*/, "").trim() + " · Copied!";
       setTimeout(updateMeta, 1500);
     });
+// Randomize button
+document.getElementById("randomBtn").addEventListener("click", () => {
+  // Clear current selections
+  document.querySelectorAll(".chip.active").forEach(c => c.classList.remove("active"));
+  document.querySelectorAll(".thumb.active").forEach(t => t.classList.remove("active"));
+
+  // Randomly pick ONE reference thumbnail
+  const thumbs = Array.from(document.querySelectorAll(".thumb"));
+  if (thumbs.length) {
+    const randomThumb = thumbs[Math.floor(Math.random() * thumbs.length)];
+    randomThumb.classList.add("active");
+  }
+
+  // For each category-group, randomly activate 0–2 chips
+  const groups = Array.from(document.querySelectorAll(".category-group[data-category]"));
+  groups.forEach(group => {
+    const chips = Array.from(group.querySelectorAll(".chip"));
+    if (!chips.length) return;
+
+    // Decide how many chips to select in this category (0 to 2)
+    const count = Math.floor(Math.random() * 3); // 0,1,2
+    const shuffled = chips
+      .map(c => ({ c, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(x => x.c);
+    for (let i = 0; i < count; i++) {
+      if (shuffled[i]) shuffled[i].classList.add("active");
+    }
+  });
+
+  // Randomize sliders a bit
+  strength.value = 70 + Math.floor(Math.random() * 21);   // 70–90
+  weirdness.value = 40 + Math.floor(Math.random() * 51);  // 40–90
+  brightness.value = 50 + Math.floor(Math.random() * 41); // 50–90
+
+  updateMeta();
+  buildPrompt();
+});
 
     function buildPrompt() {
       const activeThumbs = Array.from(document.querySelectorAll(".thumb.active"));
