@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Character Image Prompt Builder</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #050816;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      padding: 16px 24px;
+      background: radial-gradient(circle at top, #301934, #050816 60%);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+    main {
+      max-width: 1100px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr);
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 16px 18px 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    }
+    .panel h2 {
+      margin-top: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #a5b4fc;
+    }
+    .field-group {
+      margin-bottom: 14px;
+    }
+    .field-group label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 6px;
+    }
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+    select[multiple] {
+      height: 110px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
+    }
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: none;
+    }
+    #buildPrompt {
+      background: linear-gradient(135deg, #22c55e, #a3e635);
+      color: #022c22;
+      box-shadow: 0 8px 20px rgba(34,197,94,0.35);
+    }
+    #randomize {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      color: #f9fafb;
+      box-shadow: 0 8px 20px rgba(129,140,248,0.4);
+    }
+    #copyPrompt {
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+    textarea {
+      width: 100%;
+      min-height: 210px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: #020617;
+      color: #e5e7eb;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .hint {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: rgba(148,163,184,0.16);
+      color: #e5e7eb;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Character Image Prompt Builder<span class="pill">MULTI‑FILTER</span></h1>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Attributes</h2>
+
+      <div class="field-group">
+        <label for="subject">Subject / Character type</label>
+        <select id="subject" multiple>
+          <option> Cute plush creature</option>
+          <option> Small mascot</option>
+          <option> Friendly monster</option>
+          <option> Toy / doll aesthetic</option>
+          <option> Woodland fairy</option>
+          <option> Fairy insect courier</option>
+          <option> Carnival alien ringmaster</option>
+          <option> Alien in human costume</option>
+          <option> Anime-style warrior</option>
+          <option> Cyberpunk priest / religious figure</option>
+          <option> Fashion model (human)</option>
+          <option> Runway model in conceptual fashion</option>
+          <option> Surreal fashion creature</option>
+          <option> Alien priest or oracle</option>
+          <option> Mysterious wanderer</option>
+          <option> Living mascot made from swirling galaxies</option>
+          <option> Shapeshifter whose shadow has a different pose</option>
+          <option> Giant baby kaiju in designer streetwear</option>
+          <option> Headless figure with a floating halo of objects</option>
+          <option> Constellation spirit with star-map body lines</option>
+        </select>
+        <div class="hint">Pick 1–2 for variety.</div>
+      </div>
+
+      <div class="field-group">
+        <label for="materials">Materials / Textures</label>
+        <select id="materials" multiple>
+          <option> Soft plush and felt</option>
+          <option> Stitched fabric and buttons</option>
+          <option> Layered fur or quills</option>
+          <option> Sequined / glittery</option>
+          <option> Feather-metallic accents</option>
+          <option> Leaf / natural materials</option>
+          <option> Fur trim</option>
+          <option> Holographic fabric</option>
+          <option> Smooth latex or leather</option>
+          <option> Neon outline glow</option>
+          <option> Puffy cloud-like material</option>
+          <option> Ornate embroidery and beadwork</option>
+          <option> Semi-translucent organics</option>
+          <option> Metallic or carved surfaces</option>
+          <option> Cracked porcelain with light in the fractures</option>
+          <option> Wet reflective glass skin with raindrops</option>
+          <option> Patchwork of many small patterned fabrics</option>
+          <option> Brushed chrome behaving like soft fabric</option>
+          <option> Velvet that reveals subtle glowing symbols</option>
+        </select>
+        <div class="hint">Pick 1–3 distinctive surface ideas.</div>
+      </div>
+
+      <div class="field-group">
+        <label for="fashion">Fashion / Costume</label>
+        <select id="fashion" multiple>
+          <option> Circus ringmaster attire</option>
+          <option> Carnival performer outfit</option>
+          <option> Leaf dress fairy</option>
+          <option> Woodland robes</option>
+          <option> Santa-inspired suit</option>
+          <option> Traditional Asian robes</option>
+          <option> Cyberpunk religious robes</option>
+          <option> High-fashion avant-garde look</option>
+          <option> Rainbow pop fashion</option>
+          <option> Metallic armor dress</option>
+          <option> Casual modern clothing</option>
+          <option> Ornate ceremonial robes</option>
+          <option> Stylized armor set</option>
+          <option> Retro-future astronaut with royal court details</option>
+          <option> Business suit made of tangled neon cables</option>
+          <option> Children’s pajamas as ceremonial battle gear</option>
+          <option> Kimono that morphs into a landscape or skyline</option>
+          <option> Minimalist monk robes with architectural shoulders</option>
+        </select>
+        <div class="hint">Pick 1–2 fashion concepts.</div>
+      </div>
+
+      <div class="field-group">
+        <label for="color">Color scheme</label>
+        <select id="color" multiple>
+          <option> Warm earth tones</option>
+          <option> Cool moonlit blues</option>
+          <option> Neon magenta and teal</option>
+          <option> Soft pastels</option>
+          <option> Monochrome blue and silver</option>
+          <option> Candy gore reds, pinks, and cyan</option>
+          <option> Autumn leaf tones</option>
+          <option> Christmas red, white, and gold</option>
+          <option> Full rainbow spectrum</option>
+          <option> Black with cyan neon</option>
+          <option> Infrared thermal-camera palette</option>
+          <option> Toxic candy lime green, hot pink, and black</option>
+          <option> Bioluminescent deep-sea palette</option>
+          <option> Sepia world with vivid color accents</option>
+          <option> Opposite-wheel duos with near-grayscale surroundings</option>
+        </select>
+        <div class="hint">Pick 1 main palette; optional second accent.</div>
+      </div>
+
+      <div class="field-group">
+        <label for="lighting">Lighting / Effects</label>
+        <select id="lighting" multiple>
+          <option> Golden-hour sunset light</option>
+          <option> Bright moonlit night</option>
+          <option> Overcast diffuse daylight</option>
+          <option> Deep nighttime with artificial lights</option>
+          <option> Cinematic rim lighting</option>
+          <option> Soft natural bokeh</option>
+          <option> Carnival neon bokeh</option>
+          <option> Neon edge lighting</option>
+          <option> Runway spotlight from above</option>
+          <option> Circular halo glow behind the character</option>
+          <option> Sparkly reflections on water or fabric</option>
+          <option> Subtle fog or atmospheric haze</option>
+          <option> Strobe-freeze look with smeared background motion</option>
+          <option> Volumetric god-rays through colored fog</option>
+          <option> Silhouette rim-lit with internal glows</option>
+          <option> Underwater caustic light patterns</option>
+          <option> Time-slice motion trail of earlier poses</option>
+        </select>
+        <div class="hint">Pick 1–2 effects.</div>
+      </div>
+
+      <div class="field-group">
+        <label for="theme">Themes / Concepts</label>
+        <select id="theme" multiple>
+          <option> Dark carnival / candy gore</option>
+          <option> Woodland fairy tale</option>
+          <option> Holiday mashup (Christmas + sci-fi)</option>
+          <option> Martial-arts fantasy</option>
+          <option> Cyberpunk religious ritual</option>
+          <option> High-fashion runway</option>
+          <option> Toy / doll come to life</option>
+          <option> Dreamy whimsical adventure</option>
+          <option> Slightly eerie but stylish surrealism</option>
+          <option> Epic heroic moment in a strange world</option>
+          <option> Deity of glitches made of UI errors and scanlines</option>
+          <option> Post-apocalyptic children’s birthday party</option>
+          <option> Parallel-universe tourist visiting Earth</option>
+          <option> Living toy leading a rebellion against its merchandise</option>
+          <option> Ritual performance blending runway, religion, and street parade</option>
+        </select>
+        <div class="hint">Pick 1 primary narrative vibe.</div>
+      </div>
+
+      <div class="controls">
+        <button id="randomize" type="button">🎲 Randomize Attributes</button>
+        <button id="buildPrompt" type="button">✨ Build Prompt</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Generated Prompt</h2>
+      <textarea id="promptOutput" placeholder="Your character image prompt will appear here..."></textarea>
+      <div class="controls">
+        <button id="copyPrompt" type="button">📋 Copy Prompt</button>
+      </div>
+      <p class="hint">
+        Use this prompt in your image model. For more diversity, tweak wording or deselect some attributes before rebuilding.[web:58]
+      </p>
+    </section>
+  </main>
+
+  <script>
+    // Utility to get selected text from a multi-select
+    function getSelectedValues(selectEl) {
+      return Array.from(selectEl.options)
+        .filter(o => o.selected)
+        .map(o => o.text.trim());
+    }
+
+    // Randomly select N unique options from a select element
+    function randomSelect(selectEl, min, max) {
+      const options = Array.from(selectEl.options);
+      options.forEach(o => o.selected = false);
+      const count = Math.max(min, Math.floor(Math.random() * (max - min + 1)) + min);
+      const indices = [...options.keys()];
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      indices.slice(0, Math.min(count, indices.length)).forEach(idx => {
+        options[idx].selected = true;
+      });
+    }
+
+    const subjectEl = document.getElementById('subject');
+    const materialsEl = document.getElementById('materials');
+    const fashionEl = document.getElementById('fashion');
+    const colorEl = document.getElementById('color');
+    const lightingEl = document.getElementById('lighting');
+    const themeEl = document.getElementById('theme');
+    const outputEl = document.getElementById('promptOutput');
+
+    document.getElementById('randomize').addEventListener('click', () => {
+      randomSelect(subjectEl, 1, 2);
+      randomSelect(materialsEl, 1, 3);
+      randomSelect(fashionEl, 1, 2);
+      randomSelect(colorEl, 1, 2);
+      randomSelect(lightingEl, 1, 2);
+      randomSelect(themeEl, 1, 1);
+    });
+
+    document.getElementById('buildPrompt').addEventListener('click', () => {
+      const subjects = getSelectedValues(subjectEl);
+      const materials = getSelectedValues(materialsEl);
+      const fashion = getSelectedValues(fashionEl);
+      const colors = getSelectedValues(colorEl);
+      const lighting = getSelectedValues(lightingEl);
+      const themes = getSelectedValues(themeEl);
+
+      const parts = [];
+
+      if (subjects.length) {
+        parts.push(`A ${subjects.join(' and ')} character`);
+      }
+
+      if (materials.length) {
+        parts.push(`made of ${materials.join(', ')}`);
+      }
+
+      if (fashion.length) {
+        parts.push(`wearing ${fashion.join(' and ')}`);
+      }
+
+      if (themes.length) {
+        parts.push(`set in a ${themes.join(' and ')} setting`);
+      }
+
+      if (colors.length) {
+        parts.push(`with a ${colors.join(' and ')} color palette`);
+      }
+
+      if (lighting.length) {
+        parts.push(`lit with ${lighting.join(' and ')}`);
+      }
+
+      const base = parts.join(', ')
+        .replace(/\s+/g, ' ')
+        .replace(/,\s*$/, '');
+
+      const prompt = base.length
+        ? base + ", highly detailed, expressive, cinematic composition, leave room for stylistic interpretation."
+        : "A highly distinctive character in a surreal world, cinematic composition, leave room for stylistic interpretation.";
+
+      outputEl.value = prompt;
+    });
+
+    document.getElementById('copyPrompt').addEventListener('click', async () => {
+      if (!outputEl.value.trim()) return;
+      try {
+        await navigator.clipboard.writeText(outputEl.value);
+        const original = document.getElementById('copyPrompt').textContent;
+        document.getElementById('copyPrompt').textContent = "✅ Copied!";
+        setTimeout(() => {
+          document.getElementById('copyPrompt').textContent = original;
+        }, 1200);
+      } catch (e) {
+        alert("Copy failed. You can copy manually from the text area.");
+      }
+    });
+  </script>
+</body>
+</html>
