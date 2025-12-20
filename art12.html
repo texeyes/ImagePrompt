@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prize Character Forge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: radial-gradient(circle at top, #1c2333 0, #020617 45%, #000 100%);
+      --accent: #0ea5e9;
+      --accent-soft: rgba(56,189,248,0.25);
+      --accent-strong: #f97316;
+      --glass-bg: rgba(15,23,42,0.72);
+      --glass-border: rgba(148,163,184,0.55);
+      --radius-xl: 24px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(0,0,0,0.55);
+      --text-main: #e5e7eb;
+      --text-subtle: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background-image: var(--bg);
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 18px 22px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-orb {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #fbbf24, #f97316 40%, #0f172a 70%);
+      box-shadow: 0 0 18px rgba(248,250,252,0.45);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo-orb::after {
+      content: "";
+      position: absolute;
+      inset: 18% 18%;
+      border-radius: inherit;
+      border: 1px solid rgba(248,250,252,0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #cbd5f5;
+      background: linear-gradient(120deg, rgba(15,23,42,0.9), rgba(15,23,42,0.5));
+      backdrop-filter: blur(20px);
+    }
+
+    .subtitle {
+      width: 100%;
+      font-size: 0.85rem;
+      color: var(--text-subtle);
+      padding: 2px 22px 4px;
+    }
+
+    main {
+      max-width: 1160px;
+      margin: 10px auto 26px;
+      padding: 0 18px 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.4fr);
+      gap: 22px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(15,23,42,0.92), rgba(15,23,42,0.7));
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 18px 18px;
+      backdrop-filter: blur(26px) saturate(130%);
+      -webkit-backdrop-filter: blur(26px) saturate(130%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 0 0, rgba(56,189,248,0.16), transparent 55%),
+                  radial-gradient(circle at 100% 0, rgba(244,114,182,0.18), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .glass-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .glass-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .glass-header h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #c4d3ff;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 16px;
+    }
+
+    @media (max-width: 730px) {
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-label-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      align-items: baseline;
+    }
+
+    label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-subtle);
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 0.68rem;
+      border: 1px solid rgba(148,163,184,0.55);
+      color: #cbd5f5;
+    }
+
+    select {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148,163,184,0.7);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.94), rgba(15,23,42,0.9));
+      padding: 7px 9px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+      box-shadow: inset 0 0 0 0 rgba(15,23,42,0.9);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.55);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.98), rgba(15,23,42,0.93));
+    }
+
+    select[multiple] {
+      min-height: 115px;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      position: relative;
+      border-radius: 999px;
+      border: none;
+      padding: 9px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      background: #111827;
+      color: #e5e7eb;
+      box-shadow: 0 10px 28px rgba(15,23,42,0.8);
+      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease, opacity 0.1s ease;
+      outline: none;
+    }
+
+    button span.icon {
+      font-size: 1rem;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 4px 14px rgba(15,23,42,0.9);
+    }
+
+    #randomize {
+      background: linear-gradient(135deg, #22c55e, #bef264);
+      color: #052e16;
+    }
+
+    #buildPrompt {
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      color: #eff6ff;
+    }
+
+    #copyPrompt {
+      background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.9));
+      border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.97), rgba(2,6,23,0.96));
+      color: var(--text-main);
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      resize: vertical;
+      outline: none;
+      box-shadow: inset 0 0 0 0 rgba(15,23,42,1);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .prompt-title {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+      margin-bottom: 4px;
+    }
+
+    .prompt-tagline {
+      font-size: 0.85rem;
+      color: #c4d3ff;
+      margin-bottom: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #facc15, #f97316 65%, #b91c1c 100%);
+      box-shadow: 0 0 10px rgba(248,250,252,0.6);
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo-orb"></div>
+      <div>
+        <h1>Prize Character Forge</h1>
+      </div>
+    </div>
+    <div class="pill">Design your next “pull”</div>
+    <div class="subtitle">
+      Mix attributes like a gacha prize machine and mint a one‑of‑a‑kind character prompt.
+    </div>
+  </header>
+
+  <main>
+    <section class="glass-card">
+      <div class="glass-card-inner">
+        <div class="glass-header">
+          <h2>Attribute Mixer</h2>
+          <div class="hint">Tap a field or let the forge roll for you.</div>
+        </div>
+
+        <div class="field-grid">
+          <!-- SUBJECT -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="subject">Subject / Type</label>
+              <span class="chip">Pick 1–2</span>
+            </div>
+            <select id="subject" multiple>
+              <option>Cute plush creature</option>
+              <option>Small mascot</option>
+              <option>Friendly monster</option>
+              <option>Toy / doll aesthetic</option>
+              <option>Woodland fairy</option>
+              <option>Fairy insect courier</option>
+              <option>Carnival alien ringmaster</option>
+              <option>Alien in human costume</option>
+              <option>Anime-style warrior</option>
+              <option>Cyberpunk priest / religious figure</option>
+              <option>Fashion model (human)</option>
+              <option>Runway model in conceptual fashion</option>
+              <option>Surreal fashion creature</option>
+              <option>Alien priest or oracle</option>
+              <option>Mysterious wanderer</option>
+              <option>Living mascot made from swirling galaxies</option>
+              <option>Shapeshifter whose shadow has a different pose</option>
+              <option>Giant baby kaiju in designer streetwear</option>
+              <option>Headless figure with a floating halo of objects</option>
+              <option>Constellation spirit with star-map body lines</option>
+            </select>
+          </div>
+
+          <!-- MATERIALS -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="materials">Materials / Texture</label>
+              <span class="chip">Pick 1–3</span>
+            </div>
+            <select id="materials" multiple>
+              <option>Soft plush and felt</option>
+              <option>Stitched fabric and buttons</option>
+              <option>Layered fur or quills</option>
+              <option>Sequined / glittery</option>
+              <option>Feather-metallic accents</option>
+              <option>Leaf / natural materials</option>
+              <option>Fur trim</option>
+              <option>Holographic fabric</option>
+              <option>Smooth latex or leather</option>
+              <option>Neon outline glow</option>
+              <option>Puffy cloud-like material</option>
+              <option>Ornate embroidery and beadwork</option>
+              <option>Semi-translucent organics</option>
+              <option>Metallic or carved surfaces</option>
+              <option>Cracked porcelain with light in the fractures</option>
+              <option>Wet reflective glass skin with raindrops</option>
+              <option>Patchwork of many small patterned fabrics</option>
+              <option>Brushed chrome behaving like soft fabric</option>
+              <option>Velvet that reveals subtle glowing symbols</option>
+            </select>
+          </div>
+
+          <!-- FASHION -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="fashion">Fashion / Costume</label>
+              <span class="chip">Pick 1–2</span>
+            </div>
+            <select id="fashion" multiple>
+              <option>Circus ringmaster attire</option>
+              <option>Carnival performer outfit</option>
+              <option>Leaf dress fairy</option>
+              <option>Woodland robes</option>
+              <option>Santa-inspired suit</option>
+              <option>Traditional Asian robes</option>
+              <option>Cyberpunk religious robes</option>
+              <option>High-fashion avant-garde look</option>
+              <option>Rainbow pop fashion</option>
+              <option>Metallic armor dress</option>
+              <option>Casual modern clothing</option>
+              <option>Ornate ceremonial robes</option>
+              <option>Stylized armor set</option>
+              <option>Retro-future astronaut with royal court details</option>
+              <option>Business suit made of tangled neon cables</option>
+              <option>Children’s pajamas as ceremonial battle gear</option>
+              <option>Kimono that morphs into a landscape or skyline</option>
+              <option>Minimalist monk robes with architectural shoulders</option>
+            </select>
+          </div>
+
+          <!-- COLOR -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="color">Color scheme</label>
+              <span class="chip">Pick 1–2</span>
+            </div>
+            <select id="color" multiple>
+              <option>Warm earth tones</option>
+              <option>Cool moonlit blues</option>
+              <option>Neon magenta and teal</option>
+              <option>Soft pastels</option>
+              <option>Monochrome blue and silver</option>
+              <option>Candy gore reds, pinks, and cyan</option>
+              <option>Autumn leaf tones</option>
+              <option>Christmas red, white, and gold</option>
+              <option>Full rainbow spectrum</option>
+              <option>Black with cyan neon</option>
+              <option>Infrared thermal-camera palette</option>
+              <option>Toxic candy lime green, hot pink, and black</option>
+              <option>Bioluminescent deep-sea palette</option>
+              <option>Sepia world with vivid color accents</option>
+              <option>Opposite-wheel duos with near-grayscale surroundings</option>
+            </select>
+          </div>
+
+          <!-- LIGHTING -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="lighting">Lighting / Effects</label>
+              <span class="chip">Pick 1–2</span>
+            </div>
+            <select id="lighting" multiple>
+              <option>Golden-hour sunset light</option>
+              <option>Bright moonlit night</option>
+              <option>Overcast diffuse daylight</option>
+              <option>Deep nighttime with artificial lights</option>
+              <option>Cinematic rim lighting</option>
+              <option>Soft natural bokeh</option>
+              <option>Carnival neon bokeh</option>
+              <option>Neon edge lighting</option>
+              <option>Runway spotlight from above</option>
+              <option>Circular halo glow behind the character</option>
+              <option>Sparkly reflections on water or fabric</option>
+              <option>Subtle fog or atmospheric haze</option>
+              <option>Strobe-freeze look with smeared background motion</option>
+              <option>Volumetric god-rays through colored fog</option>
+              <option>Silhouette rim-lit with internal glows</option>
+              <option>Underwater caustic light patterns</option>
+              <option>Time-slice motion trail of earlier poses</option>
+            </select>
+          </div>
+
+          <!-- THEME -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label for="theme">Theme / Concept</label>
+              <span class="chip">Pick 1</span>
+            </div>
+            <select id="theme" multiple>
+              <option>Dark carnival / candy gore</option>
+              <option>Woodland fairy tale</option>
+              <option>Holiday mashup (Christmas + sci-fi)</option>
+              <option>Martial-arts fantasy</option>
+              <option>Cyberpunk religious ritual</option>
+              <option>High-fashion runway</option>
+              <option>Toy / doll come to life</option>
+              <option>Dreamy whimsical adventure</option>
+              <option>Slightly eerie but stylish surrealism</option>
+              <option>Epic heroic moment in a strange world</option>
+              <option>Deity of glitches made of UI errors and scanlines</option>
+              <option>Post-apocalyptic children’s birthday party</option>
+              <option>Parallel-universe tourist visiting Earth</option>
+              <option>Living toy leading a rebellion against its merchandise</option>
+              <option>Ritual performance blending runway, religion, and street parade</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button id="randomize" type="button">
+            <span class="icon">🎰</span>
+            Roll a Prize Build
+          </button>
+          <button id="buildPrompt" type="button">
+            <span class="icon">✨</span>
+            Mint Prompt
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass-card">
+      <div class="glass-card-inner">
+        <div class="glass-header">
+          <div>
+            <div class="prompt-title">Current Pull</div>
+            <div class="prompt-tagline">Your minted description, ready for any image model.</div>
+          </div>
+        </div>
+        <textarea id="promptOutput" placeholder="Hit “Roll a Prize Build” or start selecting attributes on the left, then tap “Mint Prompt”."></textarea>
+        <div class="controls-row" style="margin-top:10px;">
+          <button id="copyPrompt" type="button">
+            <span class="icon">📋</span>
+            Copy Prompt
+          </button>
+        </div>
+        <div class="status-row">
+          <div class="status-text">
+            Tip: tweak a few words each time to keep the model improvising while the core character stays consistent.[web:58]
+          </div>
+          <div class="status-dot" id="statusDot"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function getSelectedValues(selectEl) {
+      return Array.from(selectEl.options)
+        .filter(o => o.selected)
+        .map(o => o.text.trim());
+    }
+
+    function randomSelect(selectEl, min, max) {
+      const options = Array.from(selectEl.options);
+      options.forEach(o => o.selected = false);
+      const count = Math.max(min, Math.floor(Math.random() * (max - min + 1)) + min);
+      const indices = [...options.keys()];
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      indices.slice(0, Math.min(count, indices.length)).forEach(idx => {
+        options[idx].selected = true;
+      });
+    }
+
+    const subjectEl = document.getElementById('subject');
+    const materialsEl = document.getElementById('materials');
+    const fashionEl = document.getElementById('fashion');
+    const colorEl = document.getElementById('color');
+    const lightingEl = document.getElementById('lighting');
+    const themeEl = document.getElementById('theme');
+    const outputEl = document.getElementById('promptOutput');
+    const statusDot = document.getElementById('statusDot');
+
+    function pulseStatus() {
+      statusDot.animate(
+        [
+          { transform: 'scale(1)', opacity: 1 },
+          { transform: 'scale(1.25)', opacity: 0.4 },
+          { transform: 'scale(1)', opacity: 1 }
+        ],
+        { duration: 500, easing: 'ease-out' }
+      );
+    }
+
+    document.getElementById('randomize').addEventListener('click', () => {
+      randomSelect(subjectEl, 1, 2);
+      randomSelect(materialsEl, 1, 3);
+      randomSelect(fashionEl, 1, 2);
+      randomSelect(colorEl, 1, 2);
+      randomSelect(lightingEl, 1, 2);
+      randomSelect(themeEl, 1, 1);
+      pulseStatus();
+    });
+
+    document.getElementById('buildPrompt').addEventListener('click', () => {
+      const subjects = getSelectedValues(subjectEl);
+      const materials = getSelectedValues(materialsEl);
+      const fashion = getSelectedValues(fashionEl);
+      const colors = getSelectedValues(colorEl);
+      const lighting = getSelectedValues(lightingEl);
+      const themes = getSelectedValues(themeEl);
+
+      const parts = [];
+
+      if (subjects.length) {
+        parts.push(`a ${subjects.join(' and ')} character`);
+      } else {
+        parts.push("a distinctive character");
+      }
+
+      if (materials.length) {
+        parts.push(`made of ${materials.join(', ')}`);
+      }
+
+      if (fashion.length) {
+        parts.push(`wearing ${fashion.join(' and ')}`);
+      }
+
+      if (themes.length) {
+        parts.push(`in a ${themes.join(' and ')} setting`);
+      }
+
+      if (colors.length) {
+        parts.push(`using a ${colors.join(' and ')} color palette`);
+      }
+
+      if (lighting.length) {
+        parts.push(`lit with ${lighting.join(' and ')}`);
+      }
+
+      const base = parts.join(', ').replace(/\s+/g, ' ').trim();
+
+      const prompt = `${base}, highly detailed, cinematic composition, expressive posing, leave room for stylistic interpretation and model creativity.`;
+
+      outputEl.value = prompt;
+      pulseStatus();
+    });
+
+    document.getElementById('copyPrompt').addEventListener('click', async () => {
+      const text = outputEl.value.trim();
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById('copyPrompt');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<span class="icon">✅</span>Copied';
+        setTimeout(() => { btn.innerHTML = original; }, 1200);
+        pulseStatus();
+      } catch (e) {
+        alert("Copy failed. Please copy from the text area manually.");
+      }
+    });
+  </script>
+</body>
+</html>
