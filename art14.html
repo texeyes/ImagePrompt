@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok AI Model Prompt Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #7b2ff7, #ff4ecd, #ff8c42);
+      color: #222;
+    }
+    header {
+      padding: 40px 20px;
+      text-align: center;
+      color: #fff;
+    }
+    header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    header p { font-size: 1.1rem; opacity: 0.95; }
+
+    .container { max-width: 1200px; margin: auto; padding: 20px; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 600;
+      background: linear-gradient(135deg, #7b2ff7, #ff4ecd);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.25); }
+
+    .output {
+      background: #fff;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+    .output h2 { margin-top: 0; }
+    .output textarea {
+      width: 100%;
+      min-height: 140px;
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      resize: vertical;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      background: linear-gradient(135deg, #ff8c42, #ff4ecd);
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-3px); }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .option {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+    .option:hover { border-color: #ff4ecd; }
+    .option.selected {
+      background: linear-gradient(135deg, #7b2ff7, #ff4ecd);
+      color: #fff;
+      border-color: transparent;
+      transform: scale(1.05);
+    }
+
+    /* Script Analyzer Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 700px;
+      padding: 25px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .modal textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+    }
+    .suggestions {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .suggestion {
+      background: #f3f3f3;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .suggestion:hover { background: #e5e5e5; }
+
+    footer {
+      text-align: center;
+      padding: 30px 10px;
+      color: #fff;
+      opacity: 0.9;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>✨ TikTok AI Model Image Prompt Generator ✨</h1>
+  <p>Create scroll‑stopping AI model prompts for TikTok fashion & lifestyle content</p>
+</header>
+
+<div class="container">
+
+  <div class="controls">
+    <button class="btn" onclick="randomMagic()">🎲 Random Magic</button>
+    <button class="btn" onclick="multiSelect()">✨ Multi Select</button>
+    <button class="btn" onclick="modelOnly()">👤 Model Only</button>
+    <button class="btn" onclick="openAnalyzer()">🧠 Analyze Script</button>
+    <button class="btn" onclick="clearAll()">🧹 Clear All</button>
+    <button class="btn" onclick="generatePrompt()">🚀 Generate Prompt</button>
+  </div>
+
+  <div class="output" id="outputSection">
+    <h2>Generated AI Image Prompt</h2>
+    <textarea id="promptOutput" placeholder="Your generated prompt will appear here..."></textarea>
+    <button class="btn copy-btn" onclick="copyPrompt()">📋 Copy Prompt</button>
+  </div>
+
+  <div class="categories" id="categories"></div>
+</div>
+
+<!-- Script Analyzer Modal -->
+<div class="modal" id="analyzerModal">
+  <div class="modal-content">
+    <h2>🧠 TikTok Script Analyzer</h2>
+    <p>Paste your TikTok script below (hook, captions, hashtags, full script):</p>
+    <textarea id="scriptInput" placeholder="Paste your TikTok script here..."></textarea>
+    <div style="margin-top:12px; display:flex; gap:10px;">
+      <button class="btn" onclick="analyzeScript()">Analyze</button>
+      <button class="btn" onclick="closeAnalyzer()">Close</button>
+    </div>
+    <div class="suggestions" id="scriptSuggestions"></div>
+  </div>
+</div>
+
+<footer>
+  Built for TikTok creators 💖 Make something unforgettable.
+</footer>
+
+<script>
+  const categoryData = {
+    "TikTok Content Type": ["Fashion Tutorial","OOTD Showcase","Styling Hacks","Try-On Haul","Trend Alert","Get Ready With Me","Fashion Challenge","Closet Tips","Budget Fashion","Seasonal Style","Mix & Match"],
+    "Video Energy/Vibe": ["High Energy","Calm Relatable","Confident Boss","Fun Playful","Sophisticated","Edgy Trendy","Girl Next Door","Fashion Expert","Quirky Creative"],
+    "Setting Type": ["Bedroom Mirror","Walk-In Closet","Full-Length Mirror","Neutral Background","Urban Street","Boutique Setting","Living Room","Outdoor Natural","Ring Light Studio"],
+    "Body Language & Engagement": ["Pointing/Showing","Direct Camera Talk","Twirling/Spinning","Expressive Gestures","Mirror Selfie","Holding Clothes","Quick Changes","Walking Towards","Before/After Poses"],
+
+    "Age Range": ["18-20","21-23","24-26","27-29","30-32","33-35","25","30"],
+    "Ethnicity/Features": ["Mediterranean/Middle Eastern","Caucasian","Latina","East Asian","Black/African American","Mixed Ethnicity","South Asian","Southeast Asian"],
+    "Style/Aesthetic": ["Luxury/High Fashion","Casual/Everyday","Glamorous/Party","Beachwear/Resort","Athleisure/Sporty","Elegant/Formal","Museum/Gallery Chic","European Tourist","Minimalist Modern","Y2K/Retro","Business Casual","Street Style Urban"],
+    "Location/Background": ["Shopping Mall","Beach/Resort","Home/Indoor","Retail Store","Luxury Venue","Desert/Outdoor","Art Museum/Gallery","Historic Landmark","Luxury Hotel","Urban Street","City Street","Rooftop Terrace"],
+    "Clothing Style": ["Mini/Cocktail Dress","Tank & Shorts","Tank & Jeans","Swimwear","Oversized Jersey","Metallic Dress","Wrap Dress","Crop Top & Skirt","Blazer & Skirt","Slip Dress","Bodysuit","Maxi Dress"],
+    "Footwear & Accessories": ["Strappy Heels","Platform Sandals","Knee-High Boots","Ankle Boots","Sneakers","Designer Handbag","Sunglasses","Hoop Earrings","Layered Necklaces","Baseball Cap","Crossbody Bag","Statement Watch"],
+    "Hair Style": ["Very Long Straight","Short Bob","Natural Afro","Wavy/Loose Curls","Center Part Sleek","High Ponytail","Messy Bun","Side-Swept Bangs","Braided Style","Half-Up Half-Down","Pin-Straight Long"],
+    "Pose & Expression": ["Confident Standing","Walking Dynamic","Mirror Selfie","Seated Elegant","Over Shoulder","Candid Natural","Editorial Fashion","Laughing Joyful","Serious Sultry","Playful Fun","Profile Side View"],
+    "Lighting & Mood": ["Golden Hour","Bright Daylight","Soft Studio","Dramatic Lighting","Warm Indoor","Backlit","Neon Lights","Overcast Soft","Sunset Hues","Flash Photography","Dappled Sunlight"],
+    "Camera & Quality": ["DSLR Professional","iPhone Quality","Full Body Shot","Portrait Orientation","Shallow DOF","Wide Angle","50mm Natural","8K Ultra HD","Candid Street Style","Fashion Editorial","Social Media Style"]
+  };
+
+  const selections = {};
+
+  const categoriesEl = document.getElementById('categories');
+
+  Object.entries(categoryData).forEach(([category, options]) => {
+    selections[category] = [];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<h3>${category}</h3>`;
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    options.forEach(opt => {
+      const o = document.createElement('div');
+      o.className = 'option';
+      o.textContent = opt;
+      o.onclick = () => toggleOption(category, opt, o);
+      opts.appendChild(o);
+    });
+    card.appendChild(opts);
+    categoriesEl.appendChild(card);
+  });
+
+  function toggleOption(category, option, el) {
+    const arr = selections[category];
+    if (arr.includes(option)) {
+      selections[category] = arr.filter(o => o !== option);
+      el.classList.remove('selected');
+    } else {
+      selections[category].push(option);
+      el.classList.add('selected');
+    }
+  }
+
+  function clearAll() {
+    Object.keys(selections).forEach(k => selections[k] = []);
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    document.getElementById('promptOutput').value = '';
+  }
+
+  function randomMagic() {
+    clearAll();
+    Object.entries(categoryData).forEach(([cat, opts]) => {
+      const pick = opts[Math.floor(Math.random()*opts.length)];
+      selectOption(cat, pick);
+    });
+  }
+
+  function multiSelect() {
+    clearAll();
+    Object.entries(categoryData).forEach(([cat, opts]) => {
+      const count = Math.floor(Math.random()*3)+1;
+      shuffle(opts).slice(0,count).forEach(o => selectOption(cat, o));
+    });
+  }
+
+  function modelOnly() {
+    clearAll();
+    ['Age Range','Ethnicity/Features','Hair Style','Clothing Style','Pose & Expression','Lighting & Mood','Camera & Quality']
+      .forEach(cat => selectOption(cat, categoryData[cat][0]));
+  }
+
+  function selectOption(category, option) {
+    const el = [...document.querySelectorAll('.option')].find(o => o.textContent === option);
+    if (el && !el.classList.contains('selected')) el.click();
+  }
+
+  function generatePrompt() {
+    const age = selections['Age Range'].join(', ') || 'ages 18-35';
+    const ethnicity = selections['Ethnicity/Features'].join(', ');
+    const content = selections['TikTok Content Type'].join(', ');
+    const vibe = selections['Video Energy/Vibe'].join(', ');
+    const setting = selections['Setting Type'].join(', ');
+    const engagement = selections['Body Language & Engagement'].join(', ');
+    const style = selections['Style/Aesthetic'].join(', ');
+    const clothing = selections['Clothing Style'].join(', ');
+    const accessories = selections['Footwear & Accessories'].join(', ');
+    const hair = selections['Hair Style'].join(', ');
+    const pose = selections['Pose & Expression'].join(', ');
+    const location = selections['Location/Background'].join(', ');
+    const lighting = selections['Lighting & Mood'].join(', ');
+    const camera = selections['Camera & Quality'].join(', ');
+
+    const prompt = `Full body portrait of a stunning female model, ${age}${ethnicity ? ', ' + ethnicity : ''}, creating ${content || 'fashion content'}, with ${vibe || 'engaging'} vibe${setting ? ', filmed in ' + setting : ''}${engagement ? ', ' + engagement : ''}${style ? ', styled as ' + style : ''}${clothing ? ', wearing ' + clothing : ''}${accessories ? ' with ' + accessories : ''}${hair ? ', hair styled as ' + hair : ''}${pose ? ', posed in ' + pose : ''}${location ? ', photographed at ' + location : ''}${lighting ? ', lit with ' + lighting : ''}${camera ? ', captured with ' + camera : ''}. Professional TikTok content creator, high quality vertical format, engaging, realistic, and relatable.`;
+
+    document.getElementById('promptOutput').value = prompt;
+    document.getElementById('outputSection').scrollIntoView({behavior:'smooth'});
+  }
+
+  function copyPrompt() {
+    const t = document.getElementById('promptOutput');
+    t.select();
+    document.execCommand('copy');
+    alert('✅ Copied!');
+  }
+
+  function shuffle(arr) { return [...arr].sort(()=>0.5-Math.random()); }
+
+  function openAnalyzer() { document.getElementById('analyzerModal').style.display='flex'; }
+  function closeAnalyzer() { document.getElementById('analyzerModal').style.display='none'; }
+
+  function analyzeScript() {
+    const text = document.getElementById('scriptInput').value.toLowerCase();
+    const sug = document.getElementById('scriptSuggestions');
+    sug.innerHTML = '';
+    const rules = [
+      {k:['ootd','outfit','style'], v:'OOTD Showcase'},
+      {k:['hack','tip'], v:'Styling Hacks'},
+      {k:['try on','haul'], v:'Try-On Haul'},
+      {k:['mirror'], v:'Bedroom Mirror'},
+      {k:['closet'], v:'Walk-In Closet'},
+      {k:['bold','statement'], v:'Confident Boss'},
+      {k:['easy','simple'], v:'Calm Relatable'},
+      {k:['love','exciting'], v:'High Energy'}
+    ];
+    let found = false;
+    rules.forEach(r => {
+      if (r.k.some(x => text.includes(x))) {
+        const s = document.createElement('div');
+        s.className='suggestion';
+        s.textContent=r.v;
+        s.onclick=()=>autoApply(r.v);
+        sug.appendChild(s);
+        found=true;
+      }
+    });
+    if(!found) sug.textContent='No recommendations found.';
+  }
+
+  function autoApply(val) {
+    Object.entries(categoryData).forEach(([cat, opts]) => {
+      if (opts.includes(val)) selectOption(cat, val);
+    });
+  }
+</script>
+
+</body>
+</html>
