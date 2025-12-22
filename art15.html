@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Model Image Prompt Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+    }
+
+    .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .header p {
+        font-size: 1.2em;
+        opacity: 0.95;
+    }
+
+    .magic-text {
+        font-size: 0.9em;
+        margin-top: 10px;
+        font-style: italic;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+
+    .controls {
+        padding: 30px;
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 15px 30px;
+        font-size: 1.1em;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .btn-random {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .btn-multi {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .btn-clear {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+
+    .btn-generate {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: white;
+        font-size: 1.3em;
+        padding: 20px 50px;
+    }
+
+    .btn-minimal {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #330867;
+    }
+
+    .btn-script {
+        background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+        color: white;
+    }
+
+    .btn-analyze {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 30px;
+        font-size: 1em;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .btn-close-script {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        padding: 12px 30px;
+        font-size: 1em;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .script-analyzer {
+        padding: 30px;
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        margin: 20px 0;
+    }
+
+    .script-container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .script-container h2 {
+        color: #764ba2;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .script-helper {
+        color: #666;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+    }
+
+    #scriptInput {
+        width: 100%;
+        min-height: 200px;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 1em;
+        font-family: inherit;
+        resize: vertical;
+        margin-bottom: 20px;
+    }
+
+    #scriptInput:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .script-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .script-suggestions {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        display: none;
+    }
+
+    .script-suggestions.visible {
+        display: block;
+    }
+
+    .suggestion-section {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .suggestion-section h3 {
+        color: #764ba2;
+        margin-bottom: 10px;
+    }
+
+    .suggestion-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .suggestion-tag {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .suggestion-tag:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .auto-apply-btn {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .auto-apply-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .content {
+        padding: 40px;
+    }
+
+    .category {
+        margin-bottom: 40px;
+        padding: 25px;
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 20%);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .category h2 {
+        color: #764ba2;
+        margin-bottom: 20px;
+        font-size: 1.8em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .category-icon {
+        font-size: 1.2em;
+    }
+
+    .options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .option {
+        padding: 15px;
+        background: white;
+        border: 3px solid transparent;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .option:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+
+    .option.selected {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #764ba2;
+        transform: scale(1.05);
+    }
+
+    .prompt-output {
+        margin-top: 40px;
+        padding: 30px;
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .prompt-output h2 {
+        color: #764ba2;
+        margin-bottom: 20px;
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .prompt-text {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        min-height: 120px;
+        font-size: 1.1em;
+        line-height: 1.8;
+        color: #333;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+        word-wrap: break-word;
+    }
+
+    .prompt-text.empty {
+        color: #999;
+        font-style: italic;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .copy-btn {
+        margin-top: 15px;
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .copy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .sparkle {
+        display: inline-block;
+        animation: sparkle 1.5s infinite;
+    }
+
+    @keyframes sparkle {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="sparkle">✨</span> AI Model Image Prompt Generator <span class="sparkle">✨</span></h1>
+            <p>Create stunning, professional model prompts for your TikTok videos</p>
+            <p class="magic-text">🎨 Perfect models for your viral content... 🎨</p>
+        </div>
+
+```
+    <div class="controls">
+        <button class="btn btn-random" onclick="selectRandom()">🎲 Random Magic</button>
+        <button class="btn btn-multi" onclick="selectMulti()">🎯 Multi Select</button>
+        <button class="btn btn-minimal" onclick="selectMinimal()">👤 Model Only</button>
+        <button class="btn btn-script" onclick="showScriptAnalyzer()">📝 Analyze Script</button>
+        <button class="btn btn-clear" onclick="clearAll()">🔄 Clear All</button>
+        <button class="btn btn-generate" onclick="generatePrompt()">🚀 Generate Prompt</button>
+    </div>
+
+    <div class="script-analyzer" id="scriptAnalyzer" style="display: none;">
+        <div class="script-container">
+            <h2>📝 TikTok Script Analyzer</h2>
+            <p class="script-helper">Paste your TikTok script below and I'll suggest the perfect model characteristics!</p>
+            <textarea id="scriptInput" placeholder="Paste your TikTok script here (including title, hashtags, hook, and full script)..."></textarea>
+            <div class="script-buttons">
+                <button class="btn btn-analyze" onclick="analyzeScript()">🔍 Analyze & Suggest</button>
+                <button class="btn btn-close-script" onclick="closeScriptAnalyzer()">✕ Close</button>
+            </div>
+            <div id="scriptSuggestions" class="script-suggestions"></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="prompt-output">
+            <h2>✨ Your Masterpiece Prompt ✨</h2>
+            <div class="prompt-text empty" id="promptOutput">
+                Select options below and click "Generate Prompt" to create your perfect model image prompt!
+            </div>
+            <button class="copy-btn" onclick="copyPrompt()" id="copyBtn" style="display: none;">📋 Copy to Clipboard</button>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">🎬</span>TikTok Content Type</h2>
+            <div class="options" id="content">
+                <div class="option" data-value="fashion styling tutorial, outfit transformation">Fashion Tutorial</div>
+                <div class="option" data-value="outfit of the day, daily style showcase">OOTD Showcase</div>
+                <div class="option" data-value="styling hacks, wardrobe tips">Styling Hacks</div>
+                <div class="option" data-value="try-on haul, fashion haul">Try-On Haul</div>
+                <div class="option" data-value="fashion trends, trend alert">Trend Alert</div>
+                <div class="option" data-value="get ready with me, GRWM routine">Get Ready With Me</div>
+                <div class="option" data-value="fashion challenge, style challenge">Fashion Challenge</div>
+                <div class="option" data-value="closet organization, wardrobe tips">Closet Tips</div>
+                <div class="option" data-value="budget fashion, affordable style">Budget Fashion</div>
+                <div class="option" data-value="seasonal fashion, weather-appropriate style">Seasonal Style</div>
+                <div class="option" data-value="mix and match outfits, capsule wardrobe">Mix & Match</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">🎯</span>Video Energy/Vibe</h2>
+            <div class="options" id="energy">
+                <div class="option" data-value="energetic and enthusiastic, upbeat personality">High Energy</div>
+                <div class="option" data-value="calm and relatable, approachable demeanor">Calm Relatable</div>
+                <div class="option" data-value="confident and empowering, bold presence">Confident Boss</div>
+                <div class="option" data-value="fun and playful, bubbly personality">Fun Playful</div>
+                <div class="option" data-value="sophisticated and elegant, refined presence">Sophisticated</div>
+                <div class="option" data-value="edgy and trendy, fashion-forward attitude">Edgy Trendy</div>
+                <div class="option" data-value="girl-next-door, friendly and warm">Girl Next Door</div>
+                <div class="option" data-value="professional fashionista, expert styling">Fashion Expert</div>
+                <div class="option" data-value="quirky and creative, unique personality">Quirky Creative</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">🎥</span>Setting Type</h2>
+            <div class="options" id="setting">
+                <div class="option" data-value="bedroom mirror setup, personal space">Bedroom Mirror</div>
+                <div class="option" data-value="walk-in closet, wardrobe room">Walk-In Closet</div>
+                <div class="option" data-value="full-length mirror, standing setup">Full-Length Mirror</div>
+                <div class="option" data-value="neutral background, clean minimal backdrop">Neutral Background</div>
+                <div class="option" data-value="urban outdoor, city street">Urban Street</div>
+                <div class="option" data-value="boutique store, shopping setting">Boutique Setting</div>
+                <div class="option" data-value="living room, cozy home interior">Living Room</div>
+                <div class="option" data-value="natural outdoor lighting, outside setting">Outdoor Natural</div>
+                <div class="option" data-value="ring light setup, influencer studio">Ring Light Studio</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">👁️</span>Body Language & Engagement</h2>
+            <div class="options" id="engagement">
+                <div class="option" data-value="pointing at outfit details, showing pieces">Pointing/Showing</div>
+                <div class="option" data-value="talking to camera, direct engagement">Direct Camera Talk</div>
+                <div class="option" data-value="twirling and showing outfit, 360 view">Twirling/Spinning</div>
+                <div class="option" data-value="hands gesturing expressively, animated">Expressive Gestures</div>
+                <div class="option" data-value="mirror selfie style, phone in hand">Mirror Selfie</div>
+                <div class="option" data-value="holding clothing items, showing options">Holding Clothes</div>
+                <div class="option" data-value="quick outfit changes, transition poses">Quick Changes</div>
+                <div class="option" data-value="walking towards camera, runway style">Walking Towards</div>
+                <div class="option" data-value="side-by-side comparison poses">Before/After Poses</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">🎂</span>Age Range</h2>
+            <div class="options" id="age">
+                <div class="option" data-value="18-20 years old, youthful">18-20 Years</div>
+                <div class="option" data-value="21-23 years old, early twenties">21-23 Years</div>
+                <div class="option" data-value="24-26 years old, mid twenties">24-26 Years</div>
+                <div class="option" data-value="27-29 years old, late twenties">27-29 Years</div>
+                <div class="option" data-value="30-32 years old, early thirties">30-32 Years</div>
+                <div class="option" data-value="33-35 years old, mid thirties">33-35 Years</div>
+                <div class="option" data-value="25 years old, quarter century">25 Years</div>
+                <div class="option" data-value="30 years old, mature yet youthful">30 Years</div>
+            </div>
+        </div>
+        <div class="category">
+            <h2><span class="category-icon">👤</span>Ethnicity/Features</h2>
+            <div class="options" id="ethnicity">
+                <div class="option" data-value="Mediterranean/Middle Eastern, olive to tan skin, dark hair">Mediterranean/Middle Eastern</div>
+                <div class="option" data-value="Caucasian, fair to light skin, varying hair colors">Caucasian</div>
+                <div class="option" data-value="Latina, tan to brown skin, dark features">Latina</div>
+                <div class="option" data-value="East Asian, light to medium skin, dark straight hair">East Asian</div>
+                <div class="option" data-value="Mixed ethnicity, ambiguous features, unique beauty">Mixed Ethnicity</div>
+                <div class="option" data-value="South Asian, warm brown skin, dark eyes">South Asian</div>
+                <div class="option" data-value="Southeast Asian, golden skin tone, delicate features">Southeast Asian</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">💃</span>Style/Aesthetic</h2>
+            <div class="options" id="style">
+                <div class="option" data-value="luxury high fashion, designer setting, upscale location, polished styling">Luxury/High Fashion</div>
+                <div class="option" data-value="casual everyday, relaxed fit, denim, natural vibe">Casual/Everyday</div>
+                <div class="option" data-value="glamorous party, metallic fabrics, statement pieces, dramatic lighting">Glamorous/Party</div>
+                <div class="option" data-value="beachwear resort style, tropical setting, vacation vibes">Beachwear/Resort</div>
+                <div class="option" data-value="athleisure sporty, jerseys, casual athletic wear">Athleisure/Sporty</div>
+                <div class="option" data-value="elegant formal, slip dresses, sophisticated silhouettes">Elegant/Formal</div>
+                <div class="option" data-value="museum gallery chic, oversized pieces, casual-luxe">Museum/Gallery Chic</div>
+                <div class="option" data-value="European tourist travel style, vacation fashion">European Tourist</div>
+                <div class="option" data-value="minimalist modern, sleek silhouettes, clean lines">Minimalist Modern</div>
+                <div class="option" data-value="Y2K retro sportswear, early 2000s aesthetic">Y2K/Retro</div>
+                <div class="option" data-value="business casual preppy, layered professional look">Business Casual</div>
+                <div class="option" data-value="street style urban, effortless city fashion">Street Style Urban</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">📍</span>Location/Background</h2>
+            <div class="options" id="location">
+                <div class="option" data-value="shopping mall, modern retail environment, glass railings, artificial lighting">Shopping Mall</div>
+                <div class="option" data-value="beach resort, sandy beaches, palm trees, tropical waters, natural outdoor lighting">Beach/Resort</div>
+                <div class="option" data-value="home interior, bedroom setting, mirrors, cozy atmosphere">Home/Indoor</div>
+                <div class="option" data-value="retail store, store aisles, fluorescent lighting, shopping environment">Retail Store</div>
+                <div class="option" data-value="luxury venue, ornate interior, red curtains, golden lighting, decorative columns">Luxury Venue</div>
+                <div class="option" data-value="desert outdoor, sandy terrain, open sky, natural landscape">Desert/Outdoor</div>
+                <div class="option" data-value="art museum gallery, colorful murals, modern art installation, white walls">Art Museum/Gallery</div>
+                <div class="option" data-value="historic landmark, famous tourist destination, Baroque architecture, evening golden hour">Historic Landmark</div>
+                <div class="option" data-value="luxury hotel apartment, upscale interior, elegant decor, sophisticated setting">Luxury Hotel</div>
+                <div class="option" data-value="urban street sidewalk, concrete pavement, natural daylight">Urban Street</div>
+                <div class="option" data-value="city street, historic architecture buildings, busy street, urban outdoor">City Street</div>
+                <div class="option" data-value="rooftop terrace, city skyline, sunset lighting">Rooftop Terrace</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">👗</span>Clothing Style</h2>
+            <div class="options" id="clothing">
+                <div class="option" data-value="mini dress, cocktail dress, feminine silhouette">Mini/Cocktail Dress</div>
+                <div class="option" data-value="tank top with shorts, casual separates">Tank & Shorts</div>
+                <div class="option" data-value="tank top with jeans, denim casual">Tank & Jeans</div>
+                <div class="option" data-value="bikini, swimsuit, beachwear">Swimwear</div>
+                <div class="option" data-value="oversized jersey, athletic statement piece">Oversized Jersey</div>
+                <div class="option" data-value="metallic fabric dress, shiny statement outfit">Metallic Dress</div>
+                <div class="option" data-value="wrap dress with bow details, tie-front feminine">Wrap Dress</div>
+                <div class="option" data-value="crop top with mini skirt, two-piece outfit">Crop Top & Skirt</div>
+                <div class="option" data-value="blazer with mini skirt, professional chic">Blazer & Skirt</div>
+                <div class="option" data-value="slip dress, elegant satin">Slip Dress</div>
+                <div class="option" data-value="bodysuit with high-waisted bottoms, fitted modern">Bodysuit</div>
+                <div class="option" data-value="maxi dress, flowing long dress">Maxi Dress</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">👠</span>Footwear & Accessories</h2>
+            <div class="options" id="accessories">
+                <div class="option" data-value="strappy heels, stilettos">Strappy Heels</div>
+                <div class="option" data-value="platform sandals, casual heels">Platform Sandals</div>
+                <div class="option" data-value="knee-high boots, statement boots">Knee-High Boots</div>
+                <div class="option" data-value="ankle boots, booties">Ankle Boots</div>
+                <div class="option" data-value="sneakers, athletic casual">Sneakers</div>
+                <div class="option" data-value="designer handbag, luxury purse">Designer Handbag</div>
+                <div class="option" data-value="oversized sunglasses, statement eyewear">Sunglasses</div>
+                <div class="option" data-value="hoop earrings, gold jewelry">Hoop Earrings</div>
+                <div class="option" data-value="layered necklaces, delicate chains">Layered Necklaces</div>
+                <div class="option" data-value="baseball cap, casual hat">Baseball Cap</div>
+                <div class="option" data-value="crossbody bag, shoulder bag">Crossbody Bag</div>
+                <div class="option" data-value="statement watch, bracelet set">Statement Watch</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">💇</span>Hair Style</h2>
+            <div class="options" id="hair">
+                <div class="option" data-value="very long straight dark hair, flowing">Very Long Straight</div>
+                <div class="option" data-value="short bob, chin-length, sleek">Short Bob</div>
+                <div class="option" data-value="casual">Natural Afro</div>
+                <div class="option" data-value="wavy loose curls, beachy waves">Wavy/Loose Curls</div>
+                <div class="option" data-value="center part sleek, smooth straight">Center Part Sleek</div>
+                <div class="option" data-value="high ponytail, pulled back">High Ponytail</div>
+                <div class="option" data-value="messy bun, effortless updo">Messy Bun</div>
+                <div class="option" data-value="side-swept bangs, face-framing">Side-Swept Bangs</div>
+                <div class="option" data-value="braided style, intricate plaits">Braided Style</div>
+                <div class="option" data-value="half-up half-down, romantic">Half-Up Half-Down</div>
+                <div class="option" data-value="pin-straight long, glossy">Pin-Straight Long</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">🎭</span>Pose & Expression</h2>
+            <div class="options" id="pose">
+                <div class="option" data-value="confident standing pose, hand on hip, powerful stance">Confident Standing</div>
+                <div class="option" data-value="walking pose, dynamic movement, in motion">Walking Dynamic</div>
+                <div class="option" data-value="mirror selfie pose, phone in hand">Mirror Selfie</div>
+                <div class="option" data-value="seated elegant pose, legs crossed">Seated Elegant</div>
+                <div class="option" data-value="looking over shoulder, mysterious glance">Over Shoulder</div>
+                <div class="option" data-value="candid natural pose, relaxed spontaneous">Candid Natural</div>
+                <div class="option" data-value="fashion editorial pose, high fashion stance">Editorial Fashion</div>
+                <div class="option" data-value="laughing joyful expression, genuine smile">Laughing Joyful</div>
+                <div class="option" data-value="serious sultry expression, intense gaze">Serious Sultry</div>
+                <div class="option" data-value="playful fun expression, carefree">Playful Fun</div>
+                <div class="option" data-value="profile side view, elegant angle">Profile Side View</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">💡</span>Lighting & Mood</h2>
+            <div class="options" id="lighting">
+                <div class="option" data-value="golden hour sunlight, warm glow, soft natural light">Golden Hour</div>
+                <div class="option" data-value="bright natural daylight, clear sunny day">Bright Daylight</div>
+                <div class="option" data-value="soft studio lighting, professional setup, even illumination">Soft Studio</div>
+                <div class="option" data-value="dramatic side lighting, moody shadows">Dramatic Lighting</div>
+                <div class="option" data-value="warm indoor lighting, cozy ambiance">Warm Indoor</div>
+                <div class="option" data-value="backlit silhouette, rim lighting">Backlit</div>
+                <div class="option" data-value="neon city lights, vibrant urban glow">Neon Lights</div>
+                <div class="option" data-value="overcast soft light, diffused natural">Overcast Soft</div>
+                <div class="option" data-value="sunset orange pink hues, romantic">Sunset Hues</div>
+                <div class="option" data-value="bright flash photography, high contrast">Flash Photography</div>
+                <div class="option" data-value="dappled sunlight through trees, natural spots">Dappled Sunlight</div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2><span class="category-icon">📸</span>Camera & Quality</h2>
+            <div class="options" id="camera">
+                <div class="option" data-value="professional DSLR quality, high resolution, crisp detail">DSLR Professional</div>
+                <div class="option" data-value="iPhone 15 Pro Max quality, modern smartphone photo">iPhone Quality</div>
+                <div class="option" data-value="full body shot, head to toe in frame">Full Body Shot</div>
+                <div class="option" data-value="portrait orientation, vertical frame">Portrait Orientation</div>
+                <div class="option" data-value="shallow depth of field, blurred background">Shallow DOF</div>
+                <div class="option" data-value="wide angle lens, environmental context">Wide Angle</div>
+                <div class="option" data-value="50mm lens perspective, natural look">50mm Natural</div>
+                <div class="option" data-value="8K ultra high definition, extreme detail">8K Ultra HD</div>
+                <div class="option" data-value="candid street photography style">Candid Street Style</div>
+                <div class="option" data-value="fashion magazine editorial style">Fashion Editorial</div>
+                <div class="option" data-value="social media content style, TikTok aesthetic">Social Media Style</div>
+            </div>
+        </div>
+
+        <div class="prompt-output">
+            <h2>✨ Your Masterpiece Prompt ✨</h2>
+            <div class="prompt-text empty" id="promptOutput">
+                Select options above and click "Generate Prompt" to create your perfect model image prompt!
+            </div>
+            <button class="copy-btn" onclick="copyPrompt()" id="copyBtn" style="display: none;">📋 Copy to Clipboard</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selections = {
+        content: [],
+        energy: [],
+        setting: [],
+        engagement: [],
+        age: [],
+        ethnicity: [],
+        style: [],
+        location: [],
+        clothing: [],
+        accessories: [],
+        hair: [],
+        pose: [],
+        lighting: [],
+        camera: []
+    };
+
+    function setupClickHandlers() {
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const category = this.parentElement.id;
+                this.classList.toggle('selected');
+                
+                const value = this.getAttribute('data-value');
+                const index = selections[category].indexOf(value);
+                
+                if (index > -1) {
+                    selections[category].splice(index, 1);
+                } else {
+                    selections[category].push(value);
+                }
+            });
+        });
+    }
+
+    function showScriptAnalyzer() {
+        document.getElementById('scriptAnalyzer').style.display = 'block';
+        document.getElementById('scriptAnalyzer').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeScriptAnalyzer() {
+        document.getElementById('scriptAnalyzer').style.display = 'none';
+        document.getElementById('scriptSuggestions').classList.remove('visible');
+        document.getElementById('scriptInput').value = '';
+    }
+
+    function analyzeScript() {
+        const script = document.getElementById('scriptInput').value.toLowerCase();
+        const suggestions = document.getElementById('scriptSuggestions');
+        
+        if (!script.trim()) {
+            alert('Please paste a script first!');
+            return;
+        }
+
+        let analysis = {
+            content: [],
+            energy: [],
+            setting: [],
+            engagement: [],
+            age: [],
+            style: [],
+            clothing: [],
+            hair: [],
+            pose: []
+        };
+
+        // Content Type Analysis
+        if (script.includes('outfit') || script.includes('style')) {
+            if (script.includes('stuck') || script.includes('rotation')) analysis.content.push('Mix & Match');
+            if (script.includes('hack') || script.includes('tip')) analysis.content.push('Styling Hacks');
+            if (script.includes('daily') || script.includes('ootd')) analysis.content.push('OOTD Showcase');
+            if (script.includes('transform') || script.includes('change')) analysis.content.push('Fashion Tutorial');
+        }
+
+        // Energy Analysis
+        if (script.includes('love') || script.includes('exciting') || script.includes('boost')) {
+            analysis.energy.push('High Energy');
+        }
+        if (script.includes('simple') || script.includes('easy') || script.includes('effortless')) {
+            analysis.energy.push('Calm Relatable');
+        }
+        if (script.includes('bold') || script.includes('statement')) {
+            analysis.energy.push('Confident Boss');
+        }
+
+        // Setting Analysis
+        if (script.includes('mirror') || script.includes('show')) {
+            analysis.setting.push('Full-Length Mirror');
+        }
+        if (script.includes('closet') || script.includes('wardrobe')) {
+            analysis.setting.push('Walk-In Closet');
+        }
+        if (script.includes('street') || script.includes('urban')) {
+            analysis.setting.push('Urban Street');
+        }
+
+        // Engagement Analysis
+        if (script.includes('watch') || script.includes('showcase') || script.includes('demo')) {
+            analysis.engagement.push('Pointing/Showing');
+            analysis.engagement.push('Direct Camera Talk');
+        }
+        if (script.includes('swap') || script.includes('chang')) {
+            analysis.engagement.push('Quick Changes');
+        }
+        if (script.includes('transform')) {
+            analysis.engagement.push('Before/After Poses');
+        }
+
+        // Age Analysis (fashion content typically 21-29)
+        if (script.includes('trend') || script.includes('style')) {
+            analysis.age.push('21-23 Years');
+            analysis.age.push('24-26 Years');
+        }
+
+        // Style Analysis
+        if (script.includes('chic') || script.includes('elegant')) {
+            analysis.style.push('Elegant/Formal');
+        }
+        if (script.includes('casual')) {
+            analysis.style.push('Casual/Everyday');
+        }
+        if (script.includes('street')) {
+            analysis.style.push('Street Style Urban');
+        }
+
+        // Clothing Analysis
+        if (script.includes('jacket')) {
+            analysis.clothing.push('Blazer & Skirt');
+        }
+        if (script.includes('layer')) {
+            analysis.clothing.push('Crop Top & Skirt');
+        }
+        if (script.includes('accessories') || script.includes('necklace')) {
+            analysis.clothing.push('Mini/Cocktail Dress');
+        }
+
+        // Hair Analysis
+        if (script.includes('chic') || script.includes('polished')) {
+            analysis.hair.push('Center Part Sleek');
+        }
+
+        // Pose Analysis
+        if (script.includes('showcase') || script.includes('show')) {
+            analysis.pose.push('Confident Standing');
+        }
+
+        displaySuggestions(analysis);
+    }
+
+    function displaySuggestions(analysis) {
+        const container = document.getElementById('scriptSuggestions');
+        let html = '<h3 style="color: #764ba2; text-align: center; margin-bottom: 20px;">📊 Script Analysis Results</h3>';
+        
+        const categoryNames = {
+            content: 'TikTok Content Type',
+            energy: 'Video Energy/Vibe',
+            setting: 'Setting Type',
+            engagement: 'Body Language & Engagement',
+            age: 'Age Range',
+            style: 'Style/Aesthetic',
+            clothing: 'Clothing Style',
+            hair: 'Hair Style',
+            pose: 'Pose & Expression'
+        };
+
+        let hasRecommendations = false;
+
+        for (let category in analysis) {
+            if (analysis[category].length > 0) {
+                hasRecommendations = true;
+                html += `
+                    <div class="suggestion-section">
+                        <h3>${categoryNames[category]}</h3>
+                        <div class="suggestion-tags">
+                            ${analysis[category].map(item => 
+                                `<span class="suggestion-tag" onclick="applyRecommendation('${category}', '${item}')">${item}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        if (!hasRecommendations) {
+            html += '<p style="text-align: center; color: #666;">Try including keywords like: outfit, style, fashion, showcase, transform, casual, chic, etc.</p>';
+        } else {
+            html += '<button class="auto-apply-btn" onclick="autoApplyAll()">✨ Auto-Apply All Suggestions</button>';
+        }
+
+        container.innerHTML = html;
+        container.classList.add('visible');
+
+        // Store suggestions for auto-apply
+        window.currentAnalysis = analysis;
+    }
+
+    function applyRecommendation(category, value) {
+        const options = document.querySelectorAll(`#${category} .option`);
+        options.forEach(option => {
+            if (option.textContent.trim() === value) {
+                if (!option.classList.contains('selected')) {
+                    option.click();
+                }
+            }
+        });
+    }
+
+    function autoApplyAll() {
+        if (!window.currentAnalysis) return;
+        
+        clearAll();
+        
+        for (let category in window.currentAnalysis) {
+            window.currentAnalysis[category].forEach(value => {
+                applyRecommendation(category, value);
+            });
+        }
+
+        setTimeout(() => {
+            generatePrompt();
+            document.getElementById('scriptAnalyzer').style.display = 'none';
+            document.querySelector('.prompt-output').scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+    }
+
+    function selectMinimal() {
+        clearAll();
+        // Only select from: age, ethnicity, hair, pose, lighting, camera (no location, no accessories, no background elements)
+        const minimalCategories = ['age', 'ethnicity', 'hair', 'pose', 'lighting', 'camera'];
+        
+        minimalCategories.forEach(category => {
+            const options = document.querySelectorAll(`#${category} .option`);
+            const randomOption = options[Math.floor(Math.random() * options.length)];
+            randomOption.click();
+        });
+        
+        // Add a simple clothing option
+        const clothingOptions = document.querySelectorAll('#clothing .option');
+        const randomClothing = clothingOptions[Math.floor(Math.random() * clothingOptions.length)];
+        randomClothing.click();
+        
+        setTimeout(generatePrompt, 300);
+    }
+
+    function selectRandom() {
+        clearAll();
+        Object.keys(selections).forEach(category => {
+            const options = document.querySelectorAll(`#${category} .option`);
+            const randomOption = options[Math.floor(Math.random() * options.length)];
+            randomOption.click();
+        });
+        setTimeout(generatePrompt, 300);
+    }
+
+    function selectMulti() {
+        clearAll();
+        Object.keys(selections).forEach(category => {
+            const options = document.querySelectorAll(`#${category} .option`);
+            const numToSelect = Math.floor(Math.random() * 3) + 1;
+            const shuffled = Array.from(options).sort(() => 0.5 - Math.random());
+            shuffled.slice(0, numToSelect).forEach(opt => opt.click());
+        });
+        setTimeout(generatePrompt, 300);
+    }
+
+    function clearAll() {
+        document.querySelectorAll('.option.selected').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        Object.keys(selections).forEach(key => {
+            selections[key] = [];
+        });
+        const output = document.getElementById('promptOutput');
+        output.textContent = 'Select options above and click "Generate Prompt" to create your perfect model image prompt!';
+        output.classList.add('empty');
+        document.getElementById('copyBtn').style.display = 'none';
+    }
+
+    function generatePrompt() {
+        let prompt = "Full body portrait of a stunning female model";
+        
+        const parts = [];
+        
+        if (selections.age.length > 0) {
+            parts.push(selections.age.join(' or '));
+        } else {
+            parts.push("ages 18-35");
+        }
+        
+        if (selections.ethnicity.length > 0) {
+            parts.push(selections.ethnicity.join(' or '));
+        }
+
+        if (selections.content.length > 0) {
+            parts.push("creating " + selections.content.join(', '));
+        }
+
+        if (selections.energy.length > 0) {
+            parts.push("with " + selections.energy.join(', ') + " vibe");
+        }
+
+        if (selections.setting.length > 0) {
+            parts.push("filmed in " + selections.setting.join(' or '));
+        }
+
+        if (selections.engagement.length > 0) {
+            parts.push(selections.engagement.join(', '));
+        }
+        
+        if (selections.style.length > 0) {
+            parts.push(selections.style.join(', '));
+        }
+        
+        if (selections.clothing.length > 0) {
+            parts.push("wearing " + selections.clothing.join(' with '));
+        }
+        
+        if (selections.accessories.length > 0) {
+            parts.push("accessorized with " + selections.accessories.join(', '));
+        }
+        
+        if (selections.hair.length > 0) {
+            parts.push("hair styled as " + selections.hair.join(' or '));
+        }
+        
+        if (selections.pose.length > 0) {
+            parts.push("posed in " + selections.pose.join(', '));
+        }
+        
+        if (selections.location.length > 0) {
+            parts.push("photographed at " + selections.location.join(' or '));
+        }
+        
+        if (selections.lighting.length > 0) {
+            parts.push("lit with " + selections.lighting.join(', '));
+        }
+        
+        if (selections.camera.length > 0) {
+            parts.push("captured with " + selections.camera.join(', '));
+        }
+        
+        if (parts.length > 0) {
+            prompt += ", " + parts.join(', ') + ". Professional TikTok content creator, high quality vertical video format, engaging social media presence, realistic and relatable.";
+        } else {
+            prompt = "Please select at least one option from the categories below to generate your prompt!";
+        }
+        
+        const output = document.getElementById('promptOutput');
+        output.textContent = prompt;
+        output.classList.remove('empty');
+        
+        if (parts.length > 0) {
+            document.getElementById('copyBtn').style.display = 'block';
+        }
+    }
+
+    function copyPrompt() {
+        const promptText = document.getElementById('promptOutput').textContent;
+        navigator.clipboard.writeText(promptText).then(() => {
+            const btn = document.getElementById('copyBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        });
+    }
+
+    setupClickHandlers();
+</script>
+```
+
+</body>
+</html>
