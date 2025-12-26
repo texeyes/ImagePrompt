@@ -158,6 +158,8 @@
   </div>
 
   <button onclick="generatePrompt()">Generate AI Image Prompt</button>
+  <button onclick="randomizeFilters()" style="margin-left:1rem;">🎲 Randomize Filters</button>
+  <button onclick="copyPrompt()" style="margin-left:1rem;">📋 Copy Prompt</button>
 
   <div class="output" id="output"></div>
 
@@ -190,7 +192,7 @@ Design Characteristics:
 - Symbolic imagery that invites interpretation
 - Balanced negative space for shirt fabric
 
-${text ? `Incorporate subtle typography with the phrase: "${text}" (not dominant, integrated into the art)` : ''}
+${text ? `Incorporate subtle typography with the phrase: \"${text}\" (not dominant, integrated into the art)` : ''}
 
 Technical / Print Constraints:
 ${print}
@@ -199,7 +201,34 @@ Flat lighting, no mockups, no background environment
 Overall Intent:
 A design that feels thoughtful, modern, and quietly bold—something the wearer identifies with rather than advertises.`;
 
-      document.getElementById('output').textContent = prompt;
+      outputEl.textContent = prompt;
+    }
+
+    function randomizeFilters() {
+      randomSelect(styleEl);
+      randomSelect(complexityEl);
+      randomSelect(colorEl);
+      randomSelect(demoEl);
+      randomSelect(emotionEl);
+      randomSelect(contextEl);
+      randomSelect(printEl);
+
+      const subjects = ['ladder', 'open doorway', 'abstract face', 'floating figure', 'symbolic landscape', 'fractured icon'];
+      subjectEl.value = subjects[Math.floor(Math.random() * subjects.length)];
+
+      generatePrompt();
+    }
+
+    function randomSelect(selectEl) {
+      const index = Math.floor(Math.random() * selectEl.options.length);
+      selectEl.selectedIndex = index;
+    }
+
+    function copyPrompt() {
+      if (!outputEl.textContent) return;
+      navigator.clipboard.writeText(outputEl.textContent).then(() => {
+        alert('Prompt copied to clipboard');
+      });
     }
 
     const styleEl = document.getElementById('style');
@@ -211,6 +240,7 @@ A design that feels thoughtful, modern, and quietly bold—something the wearer 
     const subjectEl = document.getElementById('subject');
     const textEl = document.getElementById('text');
     const printEl = document.getElementById('print');
+    const outputEl = document.getElementById('output');
   </script>
 </body>
 </html>
