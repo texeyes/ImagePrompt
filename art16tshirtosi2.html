@@ -111,9 +111,9 @@
         <option>Japanese Industrial Design</option>
         <option>Brutalist Graphic Design</option>
         <option>Postmodern Technical Illustration</option>
-        <option>Mid-Century Modern Abstraction</option>
+        <option>Mid‑Century Modern Abstraction</option>
         <option>Experimental Editorial Illustration</option>
-        <option>Minimalist Screen-Print Poster</option>
+        <option>Minimalist Screen‑Print Poster</option>
         <option>Architectural Blueprint / CAD</option>
         <option>Abstract Data Visualization</option>
       </select>
@@ -233,16 +233,26 @@ A shirt someone wants to wear for how it feels and looks, not for what it says.`
     }
 
     function randomizeFilters() {
-      // Randomize only within the active worldview
+      // Randomize only within the active worldview, including visual art style
       randomSelect(styleEl);
+      randomSelect(artStyleEl);
       randomSelect(complexityEl);
       randomSelect(colorEl);
       randomSelect(printEl);
 
-      const subjects = ['grid fragment', 'unlabeled schematic', 'cropped frame', 'structural field', 'interface residue'];
+      const subjects = [
+        'grid fragment',
+        'unlabeled schematic',
+        'cropped frame',
+        'structural field',
+        'interface residue',
+        'partial system diagram',
+        'abstract technical layout'
+      ];
       subjectEl.value = subjects[Math.floor(Math.random() * subjects.length)];
 
       generatePrompt();
+    }
     }
 
     function randomSelect(selectEl) {
