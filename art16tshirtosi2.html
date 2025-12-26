@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Shirt Image Prompt Generator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0f14, #1a1a24);
+      color: #f2f2f2;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      max-width: 800px;
+      color: #bdbdd1;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: #161622;
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .card h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+      font-size: 0.85rem;
+      color: #cfcfe6;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      background: #222236;
+      color: #fff;
+    }
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #ff4ecd, #5ddcff);
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .output {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: #0d0d16;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI Shirt Image Prompt Generator</h1>
+  <p>
+    This generator is tuned for emotionally resonant, visually striking shirt designs—blending
+    conceptual depth, craft textures, and modern surreal aesthetics. It balances originality with
+    algorithm-friendly clarity for online apparel marketplaces.
+  </p>
+
+  <div class="container">
+    <div class="card">
+      <h3>Canonical Modes</h3>
+      <label>Worldview Preset (locks philosophy)</label>
+      <select id="mode" onchange="applyMode()">
+        <option value="">— choose a mode —</option>
+        <option value="artifact">System Artifact</option>
+        <option value="operation">Mid‑Operation Snapshot</option>
+        <option value="indifference">Wearable Indifference</option>
+      </select>
+      <p style="font-size:0.8rem;color:#9fa0c9;margin-top:0.5rem;">These presets constrain intent while allowing variation.</p>
+      <hr style="border:0;border-top:1px solid #222236;margin:1rem 0;" />
+      <h3>Art Direction Filters</h3>
+      <label>Core Art Style</label>
+      <select id="style">
+        <option>Modernist Technical Calm (industrial UI / documentation)</option>
+        <option>Wearable Indifference (aesthetically resolved, emotionally closed)</option>
+        <option>System Artifact (byproduct of thinking)</option>
+        <option>Snapshot of a System Mid-Operation</option>
+        <option>Architectural Drafting Minimalism</option>
+        <option>Neutral Diagrammatic Abstraction</option>
+        <option>Bauhaus-Adjacent Structural Design (non-ideological)</option>
+        <option>Japanese Industrial Restraint</option>
+      </select>
+
+      <label>Visual Complexity</label>
+      <select id="complexity">
+        <option>Clean & Iconic (Best for mass appeal)</option>
+        <option>Moderate Detail (Balanced)</option>
+        <option>High Detail (Collector / Niche)</option>
+      </select>
+
+      <label>Color Strategy</label>
+      <select id="color">
+        <option>Limited Palette (2–3 bold colors)</option>
+        <option>Muted Earth + Accent Neon</option>
+        <option>High-Contrast Pop Colors</option>
+        <option>Monochrome with Texture</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h3>Audience & Market Filters</h3>
+      <label>Primary Demographic</label>
+      <select id="demo">
+        <option>Millennial / Gen X Thoughtful Buyers</option>
+        <option>Gen Z Trend-Driven</option>
+        <option>Creative Professionals</option>
+        <option>Streetwear Enthusiasts</option>
+        <option>Minimalist Design Lovers</option>
+      </select>
+
+      <label>Emotional Hook</label>
+      <select id="emotion">
+        <option>Quiet Confidence</option>
+        <option>Introspective / Existential</option>
+        <option>Playful with Edge</option>
+        <option>Hopeful Resilience</option>
+        <option>Subtle Rebellion</option>
+      </select>
+
+      <label>Wear Context</label>
+      <select id="context">
+        <option>Everyday Statement Tee</option>
+        <option>Conversation Starter</option>
+        <option>Art-Forward Fashion Piece</option>
+        <option>Giftable Concept Shirt</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h3>Concept & Constraints</h3>
+      <label>Main Symbol / Subject</label>
+      <input id="subject" placeholder="e.g., ladder, doorway, figure, abstract face" />
+
+      <label>Optional Phrase (if any)</label>
+      <input id="text" placeholder="Short, ambiguous, emotionally open" />
+
+      <label>Print Constraints</label>
+      <select id="print">
+        <option>Screen-print friendly, flat layers</option>
+        <option>DTG with texture detail</option>
+        <option>Single-color ink design</option>
+        <option>Front-only centered graphic</option>
+      </select>
+    </div>
+  </div>
+
+  <button onclick="generatePrompt()">Generate AI Image Prompt</button>
+  <button onclick="randomizeFilters()" style="margin-left:1rem;">🎲 Randomize Filters</button>
+  <button onclick="copyPrompt()" style="margin-left:1rem;">📋 Copy Prompt</button>
+
+  <div class="output" id="output"></div>
+
+  <script>
+    function generatePrompt() {
+      const style = styleEl.value;
+      const complexity = complexityEl.value;
+      const color = colorEl.value;
+      const demo = demoEl.value;
+      const emotion = emotionEl.value;
+      const context = contextEl.value;
+      const subject = subjectEl.value || 'abstract symbolic form';
+      const text = textEl.value;
+      const print = printEl.value;
+
+      const prompt = `Create a high-impact t-shirt design intended for online apparel sales.
+
+Art Style: ${style}
+Visual Complexity: ${complexity}
+Color Strategy: ${color}
+
+Subject: ${subject}
+Emotional Tone: ${emotion}
+Audience: ${demo}
+Wear Context: ${context}
+
+Design Characteristics:
+- Strong central composition readable from 6 feet away
+- Emotionally resonant but not literal
+- Symbolic imagery that invites interpretation
+- Balanced negative space for shirt fabric
+
+${text ? `Incorporate subtle typography with the phrase: \"${text}\" (not dominant, integrated into the art)` : ''}
+
+Technical / Print Constraints:
+${print}
+Flat lighting, no mockups, no background environment
+
+Overall Intent:
+A design that feels thoughtful, modern, and quietly bold—something the wearer identifies with rather than advertises.`;
+
+      outputEl.textContent = prompt;
+    }
+
+    function randomizeFilters() {
+      // Randomize only within the active worldview
+      randomSelect(styleEl);
+      randomSelect(complexityEl);
+      randomSelect(colorEl);
+      randomSelect(printEl);
+
+      const subjects = ['grid fragment', 'unlabeled schematic', 'cropped frame', 'structural field', 'interface residue'];
+      subjectEl.value = subjects[Math.floor(Math.random() * subjects.length)];
+
+      generatePrompt();
+    }
+
+    function randomSelect(selectEl) {
+      const index = Math.floor(Math.random() * selectEl.options.length);
+      selectEl.selectedIndex = index;
+    }
+
+    function copyPrompt() {
+      if (!outputEl.textContent) return;
+      navigator.clipboard.writeText(outputEl.textContent).then(() => {
+        alert('Prompt copied to clipboard');
+      });
+    }
+
+    function applyMode() {
+      const m = modeEl.value;
+      if (!m) return;
+
+      if (m === 'artifact') {
+        styleEl.value = 'System Artifact (byproduct of thinking)';
+        complexityEl.value = 'Moderate Detail (Balanced)';
+        colorEl.value = 'Monochrome with Texture';
+        demoEl.value = 'Creative Professionals';
+        emotionEl.value = 'Quiet Confidence';
+        contextEl.value = 'Everyday Statement Tee';
+        printEl.value = 'Screen-print friendly, flat layers';
+        subjectEl.value = 'unlabeled schematic fragment';
+        textEl.value = '';
+      }
+
+      if (m === 'operation') {
+        styleEl.value = 'Snapshot of a System Mid-Operation';
+        complexityEl.value = 'High Detail (Collector / Niche)';
+        colorEl.value = 'Muted Earth + Accent Neon';
+        demoEl.value = 'Creative Professionals';
+        emotionEl.value = 'Introspective / Existential';
+        contextEl.value = 'Conversation Starter';
+        printEl.value = 'DTG with texture detail';
+        subjectEl.value = 'process diagram mid-state';
+        textEl.value = '';
+      }
+
+      if (m === 'indifference') {
+        styleEl.value = 'Wearable Indifference (aesthetically resolved, emotionally closed)';
+        complexityEl.value = 'Clean & Iconic (Best for mass appeal)';
+        colorEl.value = 'Limited Palette (2–3 bold colors)';
+        demoEl.value = 'Minimalist Design Lovers';
+        emotionEl.value = 'Quiet Confidence';
+        contextEl.value = 'Everyday Statement Tee';
+        printEl.value = 'Single-color ink design';
+        subjectEl.value = 'balanced abstract field';
+        textEl.value = '';
+      }
+
+      generatePrompt();
+    }
+
+    const modeEl = document.getElementById('mode');
+
+    const styleEl = document.getElementById('style');
+    const complexityEl = document.getElementById('complexity');
+    const colorEl = document.getElementById('color');
+    const demoEl = document.getElementById('demo');
+    const emotionEl = document.getElementById('emotion');
+    const contextEl = document.getElementById('context');
+    const subjectEl = document.getElementById('subject');
+    const textEl = document.getElementById('text');
+    const printEl = document.getElementById('print');
+    const outputEl = document.getElementById('output');
+  </script>
+</body>
+</html>
