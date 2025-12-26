@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Print Prompt Studio | Create Sellable Art</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        min-height: 100vh;
+        padding: 1.5rem;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .brand-badge {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        box-shadow: 0 8px 32px rgba(245, 87, 108, 0.4);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: pulse-glow 3s infinite;
+    }
+
+    .brand-badge-text {
+        color: white;
+        font-weight: 700;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+    }
+
+    .brand-icon {
+        width: 24px;
+        height: 24px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 8px 32px rgba(245, 87, 108, 0.4); }
+        50% { box-shadow: 0 8px 48px rgba(245, 87, 108, 0.7); }
+    }
+
+    .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding-top: 1rem;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 3rem 2rem;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header h1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+    }
+
+    .header p {
+        color: #64748b;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .quick-start {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        margin-top: 1.5rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .tabs-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .tab {
+        padding: 0.875rem 1.75rem;
+        border: none;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab:hover {
+        background: rgba(102, 126, 234, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .tab.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .prompt-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .prompt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .prompt-header h2 {
+        color: #1e293b;
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+    .controls-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .preset-dropdown {
+        flex: 1;
+        min-width: 200px;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .preset-dropdown:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .random-toggle {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .random-toggle label {
+        color: #475569;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .icon-btn {
+        padding: 1rem 1.75rem;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        letter-spacing: 0.3px;
+    }
+
+    .icon-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .icon-btn:active {
+        transform: scale(0.97);
+    }
+
+    .btn-randomize {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-clear {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-copy {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .btn-json {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .btn-preset {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+    }
+
+    .prompt-display {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border: 2px solid #475569;
+        border-radius: 16px;
+        padding: 2rem;
+        min-height: 140px;
+        color: #e2e8f0;
+        font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        font-size: 1.0625rem;
+        line-height: 1.8;
+        max-height: 500px;
+        overflow-y: auto;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .prompt-display::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .prompt-display::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+    }
+
+    .prompt-display::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.6);
+        border-radius: 10px;
+    }
+
+    .stats-grid {
+        margin-top: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        color: #667eea;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .copy-alert {
+        margin-top: 1rem;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 12px;
+        font-weight: 600;
+        text-align: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .filter-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        padding: 1.75rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .filter-card:hover {
+        border-color: rgba(102, 126, 234, 0.5);
+        box-shadow: 0 12px 48px rgba(102, 126, 234, 0.2);
+        transform: translateY(-4px);
+    }
+
+    .filter-card.disabled {
+        opacity: 0.5;
+        border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+    }
+
+    .filter-title h3 {
+        color: #1e293b;
+        font-size: 1.25rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .selected-badge {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.375rem 0.875rem;
+        border-radius: 20px;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 56px;
+        height: 32px;
+        cursor: pointer;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+        border-radius: 34px;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 24px;
+        width: 24px;
+        left: 4px;
+        bottom: 4px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .toggle-slider {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+
+    .options-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.625rem;
+    }
+
+    .option-btn {
+        padding: 0.875rem 1.25rem;
+        border: 2px solid rgba(102, 126, 234, 0.3);
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+        color: #475569;
+    }
+
+    .option-btn:hover:not(.selected):not(:disabled) {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-color: rgba(102, 126, 234, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .option-btn.selected {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .option-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+    }
+
+    .combos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+        margin-top: 1.5rem;
+    }
+
+    .combo-card {
+        background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+        border: 2px solid rgba(245, 87, 108, 0.3);
+        border-radius: 16px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .combo-card:hover {
+        border-color: #f5576c;
+        box-shadow: 0 8px 32px rgba(245, 87, 108, 0.3);
+        transform: translateY(-4px);
+    }
+
+    .combo-title {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .combo-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .combo-tag {
+        background: rgba(102, 126, 234, 0.15);
+        color: #667eea;
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding: 2.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        color: #64748b;
+        font-size: 1rem;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .brand-badge {
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .tabs {
+            justify-content: center;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 140px;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="brand-badge">
+        <div class="brand-icon">🎨</div>
+        <div class="brand-badge-text">PROMPT STUDIO</div>
+    </div>
+
+```
+<div class="container">
+    <div class="header">
+        <h1>🎨 Art Print Prompt Studio</h1>
+        <p>Create Professional, Sellable Art Prompts in Seconds</p>
+        <div class="quick-start">💡 Pro Tip: Try a preset combo for instant results!</div>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('basic')">🎯 Basic Filters</button>
+            <button class="tab" onclick="switchTab('advanced')">⚡ Advanced</button>
+            <button class="tab" onclick="switchTab('seller')">💰 Top Sellers</button>
+        </div>
+
+        <div id="basic-tab" class="tab-content active">
+            <p style="color: #64748b; margin-bottom: 1rem;">Start here! Select from core filters to build your art prompt.</p>
+        </div>
+
+        <div id="advanced-tab" class="tab-content">
+            <p style="color: #64748b; margin-bottom: 1rem;">Fine-tune your prompt with detailed artistic controls.</p>
+        </div>
+
+        <div id="seller-tab" class="tab-content">
+            <p style="color: #64748b; margin-bottom: 1rem;">Pre-made combinations proven to sell! Click any combo to apply instantly.</p>
+            <div class="combos-grid" id="combosGrid"></div>
+        </div>
+    </div>
+
+    <div class="prompt-section">
+        <div class="prompt-header">
+            <h2>✨ Your Art Prompt</h2>
+        </div>
+
+        <div class="controls-row">
+            <select class="preset-dropdown" id="presetSelector" onchange="applyPreset()">
+                <option value="">📦 Load a Preset Combo...</option>
+            </select>
+
+            <div class="random-toggle">
+                <input type="checkbox" id="randomToggleFilters" checked onchange="updateRandomMode()">
+                <label for="randomToggleFilters">🎲 Random toggle filters</label>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="icon-btn btn-randomize" onclick="randomize()">🎲 Randomize</button>
+            <button class="icon-btn btn-clear" onclick="clearAll()">🗑️ Clear All</button>
+            <button class="icon-btn btn-copy" onclick="copyToClipboard()">📋 Copy Text</button>
+            <button class="icon-btn btn-json" onclick="copyJSON()">{ } Copy JSON</button>
+            <button class="icon-btn btn-preset" onclick="saveAsPreset()">💾 Save Preset</button>
+        </div>
+
+        <div class="prompt-display" id="promptDisplay">
+            Select options to build your sellable art prompt...
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Filters</div>
+                <div class="stat-value" id="activeFilters">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Selections</div>
+                <div class="stat-value" id="selectionsCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Characters</div>
+                <div class="stat-value" id="charCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Market Appeal</div>
+                <div class="stat-value" id="marketScore">--</div>
+            </div>
+        </div>
+
+        <div class="copy-alert hidden" id="copyAlert"></div>
+    </div>
+
+    <div class="filters-grid" id="filtersContainer"></div>
+
+    <div class="footer">
+        <p>🎨 <span class="footer-highlight">Art Print Prompt Studio</span> • Create sellable art with proven combinations • Toggle filters • Save favorites • Export JSON</p>
+        <p style="margin-top: 1rem; font-size: 0.875rem;">Part of the <span class="footer-highlight">Prompt Studio Collection</span> - Professional tools for creators</p>
+    </div>
+</div>
+
+<script>
+    let randomToggleFilters = true;
+    let currentTab = 'basic';
+
+    const filterStates = {
+        subjectArchetype: true,
+        artisticStyle: true,
+        colorPalette: true,
+        mood: true,
+        composition: true,
+        detailDensity: true,
+        environment: true,
+        lighting: true,
+        theme: true,
+        marketPosition: true,
+        format: true,
+        specialEffects: true,
+        printSize: true
+    };
+
+    const selections = {
+        subjectArchetype: '',
+        artisticStyle: '',
+        colorPalette: '',
+        mood: '',
+        composition: '',
+        detailDensity: '',
+        environment: '',
+        lighting: '',
+        theme: '',
+        marketPosition: '',
+        format: '',
+        specialEffects: '',
+        printSize: ''
+    };
+
+    const filters = {
+        subjectArchetype: {
+            title: '🎭 Subject Archetype',
+            tab: 'basic',
+            options: [
+                'Whimsical Nature Spirit', 'Mystical Animal Hybrid', 'Cute Alien/Monster',
+                'Fashion Forward Character', 'Dark Fantasy Entity', 'Anthropomorphic Animal',
+                'Cyberpunk Being', 'Mythological Creature', 'Porcelain Doll/Mannequin',
+                'Carnival/Circus Character', 'Ethereal Guardian', 'Bio-Organic Entity'
+            ]
+        },
+        artisticStyle: {
+            title: '🎨 Artistic Style',
+            tab: 'basic',
+            options: [
+                'Photorealistic CGI', 'Whimsical Illustration', 'Dark Surrealism',
+                'Pop Art Bold', 'Art Deco/Retro', 'Anime/Manga Inspired',
+                'Hyperrealistic Fantasy', 'Cyberpunk Neon', 'Folk Art Painted',
+                'Fashion Editorial', 'Bio-Organic Surreal', 'Minimalist Graphic'
+            ]
+        },
+        colorPalette: {
+            title: '🌈 Color Palette',
+            tab: 'basic',
+            options: [
+                'Calming Naturals', 'Dreamy Pastels', 'Bold Statement', 'Luxury Metallics',
+                'Ocean Serenity', 'Sunset Warmth', 'Cyberpunk Edge', 'Monochrome Drama',
+                'Rainbow Joy', 'Autumn Cozy', 'Desert Mystique', 'Gothic Romance'
+            ]
+        },
+        mood: {
+            title: '💫 Emotional Vibe',
+            tab: 'basic',
+            options: [
+                'Whimsical Wonder', 'Serene Tranquility', 'Bold Confidence',
+                'Mysterious Intrigue', 'Playful Joy', 'Dark Elegance',
+                'Nostalgic Warmth', 'Futuristic Cool', 'Nature Harmony', 'Quirky Humor'
+            ]
+        },
+        composition: {
+            title: '🖼️ Composition',
+            tab: 'advanced',
+            options: [
+                'Centered Portrait', 'Symmetrical Balance', 'Rule of Thirds Dynamic',
+                'Minimalist Negative Space', 'Full Bleed Immersive', 'Vignette Focus',
+                'Landscape Panorama', 'Circular/Radial', 'Silhouette Graphic'
+            ]
+        },
+        detailDensity: {
+            title: '✨ Detail Level',
+            tab: 'advanced',
+            options: [
+                'Minimal Clean', 'Moderate Detail', 'Intricate Hyperdetail', 'Graphic Bold'
+            ]
+        },
+        environment: {
+            title: '🌍 Environment',
+            tab: 'advanced',
+            options: [
+                'Isolated Studio', 'Natural Landscape', 'Urban Cityscape',
+                'Mystical Fantasy World', 'Abstract Void', 'Domestic Interior', 'Cosmic Space'
+            ]
+        },
+        lighting: {
+            title: '💡 Lighting',
+            tab: 'advanced',
+            options: [
+                'Golden Hour Warmth', 'Soft Dreamy Haze', 'Dramatic Rim Light',
+                'Neon Glow Accent', 'Studio Perfect', 'Bioluminescent Magic', 'Chiaroscuro Drama'
+            ]
+        },
+        theme: {
+            title: '🎪 Theme/Niche',
+            tab: 'advanced',
+            options: [
+                'Cottagecore/Nature', 'Cyberpunk/Sci-Fi', 'Dark Academia/Gothic',
+                'Kawaii/Cute', 'Bohemian/Spiritual', 'Maximalist/Eclectic',
+                'Minimalist Modern', 'Vintage/Retro', 'Fashion/Glam', 'Horror-Beauty'
+            ]
+        },
+        marketPosition: {
+            title: '🎁 Target Market',
+            tab: 'seller',
+            options: [
+                'Gallery Fine Art', 'Pop Culture Fandom', 'Interior Design Statement',
+                'Gift Market', "Children's Room", 'Teen/Young Adult', 'Wellness/Spa',
+                'Office/Professional', 'Alternative/Goth', 'Maximalist Collectors'
+            ]
+        },
+        format: {
+            title: '📐 Format',
+            tab: 'advanced',
+            options: ['Vertical Portrait', 'Horizontal Landscape', 'Square', 'Panoramic']
+        },
+        specialEffects: {
+            title: '🔮 Special Effects',
+            tab: 'advanced',
+            options: [
+                'Bokeh Blur Background', 'Particle Effects', 'Reflections',
+                'Glowing Elements', 'Chromatic Aberration', 'Depth of Field',
+                'Motion Blur', 'Holographic Shimmer'
+            ]
+        },
+        printSize: {
+            title: '🎯 Print Optimization',
+            tab: 'advanced',
+            options: ['Large Format Suitable', 'Small Format Perfect', 'Scalable Vector Style']
+        }
+    };
+
+    const topSellerCombos = [
+        {
+            name: '🍄 Cottagecore Dream',
+            combo: {
+                subjectArchetype: 'Whimsical Nature Spirit',
+                artisticStyle: 'Photorealistic CGI',
+                colorPalette: 'Dreamy Pastels',
+                lighting: 'Golden Hour Warmth',
+                theme: 'Cottagecore/Nature'
+            }
+        },
+        {
+            name: '👽 Neon Alien Pop',
+            combo: {
+                subjectArchetype: 'Cute Alien/Monster',
+                artisticStyle: 'Cyberpunk Neon',
+                colorPalette: 'Bold Statement',
+                composition: 'Centered Portrait',
+                theme: 'Cyberpunk/Sci-Fi'
+            }
+        },
+        {
+            name: '🦇 Gothic Elegance',
+            combo: {
+                subjectArchetype: 'Dark Fantasy Entity',
+                artisticStyle: 'Hyperrealistic Fantasy',
+                colorPalette: 'Gothic Romance',
+                lighting: 'Dramatic Rim Light',
+                theme: 'Dark Academia/Gothic'
+            }
+        },
+        {
+            name: '🦊 Western Wanderer',
+            combo: {
+                subjectArchetype: 'Anthropomorphic Animal',
+                environment: 'Natural Landscape',
+                colorPalette: 'Sunset Warmth',
+                lighting: 'Golden Hour Warmth',
+                mood: 'Nostalgic Warmth'
+            }
+        },
+        {
+            name: '💃 Fashion Statement',
+            combo: {
+                subjectArchetype: 'Fashion Forward Character',
+                artisticStyle: 'Pop Art Bold',
+                colorPalette: 'Rainbow Joy',
+                environment: 'Isolated Studio',
+                theme: 'Fashion/Glam'
+            }
+        },
+        {
+            name: '🌊 Mystical Hybrid',
+            combo: {
+                subjectArchetype: 'Mystical Animal Hybrid',
+                artisticStyle: 'Whimsical Illustration',
+                colorPalette: 'Ocean Serenity',
+                specialEffects: 'Bokeh Blur Background',
+                mood: 'Whimsical Wonder'
+            }
+        },
+        {
+            name: '🎪 Dark Carnival',
+            combo: {
+                subjectArchetype: 'Carnival/Circus Character',
+                artisticStyle: 'Dark Surrealism',
+                colorPalette: 'Cyberpunk Edge',
+                lighting: 'Neon Glow Accent',
+                mood: 'Mysterious Intrigue'
+            }
+        },
+        {
+            name: '🎎 Anime Warrior',
+            combo: {
+                subjectArchetype: 'Mythological Creature',
+                artisticStyle: 'Anime/Manga Inspired',
+                environment: 'Natural Landscape',
+                colorPalette: 'Autumn Cozy',
+                lighting: 'Dramatic Rim Light'
+            }
+        },
+        {
+            name: '🤖 Tech Oracle',
+            combo: {
+                subjectArchetype: 'Cyberpunk Being',
+                artisticStyle: 'Hyperrealistic Fantasy',
+                colorPalette: 'Monochrome Drama',
+                environment: 'Urban Cityscape',
+                theme: 'Cyberpunk/Sci-Fi'
+            }
+        },
+        {
+            name: '✨ Ethereal Spirit',
+            combo: {
+                subjectArchetype: 'Ethereal Guardian',
+                artisticStyle: 'Bio-Organic Surreal',
+                colorPalette: 'Luxury Metallics',
+                specialEffects: 'Glowing Elements',
+                mood: 'Mysterious Intrigue'
+            }
+        }
+    ];
+
+    function switchTab(tabName) {
+        currentTab = tabName;
+        
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tabName + '-tab').classList.add('active');
+        
+        renderFilters();
+    }
+
+    function renderCombos() {
+        const grid = document.getElementById('combosGrid');
+        grid.innerHTML = '';
+        
+        topSellerCombos.forEach((seller) => {
+            const card = document.createElement('div');
+            card.className = 'combo-card';
+            card.onclick = () => applyCombo(seller.combo);
+            
+            const title = document.createElement('div');
+            title.className = 'combo-title';
+            title.textContent = seller.name;
+            
+            const tags = document.createElement('div');
+            tags.className = 'combo-tags';
+            
+            Object.values(seller.combo).forEach(value => {
+                const tag = document.createElement('span');
+                tag.className = 'combo-tag';
+                tag.textContent = value;
+                tags.appendChild(tag);
+            });
+            
+            card.appendChild(title);
+            card.appendChild(tags);
+            grid.appendChild(card);
+        });
+    }
+
+    function applyCombo(combo) {
+        Object.keys(combo).forEach(key => {
+            filterStates[key] = true;
+        });
+        
+        Object.keys(selections).forEach(key => selections[key] = '');
+        
+        Object.entries(combo).forEach(([key, value]) => {
+            selections[key] = value;
+        });
+        
+        updatePrompt();
+        renderFilters();
+        
+        if (currentTab === 'seller') {
+            document.querySelectorAll('.tab')[0].click();
+        }
+    }
+
+    function populatePresetDropdown() {
+        const selector = document.getElementById('presetSelector');
+        topSellerCombos.forEach((seller, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = seller.name;
+            selector.appendChild(option);
+        });
+    }
+
+    function applyPreset() {
+        const selector = document.getElementById('presetSelector');
+        const index = selector.value;
+        if (index !== '') {
+            applyCombo(topSellerCombos[index].combo);
+        }
+    }
+
+    function saveAsPreset() {
+        const activeSelections = {};
+        Object.entries(selections).forEach(([key, value]) => {
+            if (value) activeSelections[key] = value;
+        });
+        
+        if (Object.keys(activeSelections).length === 0) {
+            showAlert('⚠️ No selections to save! Make some choices first.');
+            return;
+        }
+        
+        const presetName = prompt('Name your preset:', 'My Custom Combo');
+        if (presetName) {
+            topSellerCombos.push({
+                name: '⭐ ' + presetName,
+                combo: activeSelections
+            });
+            populatePresetDropdown();
+            renderCombos();
+            showAlert('✅ Preset saved! Find it in the dropdown and Top Sellers tab.');
+        }
+    }
+
+    function updateRandomMode() {
+        randomToggleFilters = document.getElementById('randomToggleFilters').checked;
+    }
+
+    function toggleFilter(key) {
+        filterStates[key] = !filterStates[key];
+        if (!filterStates[key]) {
+            selections[key] = '';
+        }
+        updatePrompt();
+        renderFilters();
+    }
+
+    function handleSelect(category, value) {
+        if (!filterStates[category]) return;
+        selections[category] = selections[category] === value ? '' : value;
+        updatePrompt();
+        renderFilters();
+    }
+
+    function generatePrompt() {
+        const parts = [];
+        
+        Object.keys(filters).forEach(key => {
+            if (filterStates[key] && selections[key]) {
+                parts.push(selections[key].toLowerCase());
+            }
+        });
+        
+        return parts.length > 0 ? parts.join(', ') : 'Select options to build your sellable art prompt...';
+    }
+
+    function calculateMarketScore() {
+        const selectionCount = Object.values(selections).filter(v => v).length;
+        if (selectionCount === 0) return '--';
+        
+        let score = Math.min(100, selectionCount * 8);
+        
+        if (selections.subjectArchetype) score += 5;
+        if (selections.artisticStyle) score += 5;
+        if (selections.colorPalette) score += 5;
+        if (selections.mood) score += 5;
+        
+        return Math.round(score) + '%';
+    }
+
+    function updateStats() {
+        const activeCount = Object.values(filterStates).filter(v => v).length;
+        const selectionCount = Object.values(selections).filter(v => v).length;
+        const prompt = generatePrompt();
+        const charCount = prompt === 'Select options to build your sellable art prompt...' ? 0 : prompt.length;
+        const marketScore = calculateMarketScore();
+
+        document.getElementById('activeFilters').textContent = activeCount;
+        document.getElementById('selectionsCount').textContent = selectionCount;
+        document.getElementById('charCount').textContent = charCount;
+        document.getElementById('marketScore').textContent = marketScore;
+    }
+
+    function updatePrompt() {
+        document.getElementById('promptDisplay').textContent = generatePrompt();
+        updateStats();
+    }
+
+    function copyToClipboard() {
+        const prompt = generatePrompt();
+        if (prompt !== 'Select options to build your sellable art prompt...') {
+            navigator.clipboard.writeText(prompt).then(() => {
+                showAlert('✅ Text prompt copied to clipboard!');
+            });
+        }
+    }
+
+    function copyJSON() {
+        const jsonData = {
+            filters: {},
+            prompt: generatePrompt(),
+            marketScore: calculateMarketScore(),
+            metadata: {
+                activeFilters: Object.values(filterStates).filter(v => v).length,
+                totalSelections: Object.values(selections).filter(v => v).length,
+                timestamp: new Date().toISOString(),
+                studio: 'Art Print Prompt Studio'
+            }
+        };
+
+        Object.keys(filters).forEach(key => {
+            jsonData.filters[key] = {
+                enabled: filterStates[key],
+                value: selections[key] || null
+            };
+        });
+
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        navigator.clipboard.writeText(jsonString).then(() => {
+            showAlert('✅ JSON data copied to clipboard!');
+        });
+    }
+
+    function showAlert(message) {
+        const alert = document.getElementById('copyAlert');
+        alert.textContent = message;
+        alert.classList.remove('hidden');
+        setTimeout(() => alert.classList.add('hidden'), 3000);
+    }
+
+    function clearAll() {
+        Object.keys(selections).forEach(key => selections[key] = '');
+        document.getElementById('presetSelector').value = '';
+        updatePrompt();
+        renderFilters();
+    }
+
+    function randomize() {
+        if (randomToggleFilters) {
+            Object.keys(filterStates).forEach(key => {
+                filterStates[key] = Math.random() > 0.3;
+            });
+        }
+
+        Object.keys(filters).forEach(key => {
+            if (filterStates[key]) {
+                const options = filters[key].options;
+                selections[key] = options[Math.floor(Math.random() * options.length)];
+            } else {
+                selections[key] = '';
+            }
+        });
+
+        updatePrompt();
+        renderFilters();
+    }
+
+    function renderFilters() {
+        const container = document.getElementById('filtersContainer');
+        container.innerHTML = '';
+
+        Object.entries(filters).forEach(([key, filter]) => {
+            if (currentTab !== 'seller' && filter.tab !== currentTab) {
+                return;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'filter-card';
+            if (!filterStates[key]) {
+                card.classList.add('disabled');
+            }
+
+            const header = document.createElement('div');
+            header.className = 'filter-header';
+
+            const titleContainer = document.createElement('div');
+            titleContainer.className = 'filter-title';
+
+            const title = document.createElement('h3');
+            title.textContent = filter.title;
+            
+            if (filterStates[key] && selections[key]) {
+                const badge = document.createElement('span');
+                badge.className = 'selected-badge';
+                badge.textContent = 'Selected';
+                title.appendChild(badge);
+            }
+
+            titleContainer.appendChild(title);
+
+            const toggle = document.createElement('label');
+            toggle.className = 'toggle-switch';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = filterStates[key];
+            checkbox.onchange = () => toggleFilter(key);
+
+            const slider = document.createElement('span');
+            slider.className = 'toggle-slider';
+
+            toggle.appendChild(checkbox);
+            toggle.appendChild(slider);
+
+            header.appendChild(titleContainer);
+            header.appendChild(toggle);
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            filter.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.disabled = !filterStates[key];
+                if (selections[key] === option) {
+                    btn.classList.add('selected');
+                }
+                btn.textContent = option;
+                btn.onclick = () => handleSelect(key, option);
+                optionsContainer.appendChild(btn);
+            });
+
+            card.appendChild(header);
+            card.appendChild(optionsContainer);
+            container.appendChild(card);
+        });
+    }
+
+    renderFilters();
+    renderCombos();
+    populatePresetDropdown();
+    updateStats();
+</script>
+```
+
+</body>
+</html>
