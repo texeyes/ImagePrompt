@@ -95,17 +95,31 @@
       <p style="font-size:0.8rem;color:#9fa0c9;margin-top:0.5rem;">These presets constrain intent while allowing variation.</p>
       <hr style="border:0;border-top:1px solid #222236;margin:1rem 0;" />
       <h3>Art Direction Filters</h3>
-      <label>Core Art Style</label>
+      <label>Core Art Philosophy</label>
       <select id="style">
-        <option>Modernist Technical Calm (industrial UI / documentation)</option>
-        <option>Wearable Indifference (aesthetically resolved, emotionally closed)</option>
         <option>System Artifact (byproduct of thinking)</option>
         <option>Snapshot of a System Mid-Operation</option>
-        <option>Architectural Drafting Minimalism</option>
+        <option>Wearable Indifference (aesthetically resolved, emotionally closed)</option>
         <option>Neutral Diagrammatic Abstraction</option>
-        <option>Bauhaus-Adjacent Structural Design (non-ideological)</option>
-        <option>Japanese Industrial Restraint</option>
+        <option>Architectural Drafting Minimalism</option>
+        <option>Modernist Technical Calm</option>
       </select>
+
+      <label>Visual Art Style (adds texture + variation)</label>
+      <select id="artStyle">
+        <option>Swiss / International Typographic Style</option>
+        <option>Japanese Industrial Design</option>
+        <option>Brutalist Graphic Design</option>
+        <option>Postmodern Technical Illustration</option>
+        <option>Mid-Century Modern Abstraction</option>
+        <option>Experimental Editorial Illustration</option>
+        <option>Minimalist Screen-Print Poster</option>
+        <option>Architectural Blueprint / CAD</option>
+        <option>Abstract Data Visualization</option>
+      </select>
+
+      <label>Visual Complexity</label>
+      <select id="complexity">
 
       <label>Visual Complexity</label>
       <select id="complexity">
@@ -179,40 +193,41 @@
   <script>
     function generatePrompt() {
       const style = styleEl.value;
+      const artStyle = artStyleEl.value;
       const complexity = complexityEl.value;
       const color = colorEl.value;
       const demo = demoEl.value;
       const emotion = emotionEl.value;
       const context = contextEl.value;
-      const subject = subjectEl.value || 'abstract symbolic form';
+      const subject = subjectEl.value || 'abstract structural form';
       const text = textEl.value;
       const print = printEl.value;
 
       const prompt = `Create a high-impact t-shirt design intended for online apparel sales.
 
-Art Style: ${style}
+Core Philosophy: ${style}
+Art Style Influence: ${artStyle}
 Visual Complexity: ${complexity}
 Color Strategy: ${color}
 
 Subject: ${subject}
-Emotional Tone: ${emotion}
 Audience: ${demo}
 Wear Context: ${context}
 
 Design Characteristics:
-- Strong central composition readable from 6 feet away
-- Emotionally resonant but not literal
-- Symbolic imagery that invites interpretation
-- Balanced negative space for shirt fabric
+- Visually pleasing before meaningful
+- Structured, calm, and self-contained
+- No narrative or emotional invitation
+- Strong composition suitable for a wearable object
 
-${text ? `Incorporate subtle typography with the phrase: \"${text}\" (not dominant, integrated into the art)` : ''}
+${text ? `Optional functional text: \"${text}\" (non-decorative, secondary)` : ''}
 
 Technical / Print Constraints:
 ${print}
-Flat lighting, no mockups, no background environment
+Flat presentation, no mockups or lifestyle scenes
 
 Overall Intent:
-A design that feels thoughtful, modern, and quietly bold—something the wearer identifies with rather than advertises.`;
+A shirt someone wants to wear for how it feels and looks, not for what it says.`;
 
       outputEl.textContent = prompt;
     }
@@ -288,6 +303,7 @@ A design that feels thoughtful, modern, and quietly bold—something the wearer 
     const modeEl = document.getElementById('mode');
 
     const styleEl = document.getElementById('style');
+    const artStyleEl = document.getElementById('artStyle');
     const complexityEl = document.getElementById('complexity');
     const colorEl = document.getElementById('color');
     const demoEl = document.getElementById('demo');
