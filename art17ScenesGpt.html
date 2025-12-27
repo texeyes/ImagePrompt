@@ -51,6 +51,25 @@
       opacity: 0.65;
       margin-bottom: 6px;
     }
+    .row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    select {
+      background: #0a0a0a;
+      color: #eaeaea;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 14px;
+    }
+    .copied {
+      font-size: 13px;
+      color: #7CFF7C;
+      margin-top: 8px;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -58,13 +77,23 @@
 <h1>🎬 TikTok Script → Mega Image Prompt</h1>
 <p>
 Paste a TikTok video script. This tool generates a single cohesive,
-multi-scene image prompt optimized for TikTok storytelling.
+multi-scene image prompt optimized for TikTok visuals.
 </p>
 
 <div class="label">TikTok Video Script Input</div>
 <textarea id="scriptInput" placeholder="Paste TikTok Video Script here..."></textarea>
 
-<button onclick="generatePrompt()">Generate Mega Image Prompt</button>
+<div class="row">
+  <div>
+    <div class="label">Output Type</div>
+    <select id="outputType">
+      <option value="contact">Contact Sheet (Multi-frame)</option>
+      <option value="single">Single Frame (Hero Image)</option>
+    </select>
+  </div>
+</div>
+
+<button onclick="generatePrompt()">Generate & Copy Prompt</button>
 
 <div id="output"></div>
 
@@ -75,78 +104,82 @@ Late-night Austin, Texas museum atmosphere.
 Brutal on-camera flash, crushed blacks, blown highlights.
 Heavy film grain, raw street-photography aesthetic.
 Anti-polish, fashion-documentary realism.
-No text overlays, no UI, no borders, no labels.
+
+ABSOLUTE CONSTRAINT:
+Absolutely NO words, letters, typography, captions, signage, symbols,
+numbers, logos, or readable text of any kind anywhere in any image.
 `.trim();
 
 const SCENE_BEATS = [
-  {
-    name: "Hook / Intro",
-    visual: "Immediate visual tension, strong eye contact or silhouette, flash dominates, attention-grabbing pose"
-  },
-  {
-    name: "Setup",
-    visual: "Wider context shot, environment introduced, outfit fully visible, casual movement"
-  },
-  {
-    name: "Core",
-    visual: "Detail-focused framing, textures, accessories, fabric, body language relaxed but intentional"
-  },
-  {
-    name: "Show",
-    visual: "Motion-driven scene, outfit interaction, walking, turning, stepping, flash freezing action"
-  },
-  {
-    name: "Peak",
-    visual: "Strongest styling moment, confident posture, bold framing, editorial impact"
-  },
-  {
-    name: "Outro",
-    visual: "Quiet confidence, pull-back or intimate close-up, emotional resolution"
-  }
+  "Hook / Intro – immediate visual tension, strong silhouette or eye contact",
+  "Setup – environment revealed, full outfit context",
+  "Core – texture, accessories, fabric, detail emphasis",
+  "Show – motion moment, walking, turning, flash freezing action",
+  "Peak – strongest styling, bold framing, editorial confidence",
+  "Outro – calm resolution, intimate or pulled-back moment"
 ];
-
-function extractSections(text) {
-  return SCENE_BEATS.map(b => b.name);
-}
 
 function generatePrompt() {
   const script = document.getElementById("scriptInput").value.trim();
+  const outputType = document.getElementById("outputType").value;
   if (!script) return;
 
-  const scenes = extractSections(script);
+  let layoutBlock = "";
+  let sceneBlock = "";
 
-  let sceneDescriptions = scenes.map((scene, i) => {
-    return `
-Scene ${i + 1} (${scene}):
-${SCENE_BEATS[i].visual}
-Same character, same outfit universe, visual continuity maintained.
+  if (outputType === "contact") {
+    layoutBlock = `
+Output Format:
+Create a multi-frame contact sheet grid.
+Frames should feel like moments from the same shoot and same night.
+Each frame must be visually distinct but stylistically unified.
 `.trim();
-  }).join("\n\n");
+
+    sceneBlock = SCENE_BEATS.map((s, i) => `
+Frame ${i + 1}:
+${s}.
+Same character, same outfit universe, continuity maintained.
+`).join("\n");
+  } else {
+    layoutBlock = `
+Output Format:
+Create a single, high-impact hero image.
+This image should visually summarize the entire TikTok arc.
+Optimized for hooks, thumbnails, and opening frames.
+`.trim();
+
+    sceneBlock = `
+Single Scene Direction:
+Confident fashion-forward subject.
+Strong pose, clear outfit read, emotional immediacy.
+Editorial but authentic — designed to stop the scroll.
+`.trim();
+  }
 
   const megaPrompt = `
-Create a multi-scene image set designed for TikTok video storytelling.
+Create image content specifically designed for TikTok video creation.
 
 ${STYLE_TEMPLATE}
 
-Scene Structure:
-Generate a cohesive sequence of scenes that visually map to a TikTok script arc.
-Scenes should feel like moments from the same night and location,
-with evolving energy and framing but consistent character identity.
+${layoutBlock}
 
-${sceneDescriptions}
+Scene Direction:
+${sceneBlock}
 
-Overall Direction:
-Fashion-forward subject.
-Scenes should prioritize clarity at small screen size.
-Each frame must be visually distinct enough to cut between quickly.
-Lighting and flash behavior may vary slightly per scene but remain stylistically unified.
+Overall Guidance:
+Same character throughout.
+Consistent styling universe.
+Scene-to-scene evolution in energy, framing, and motion.
+Optimized for small-screen clarity and fast cuts.
 `.trim();
+
+  navigator.clipboard.writeText(megaPrompt);
 
   document.getElementById("output").innerHTML = `
     <div class="card">
       <h2>🖼 Mega Image Prompt</h2>
-      <div class="label">Copy into your image generator</div>
       <textarea readonly>${megaPrompt}</textarea>
+      <div class="copied">✓ Prompt copied to clipboard</div>
     </div>
   `;
 }
