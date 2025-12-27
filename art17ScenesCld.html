@@ -74,6 +74,7 @@
     textarea {
         min-height: 80px;
         resize: vertical;
+        font-family: inherit;
     }
 
     button {
@@ -87,6 +88,7 @@
         cursor: pointer;
         width: 100%;
         margin-top: 20px;
+        transition: all 0.3s;
     }
 
     button:hover {
@@ -149,6 +151,11 @@
         font-size: 14px;
         width: auto;
         margin: 0;
+        cursor: pointer;
+    }
+
+    .copy-btn:hover {
+        background: #38a169;
     }
 
     .prompt-text {
@@ -159,12 +166,41 @@
         font-family: 'Courier New', monospace;
         font-size: 14px;
         line-height: 1.6;
+        border: 1px solid #e2e8f0;
     }
 
     .empty-state {
         text-align: center;
         padding: 60px 20px;
         color: #718096;
+    }
+
+    .video-section {
+        background: #edf2f7;
+        padding: 25px;
+        border-radius: 12px;
+    }
+
+    .video-details {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .tag {
+        background: #667eea;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
     }
 </style>
 ```
@@ -179,21 +215,21 @@
     <div class="controls">
         <div class="control-group">
             <label>Character/Subject</label>
-            <input type="text" id="character" placeholder="e.g., Young woman in trendy streetwear">
+            <input type="text" id="character" placeholder="e.g., Young woman in trendy streetwear" value="">
         </div>
 
         <div class="control-group">
             <label>Location</label>
-            <input type="text" id="location" placeholder="e.g., Late-night Austin Museum">
+            <input type="text" id="location" placeholder="e.g., Late-night Austin Museum" value="">
         </div>
 
         <div class="control-group">
             <label>Visual Style</label>
             <select id="visualStyle">
-                <option value="brutal on-camera flash, crushed blacks, blown highlights, heavy film grain">Flash Photography</option>
+                <option value="brutal on-camera flash, crushed blacks, blown highlights, heavy film grain">Flash Photography - Raw Street</option>
                 <option value="soft natural lighting, pastel tones, dreamy aesthetic">Soft & Dreamy</option>
-                <option value="neon lights, cyberpunk aesthetic, high contrast">Neon Cyberpunk</option>
-                <option value="golden hour, warm tones, cinematic">Golden Hour</option>
+                <option value="neon lights, cyberpunk aesthetic, high contrast, vibrant colors">Neon Cyberpunk</option>
+                <option value="golden hour, warm tones, cinematic, shallow depth of field">Golden Hour</option>
             </select>
         </div>
 
@@ -214,142 +250,147 @@
     </div>
 
     <div class="templates">
-        <button class="template-btn" onclick="loadTemplate('museum')">🏛️ Museum</button>
-        <button class="template-btn" onclick="loadTemplate('street')">🌃 Street</button>
-        <button class="template-btn" onclick="loadTemplate('cafe')">☕ Cafe</button>
-        <button class="template-btn" onclick="loadTemplate('urban')">🏙️ Rooftop</button>
+        <button class="template-btn" onclick="loadTemplate('museum')">🏛️ Museum Night</button>
+        <button class="template-btn" onclick="loadTemplate('street')">🌃 Street Fashion</button>
+        <button class="template-btn" onclick="loadTemplate('cafe')">☕ Coffee Shop</button>
+        <button class="template-btn" onclick="loadTemplate('urban')">🏙️ Urban Rooftop</button>
     </div>
 
-    <button onclick="generateScenes()">✨ Generate Scenes & Script</button>
+    <button onclick="generateScenes()">✨ Generate Scenes & Video Script</button>
 
     <div class="output-section" id="output">
         <div class="empty-state">
-            <h3>🎬 Ready to Create?</h3>
-            <p>Fill in the details and click Generate!</p>
+            <h2>🎬 Ready to Create Viral Content?</h2>
+            <p>Fill in the details above and click "Generate Scenes & Video Script" to get started!</p>
         </div>
     </div>
 </div>
 
 <script>
+    console.log('Script loaded successfully');
+
     const templates = {
         museum: {
-            character: "Stylish young woman",
-            location: "Late-night Austin Museum",
+            character: "Stylish young woman in contemporary fashion",
+            location: "Late-night Austin, Texas Museum",
             category: "fashion",
             scenes: [
-                "Full body shot viewing abstract art, 9:16 vertical, no text",
-                "Close-up of eyes, face partially in shadow, vertical format",
-                "Mid-step on minimalist stairs, flash frozen, 9:16",
-                "Overhead shot seated alone, harsh flash, vertical",
-                "Side profile at exhibit, black background, 9:16",
-                "Pressed to abstract art, flash glare, vertical, no text"
+                "Full body shot viewing abstract art, mirror reflecting flash, 9:16 vertical, no text visible",
+                "Tight close-up of eyes and nose, face partially obscured by glare, vertical format",
+                "Stepping down minimalist display, flash freezing one foot mid-air, 9:16 vertical",
+                "Overhead shot seated alone in museum, harsh flash flattening space, portrait orientation",
+                "Side profile leaning into art exhibit, background disappearing into pure black, 9:16 vertical",
+                "Pressed close to abstract art piece, flash glare scattering across surface, no readable text"
             ]
         },
         street: {
-            character: "Model in urban streetwear",
-            location: "Neon-lit downtown street",
+            character: "Confident model in urban streetwear",
+            location: "Neon-lit downtown street at night",
             category: "fashion",
             scenes: [
-                "Walking toward camera, bokeh lights, 9:16 vertical",
-                "Leaning on textured wall, side view, vertical, no text",
-                "Close-up sneakers on wet ground, 9:16",
-                "Sitting on steps, neon reflections, vertical",
-                "Adjusting sunglasses, skyline behind, 9:16",
-                "Spinning motion blur, sharp face, vertical, no text"
+                "Walking toward camera with city lights bokeh in background, 9:16 vertical, no text",
+                "Leaning against textured wall, looking off to the side, portrait orientation, text-free",
+                "Close-up of sneakers mid-stride on wet pavement, 9:16 vertical composition",
+                "Sitting on steps with neon lights reflecting in puddles, no signage visible, vertical frame",
+                "Adjusting sunglasses with city skyline behind, portrait format, clean background",
+                "Dynamic spinning shot with motion blur and sharp focus on face, 9:16 vertical"
             ]
         },
         cafe: {
-            character: "Cozy influencer",
-            location: "Vintage coffee shop",
+            character: "Cozy aesthetic influencer in warm-toned outfit",
+            location: "Vintage coffee shop with warm lighting",
             category: "lifestyle",
             scenes: [
-                "Holding coffee near window, 9:16 vertical, no text",
-                "Reading at corner table, plants behind, vertical",
-                "Hands around mug close-up, 9:16",
-                "Looking up smiling, laptop visible, vertical",
-                "Overhead coffee table setup, 9:16, no text",
-                "Candid laughing moment, vertical format"
+                "Holding latte art coffee cup near window with soft natural light, 9:16 vertical, no menu text",
+                "Reading unmarked book at corner table with plants in background, portrait orientation",
+                "Close-up hands wrapping around warm mug, vertical composition, no visible labels",
+                "Looking up from blank laptop with smile, shallow depth of field, 9:16 format",
+                "Overhead shot of table with coffee and pastry, aesthetic setup without text, vertical frame",
+                "Candid laughing moment with friend across table, portrait orientation, text-free"
             ]
         },
         urban: {
-            character: "Trendsetter",
-            location: "Rooftop at sunset",
+            character: "Trendsetter in contemporary fashion",
+            location: "Modern rooftop overlooking city skyline at sunset",
             category: "fashion",
             scenes: [
-                "Standing at edge, backlit, 9:16 vertical",
-                "Wind in hair, city behind, vertical, no text",
-                "Sitting on ledge, legs dangling, 9:16",
-                "Jewelry catching light, close-up, vertical",
-                "Silhouette against sunset, 9:16",
-                "Jump shot, cityscape, vertical, no text"
+                "Standing at edge with golden hour backlighting, 9:16 vertical, no building signage",
+                "Wind blowing hair with city sprawl in background, portrait format, clean skyline",
+                "Sitting on ledge with legs dangling, urban landscape below, vertical composition without text",
+                "Close-up of jewelry catching sunset glow, 9:16 vertical frame, no words",
+                "Silhouette against colorful sunset sky, portrait orientation, text-free",
+                "Dynamic jump shot with cityscape and sky, vertical 9:16 format, no visible text"
             ]
         }
     };
 
     const videoTemplates = {
         fashion: {
-            titles: ["Effortless Outfit Ideas", "Style Tips for Every Day"],
-            hashtags: ["#outfitinspo", "#fashiontips", "#stylesecrets"],
-            hook: "Want to elevate your style?",
+            titles: ["Effortless Outfit Ideas", "Fashion Hauls for Inspiration", "Style Tips for Every Day"],
+            hashtags: ["#outfitinspo", "#fashiontips", "#stylesecrets", "#outfitideas", "#dailyfashion"],
+            hook: "Want to elevate your style with simple outfit hacks?",
             script: {
-                intro: "Ever wonder how to look chic in minutes?",
-                setup: "Here are quick, trendy looks you can copy.",
-                core: "Mix basics with statement accessories.",
-                show: "Watch how accessories transform the outfit!",
-                peak: "This switch makes it pop!",
-                outro: "Share your hacks in comments!"
+                intro: "Ever wonder how to look chic in minutes? Let's explore easy outfit tips!",
+                setup: "Here are some quick, trendy looks you can copy for any day of the week.",
+                core: "Mix basics like jeans and tees with statement accessories for instant style.",
+                show: "Watch how switching accessories transforms the same outfit into a new look!",
+                peak: "This effortless switch makes the outfit pop—ready to try this yourself?",
+                outro: "Show us your go-to outfit hacks in the comments and follow for more!"
             }
         },
         beauty: {
-            titles: ["Quick Makeup Tutorials", "Beauty Hacks"],
-            hashtags: ["#makeuptutorial", "#beautyhacks", "#glowup"],
-            hook: "Want flawless makeup in 5 minutes?",
+            titles: ["Quick Makeup Tutorials", "Beauty Hacks You Need", "Everyday Glow Up"],
+            hashtags: ["#makeuptutorial", "#beautyhacks", "#glowup", "#makeuptips", "#beautyroutine"],
+            hook: "Want flawless makeup in under 5 minutes?",
             script: {
-                intro: "My go-to quick makeup routine!",
-                setup: "Essential products I use daily.",
-                core: "Focus on skin first—concealer and highlight.",
-                show: "This technique creates natural glow!",
-                peak: "This trick changed my routine!",
-                outro: "Drop your beauty hack below!"
+                intro: "Let me show you my go-to quick makeup routine that saves time!",
+                setup: "These are the essential products I use every single day.",
+                core: "Focus on skin first—concealer, blush, and a pop of highlight.",
+                show: "Watch how this simple technique creates a natural glow!",
+                peak: "This trick changed my entire routine—you have to try it!",
+                outro: "Drop your favorite beauty hack below and follow for more tips!"
             }
         },
         lifestyle: {
-            titles: ["Daily Routine Inspiration", "Cozy Life"],
-            hashtags: ["#lifestyleblogger", "#dailyroutine", "#cozyvibes"],
-            hook: "Make your routine more intentional?",
+            titles: ["Daily Routine Inspiration", "Productive Day Vibes", "Cozy Life Moments"],
+            hashtags: ["#lifestyleblogger", "#dailyroutine", "#productiveday", "#cozyvibes", "#slowliving"],
+            hook: "Want to make your daily routine more intentional?",
             script: {
-                intro: "Come through my mindful routine!",
-                setup: "Morning rituals that set the tone.",
-                core: "Small habits make all the difference.",
-                show: "How I structure my day!",
-                peak: "This change transformed my mindset!",
-                outro: "What's your favorite routine part?"
+                intro: "Come with me through my mindful daily routine!",
+                setup: "Starting with morning rituals that set the tone for the day.",
+                core: "Small habits like journaling and coffee time make all the difference.",
+                show: "Here's how I structure my day for maximum peace and productivity!",
+                peak: "This simple change transformed my entire mindset!",
+                outro: "What's your favorite part of your routine? Comment below!"
             }
         },
         fitness: {
-            titles: ["Quick Workouts", "Fitness Motivation"],
-            hashtags: ["#workoutroutine", "#fitnessmotivation", "#healthylifestyle"],
-            hook: "Stay fit without hours at the gym?",
+            titles: ["Quick Workout Routines", "Fitness Motivation", "Healthy Habits Daily"],
+            hashtags: ["#workoutroutine", "#fitnessmotivation", "#healthylifestyle", "#quickworkout", "#fitnessjourney"],
+            hook: "Want to stay fit without spending hours at the gym?",
             script: {
-                intro: "My 15-minute workout that works!",
-                setup: "Exercises for all major muscles.",
-                core: "Consistency over intensity.",
-                show: "Watch the proper form!",
-                peak: "Results in just 3 weeks!",
-                outro: "Try it and let me know!"
+                intro: "Here's my 15-minute workout that actually works!",
+                setup: "These exercises target all major muscle groups efficiently.",
+                core: "Consistency over intensity—that's the real secret.",
+                show: "Watch the proper form to get maximum results safely!",
+                peak: "This routine helped me see results in just 3 weeks!",
+                outro: "Try this workout and let me know how it goes! Follow for more!"
             }
         }
     };
 
-    function loadTemplate(name) {
-        const t = templates[name];
-        document.getElementById('character').value = t.character;
-        document.getElementById('location').value = t.location;
-        document.getElementById('category').value = t.category;
-        document.getElementById('customScenes').value = t.scenes.join('\n');
+    function loadTemplate(templateName) {
+        console.log('Loading template:', templateName);
+        const template = templates[templateName];
+        document.getElementById('character').value = template.character;
+        document.getElementById('location').value = template.location;
+        document.getElementById('category').value = template.category;
+        document.getElementById('customScenes').value = template.scenes.join('\n');
     }
 
     function generateScenes() {
+        console.log('Generate button clicked');
+        
         const character = document.getElementById('character').value || "Character";
         const location = document.getElementById('location').value || "Location";
         const visualStyle = document.getElementById('visualStyle').value;
@@ -360,81 +401,131 @@
             ? customScenes.split('\n').filter(s => s.trim())
             : templates.museum.scenes;
 
-        const vt = videoTemplates[category];
+        const videoTemplate = videoTemplates[category];
 
-        const imagePrompt = `Create a 3x2 grid contact sheet in ${location}.
+        const imagePrompt = `Create a professional 3x2 grid contact sheet featuring the same character in ${location}.
 ```
 
 CHARACTER: ${character}
 
 VISUAL STYLE: ${visualStyle}
 
-TECHNICAL SPECS:
+TECHNICAL SPECIFICATIONS:
 
-- Grid: 3x2 (3 top, 3 bottom)
-- Each frame: 9:16 vertical (1080x1920px)
-- Total: 3240x3840 pixels
-- Consistent character across all frames
+- Grid Layout: Exactly 3x2 (3 images top row, 3 images bottom row)
+- Aspect Ratio: Each individual frame must be 9:16 vertical (1080x1920 pixels) - TikTok native format
+- Overall contact sheet dimensions: 3240x3840 pixels (3 frames wide x 2 frames tall)
+- Maintain consistent character appearance across all frames
+- Raw street-photography aesthetic with authentic, candid energy
 
-⚠️ CRITICAL: ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, SIGNS, OR LABELS
-⚠️ Zero text elements - purely visual images only
+CRITICAL CONSTRAINTS:
+⚠️ ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, CAPTIONS, OR LABELS ANYWHERE IN THE IMAGE
+⚠️ NO frame numbering, NO title text, NO overlay text, NO watermarks
+⚠️ NO visible signage, posters, graffiti text, or any readable words in the environment
+⚠️ This is a purely visual contact sheet with ZERO text elements
+⚠️ Environmental elements like abstract shapes, patterns, or non-text graffiti are acceptable
 
-FRAMES (all 9:16 vertical):
-${scenes.map((s, i) => `${i + 1}. ${s}`).join(’\n’)}
+FRAME COMPOSITIONS (9:16 vertical format for each):
+${scenes.map((scene, i) => `${i + 1}. ${scene} - FRAME SIZE: 1080x1920px vertical`).join(’\n’)}
 
-DIRECTION:
+CREATIVE DIRECTION:
 
-- Authentic candid moments
-- Vertical phone orientation
-- Visual storytelling flow
-- NO TEXT ANYWHERE`;
+- Each frame should feel like a decisive moment captured authentically
+- Every frame must be composed in vertical 9:16 aspect ratio (phone-held portrait orientation)
+- Vary angles and distances to create visual rhythm across the grid
+- Ensure continuity of character styling, lighting quality, and atmosphere
+- The contact sheet should tell a cohesive visual story
+- REMINDER: No text or words should appear anywhere in any frame`;
   
   ```
-        const videoScript = `HOOK: ${vt.hook}
+        const videoScript = `🎣 HOOK: ${videoTemplate.hook}
   ```
 
-INTRO (0-5s): ${vt.script.intro}
-SETUP (5-10s): ${vt.script.setup}
-CORE (10-20s): ${vt.script.core}
-SHOW (20-30s): ${vt.script.show}
-PEAK (30-40s): ${vt.script.peak}
-OUTRO (40-50s): ${vt.script.outro}
+📱 INTRO (0-5 seconds):
+Script: “${videoTemplate.script.intro}”
+Visual: Show the contact sheet or first striking image
 
-TITLES: ${vt.titles.join(’ • ‘)}
-HASHTAGS: ${vt.hashtags.join(’ ’)}
+📱 SETUP (5-10 seconds):
+Script: “${videoTemplate.script.setup}”
+Visual: Quick montage of 2-3 frames from your contact sheet
 
-💡 Post 9:16 vertical for TikTok
-💡 45-60 seconds optimal length`;
+📱 CORE (10-20 seconds):
+Script: “${videoTemplate.script.core}”
+Visual: Demonstrate the key elements using your images
 
-```
-        let html = '<div class="scene-card">';
-        html += '<div class="scene-header">';
-        html += '<div class="scene-title">📸 Image Prompt</div>';
-        html += '<button class="copy-btn" onclick="copyText(\'imagePrompt\')">Copy</button>';
-        html += '</div>';
-        html += `<div class="prompt-text" id="imagePrompt">${imagePrompt}</div>`;
-        html += '</div>';
+📱 SHOW (20-30 seconds):
+Script: “${videoTemplate.script.show}”
+Visual: Before/after or transformation reveal
 
-        html += '<div class="scene-card">';
-        html += '<div class="scene-header">';
-        html += '<div class="scene-title">🎥 Video Script</div>';
-        html += '<button class="copy-btn" onclick="copyText(\'videoScript\')">Copy</button>';
-        html += '</div>';
-        html += `<div class="prompt-text" id="videoScript">${videoScript}</div>`;
-        html += '</div>';
+📱 PEAK (30-40 seconds):
+Script: “${videoTemplate.script.peak}”
+Visual: Your most impressive image/moment
 
-        document.getElementById('output').innerHTML = html;
+📱 OUTRO (40-50 seconds):
+Script: “${videoTemplate.script.outro}”
+Visual: Return to full contact sheet or final striking image
+
+✨ SUGGESTED TITLES: ${videoTemplate.titles.join(’ • ’)}
+
+🏷️ HASHTAGS: ${videoTemplate.hashtags.join(’ ’)}
+
+💡 TIPS:
+
+- Post 9:16 vertical for TikTok
+- Optimal length: 45-60 seconds
+- Use trending audio
+- Add text overlay for 80% of viewers watching without sound`;
+  
+  ```
+        let output = '<div class="scene-card">';
+        output += '<div class="scene-header">';
+        output += '<div class="scene-title">📸 Image Generation Prompt</div>';
+        output += '<button class="copy-btn" onclick="copyToClipboard(\'imagePrompt\')">Copy Prompt</button>';
+        output += '</div>';
+        output += `<div class="prompt-text" id="imagePrompt">${imagePrompt}</div>`;
+        output += '</div>';
+  
+        output += '<div class="scene-card">';
+        output += '<div class="video-section">';
+        output += '<div class="scene-header">';
+        output += '<div class="scene-title">🎥 TikTok Video Script</div>';
+        output += '<button class="copy-btn" onclick="copyToClipboard(\'videoScript\')">Copy Script</button>';
+        output += '</div>';
+        output += `<div class="prompt-text" id="videoScript">${videoScript}</div>`;
+        output += '</div>';
+        output += '</div>';
+  
+        document.getElementById('output').innerHTML = output;
+        console.log('Output generated successfully');
     }
-
-    function copyText(id) {
-        const el = document.getElementById(id);
-        const text = el.innerText;
+  
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        const text = element.innerText;
+        
         navigator.clipboard.writeText(text).then(() => {
-            alert('Copied to clipboard!');
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = '✓ Copied!';
+            btn.style.background = '#38a169';
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = '#48bb78';
+            }, 2000);
+        }).catch(err => {
+            console.error('Copy failed:', err);
+            alert('Copy failed. Please select and copy manually.');
         });
     }
-</script>
-```
+  
+    // Test on page load
+    window.addEventListener('load', function() {
+        console.log('Page fully loaded');
+        console.log('Templates available:', Object.keys(templates));
+    });
+  ```
+  
+    </script>
 
 </body>
 </html>
