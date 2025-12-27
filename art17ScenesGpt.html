@@ -2,18 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TikTok Scene & Image Prompt Generator</title>
+  <title>TikTok Script → Image Prompt Factory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0e0e0e;
+      background: #0c0c0c;
       color: #eaeaea;
       margin: 0;
       padding: 20px;
     }
-    h1, h2, h3 {
+    h1, h2 {
       font-weight: 600;
+    }
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      background: #0a0a0a;
+      color: #eaeaea;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 13px;
+      margin-bottom: 16px;
+      resize: vertical;
     }
     button {
       background: #ffffff;
@@ -21,147 +34,119 @@
       border: none;
       padding: 12px 18px;
       font-size: 16px;
-      cursor: pointer;
       border-radius: 6px;
-      margin-bottom: 20px;
+      cursor: pointer;
     }
     button:hover {
       opacity: 0.9;
     }
     .card {
-      background: #161616;
-      border-radius: 10px;
+      background: #151515;
+      border-radius: 12px;
       padding: 16px;
-      margin-bottom: 20px;
-    }
-    textarea {
-      width: 100%;
-      min-height: 140px;
-      background: #0b0b0b;
-      color: #eaeaea;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 10px;
-      resize: vertical;
-      font-family: monospace;
-      font-size: 13px;
+      margin-top: 20px;
     }
     .label {
       font-size: 13px;
-      opacity: 0.7;
+      opacity: 0.65;
       margin-bottom: 6px;
     }
   </style>
 </head>
 <body>
 
-<h1>📸 TikTok Image Scene + Video Idea Generator</h1>
+<h1>🎬 TikTok Script → Mega Image Prompt</h1>
 <p>
-  Generates brutal-flash museum image prompts + TikTok video scripts
-  designed for fashion & style content.
+Paste a TikTok video script. This tool generates a single cohesive,
+multi-scene image prompt optimized for TikTok storytelling.
 </p>
 
-<button onclick="generate()">Generate Scene Set</button>
+<div class="label">TikTok Video Script Input</div>
+<textarea id="scriptInput" placeholder="Paste TikTok Video Script here..."></textarea>
+
+<button onclick="generatePrompt()">Generate Mega Image Prompt</button>
 
 <div id="output"></div>
 
 <script>
-const baseImagePrompt = `
-Create a 3x2 grid contact sheet of the same character in late-night Austin, Texas Museum.
-Visual style features brutal on-camera flash, crushed blacks, blown highlights, and heavy film grain
-with a raw street-photography feel.
-
-Grid Layout:
-Arrange exactly as a 3x2 grid (3 Images on the top row, 3 images on the bottom row).
-Absolutely NO frame labels, captions, or numbering.
-
-Frames:
-1. Full body shot of the character viewing art, mirror reflecting flash like glass.
-2. Tight close-up of eyes and nose, face partially obscured by glare from shine.
-3. Character stepping down a graffiti-covered display, flash freezing one foot mid-air.
-4. Overhead shot of the character seated alone in the museum, harsh flash flattening the space.
-5. Side profile leaning into an art exhibit, background disappearing into pure black.
-6. Character pressed close to an art print, flash glare scattering across scratched glass.
-`;
-
-const visualModifiers = [
-  "emotionally distant, candid, unposed",
-  "restless movement energy, nightlife tension",
-  "introspective mood, fashion-forward posture",
-  "editorial fashion attitude, anti-polish aesthetic",
-  "youth culture meets fine art contrast"
-];
-
-const tiktokTitles = [
-  "Effortless Outfit Ideas",
-  "Fashion Hauls for Inspiration",
-  "Style Tips for Every Day",
-  "How to Look Put-Together Fast",
-  "Minimal Pieces, Maximum Style"
-];
-
-const hooks = [
-  "Want to elevate your style with simple outfit hacks?",
-  "Here’s how to look stylish without overthinking it.",
-  "You don’t need more clothes — just better combos.",
-  "Steal these outfit tricks in under 30 seconds.",
-  "Watch how one outfit turns into five looks."
-];
-
-function generate() {
-  const modifier = visualModifiers[Math.floor(Math.random() * visualModifiers.length)];
-  const title = tiktokTitles[Math.floor(Math.random() * tiktokTitles.length)];
-  const hook = hooks[Math.floor(Math.random() * hooks.length)];
-
-  const imagePrompt = `
-${baseImagePrompt}
-
-Additional Direction:
-${modifier}
-Late-night museum silence, flash dominates the scene, raw fashion-documentary energy.
-No text, no UI, no labels, no borders.
+const STYLE_TEMPLATE = `
+Visual Style Reference:
+Late-night Austin, Texas museum atmosphere.
+Brutal on-camera flash, crushed blacks, blown highlights.
+Heavy film grain, raw street-photography aesthetic.
+Anti-polish, fashion-documentary realism.
+No text overlays, no UI, no borders, no labels.
 `.trim();
 
-  const tiktokScript = `
-Title:
-${title}
+const SCENE_BEATS = [
+  {
+    name: "Hook / Intro",
+    visual: "Immediate visual tension, strong eye contact or silhouette, flash dominates, attention-grabbing pose"
+  },
+  {
+    name: "Setup",
+    visual: "Wider context shot, environment introduced, outfit fully visible, casual movement"
+  },
+  {
+    name: "Core",
+    visual: "Detail-focused framing, textures, accessories, fabric, body language relaxed but intentional"
+  },
+  {
+    name: "Show",
+    visual: "Motion-driven scene, outfit interaction, walking, turning, stepping, flash freezing action"
+  },
+  {
+    name: "Peak",
+    visual: "Strongest styling moment, confident posture, bold framing, editorial impact"
+  },
+  {
+    name: "Outro",
+    visual: "Quiet confidence, pull-back or intimate close-up, emotional resolution"
+  }
+];
 
-Hashtags:
-#outfitinspo #fashiontips #stylesecrets #outfitideas #dailyfashion #tinyhaul
+function extractSections(text) {
+  return SCENE_BEATS.map(b => b.name);
+}
 
-Hook:
-${hook}
+function generatePrompt() {
+  const script = document.getElementById("scriptInput").value.trim();
+  if (!script) return;
 
-Intro:
-“Ever wonder how to look chic in minutes? Let’s explore easy outfit tips.”
+  const scenes = extractSections(script);
 
-Setup:
-“Here are some quick, trendy looks you can copy for any day of the week.”
+  let sceneDescriptions = scenes.map((scene, i) => {
+    return `
+Scene ${i + 1} (${scene}):
+${SCENE_BEATS[i].visual}
+Same character, same outfit universe, visual continuity maintained.
+`.trim();
+  }).join("\n\n");
 
-Core:
-“Mix basics like jeans and tees with statement accessories for instant style.”
+  const megaPrompt = `
+Create a multi-scene image set designed for TikTok video storytelling.
 
-Show:
-“Watch how switching accessories transforms the same outfit into a new look!”
+${STYLE_TEMPLATE}
 
-Peak:
-“This effortless switch makes the outfit pop — ready to try this yourself?”
+Scene Structure:
+Generate a cohesive sequence of scenes that visually map to a TikTok script arc.
+Scenes should feel like moments from the same night and location,
+with evolving energy and framing but consistent character identity.
 
-Outro:
-“Drop your favorite look in the comments and follow for more.”
+${sceneDescriptions}
+
+Overall Direction:
+Fashion-forward subject.
+Scenes should prioritize clarity at small screen size.
+Each frame must be visually distinct enough to cut between quickly.
+Lighting and flash behavior may vary slightly per scene but remain stylistically unified.
 `.trim();
 
   document.getElementById("output").innerHTML = `
     <div class="card">
-      <h2>🖼 Image Generation Prompt</h2>
+      <h2>🖼 Mega Image Prompt</h2>
       <div class="label">Copy into your image generator</div>
-      <textarea readonly>${imagePrompt}</textarea>
-    </div>
-
-    <div class="card">
-      <h2>🎬 TikTok Video Script</h2>
-      <div class="label">Voiceover + caption structure</div>
-      <textarea readonly>${tiktokScript}</textarea>
+      <textarea readonly>${megaPrompt}</textarea>
     </div>
   `;
 }
