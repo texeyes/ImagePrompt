@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Scene Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .output-section {
+            margin-top: 40px;
+        }
+
+        .scene-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .scene-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .scene-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .scene-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .copy-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: auto;
+            margin: 0;
+        }
+
+        .copy-btn:hover {
+            background: #38a169;
+        }
+
+        .prompt-text {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .video-section {
+            background: #edf2f7;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .video-header {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .video-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .detail-content {
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .template-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            margin-top: 0;
+        }
+
+        .template-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 TikTok Scene Generator</h1>
+        <p class="subtitle">Create image prompts and video scripts for viral TikTok content</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Character/Subject</label>
+                <input type="text" id="character" placeholder="e.g., Young woman in trendy streetwear">
+            </div>
+
+            <div class="control-group">
+                <label>Location</label>
+                <input type="text" id="location" placeholder="e.g., Late-night Austin, Texas Museum">
+            </div>
+
+            <div class="control-group">
+                <label>Visual Style</label>
+                <select id="visualStyle">
+                    <option value="brutal on-camera flash, crushed blacks, blown highlights, heavy film grain">Flash Photography - Raw Street</option>
+                    <option value="soft natural lighting, pastel tones, dreamy aesthetic, film photography">Soft & Dreamy - Natural Light</option>
+                    <option value="neon lights, cyberpunk aesthetic, high contrast, vibrant colors">Neon Cyberpunk - Night City</option>
+                    <option value="golden hour, warm tones, cinematic, shallow depth of field">Golden Hour - Cinematic</option>
+                    <option value="moody dark aesthetic, dramatic shadows, noir style">Dark & Moody - Film Noir</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Content Category</label>
+                <select id="category">
+                    <option value="fashion">Fashion & Style</option>
+                    <option value="beauty">Beauty & Makeup</option>
+                    <option value="lifestyle">Lifestyle & Daily</option>
+                    <option value="fitness">Fitness & Wellness</option>
+                    <option value="food">Food & Cooking</option>
+                    <option value="travel">Travel & Adventure</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Custom Scene Ideas (Optional)</label>
+                <textarea id="customScenes" placeholder="Enter custom scene descriptions, one per line..."></textarea>
+            </div>
+        </div>
+
+        <div class="templates">
+            <button class="template-btn" onclick="loadTemplate('museum')">🏛️ Museum Night</button>
+            <button class="template-btn" onclick="loadTemplate('street')">🌃 Street Fashion</button>
+            <button class="template-btn" onclick="loadTemplate('cafe')">☕ Coffee Shop</button>
+            <button class="template-btn" onclick="loadTemplate('urban')">🏙️ Urban Rooftop</button>
+        </div>
+
+        <button onclick="generateScenes()">✨ Generate Scenes & Video Script</button>
+
+        <div class="output-section" id="output"></div>
+    </div>
+
+    <script>
+        const templates = {
+            museum: {
+                character: "Stylish young woman in contemporary fashion",
+                location: "Late-night Austin, Texas Museum",
+                category: "fashion",
+                scenes: [
+                    "Full body shot viewing art, mirror reflecting flash like glass",
+                    "Tight close-up of eyes and nose, face partially obscured by glare from shine",
+                    "Stepping down graffiti-covered display, flash freezing one foot mid-air",
+                    "Overhead shot seated alone in the museum, harsh flash flattening space",
+                    "Side profile leaning into art exhibit, background disappearing into pure black",
+                    "Pressed close to art print, flash glare scattering across scratched glass"
+                ]
+            },
+            street: {
+                character: "Confident model in urban streetwear",
+                location: "Neon-lit downtown street at night",
+                category: "fashion",
+                scenes: [
+                    "Walking towards camera with city lights bokeh in background",
+                    "Leaning against graffiti wall, looking off to the side",
+                    "Close-up of sneakers mid-stride on wet pavement",
+                    "Sitting on steps with neon signs reflecting in puddles",
+                    "Adjusting sunglasses with city skyline behind",
+                    "Dynamic spinning shot with motion blur and sharp focus on face"
+                ]
+            },
+            cafe: {
+                character: "Cozy aesthetic influencer in warm-toned outfit",
+                location: "Vintage coffee shop with warm lighting",
+                category: "lifestyle",
+                scenes: [
+                    "Holding latte art coffee cup near window with soft natural light",
+                    "Reading book at corner table with plants in background",
+                    "Close-up hands wrapping around warm mug",
+                    "Looking up from laptop with smile, shallow depth of field",
+                    "Overhead shot of table with coffee, pastry, and aesthetic setup",
+                    "Candid laughing moment with friend across table"
+                ]
+            },
+            urban: {
+                character: "Trendsetter in contemporary fashion",
+                location: "Modern rooftop overlooking city skyline at sunset",
+                category: "fashion",
+                scenes: [
+                    "Standing at edge with golden hour backlighting",
+                    "Wind blowing hair with city sprawl in background",
+                    "Sitting on ledge with legs dangling, urban landscape below",
+                    "Close-up of jewelry catching sunset glow",
+                    "Silhouette against colorful sunset sky",
+                    "Dynamic jump shot with cityscape and sky"
+                ]
+            }
+        };
+
+        const videoTemplates = {
+            fashion: {
+                titles: ["Effortless Outfit Ideas", "Fashion Hauls for Inspiration", "Style Tips for Every Day"],
+                hashtags: ["#outfitinspo", "#fashiontips", "#stylesecrets", "#outfitideas", "#dailyfashion", "#tinyhaul"],
+                hook: "Want to elevate your style with simple outfit hacks?",
+                script: {
+                    intro: "Ever wonder how to look chic in minutes? Let's explore easy outfit tips!",
+                    setup: "Here are some quick, trendy looks you can copy for any day of the week.",
+                    core: "Mix basics like jeans and tees with statement accessories for instant style.",
+                    show: "Watch how switching accessories transforms the same outfit into a new look!",
+                    peak: "This effortless switch makes the outfit pop—ready to try this yourself?",
+                    outro: "Show us your go-to outfit hacks in the comments and follow for more!"
+                }
+            },
+            beauty: {
+                titles: ["Quick Makeup Tutorials", "Beauty Hacks You Need", "Everyday Glow Up"],
+                hashtags: ["#makeuptutorial", "#beautyhacks", "#glowup", "#makeuptips", "#beautyroutine", "#quickmakeup"],
+                hook: "Want flawless makeup in under 5 minutes?",
+                script: {
+                    intro: "Let me show you my go-to quick makeup routine that saves time!",
+                    setup: "These are the essential products I use every single day.",
+                    core: "Focus on skin first—concealer, blush, and a pop of highlight.",
+                    show: "Watch how this simple technique creates a natural glow!",
+                    peak: "This trick changed my entire routine—you have to try it!",
+                    outro: "Drop your favorite beauty hack below and follow for more tips!"
+                }
+            },
+            lifestyle: {
+                titles: ["Daily Routine Inspiration", "Productive Day Vibes", "Cozy Life Moments"],
+                hashtags: ["#lifestyleblogger", "#dailyroutine", "#productiveday", "#cozyvibes", "#slowliving", "#morningroutine"],
+                hook: "Want to make your daily routine more intentional?",
+                script: {
+                    intro: "Come with me through my mindful daily routine!",
+                    setup: "Starting with morning rituals that set the tone for the day.",
+                    core: "Small habits like journaling and coffee time make all the difference.",
+                    show: "Here's how I structure my day for maximum peace and productivity!",
+                    peak: "This simple change transformed my entire mindset!",
+                    outro: "What's your favorite part of your routine? Comment below!"
+                }
+            },
+            fitness: {
+                titles: ["Quick Workout Routines", "Fitness Motivation", "Healthy Habits Daily"],
+                hashtags: ["#workoutroutine", "#fitnessmotivation", "#healthylifestyle", "#quickworkout", "#fitnessjourney", "#gymtips"],
+                hook: "Want to stay fit without spending hours at the gym?",
+                script: {
+                    intro: "Here's my 15-minute workout that actually works!",
+                    setup: "These exercises target all major muscle groups efficiently.",
+                    core: "Consistency over intensity—that's the real secret.",
+                    show: "Watch the proper form to get maximum results safely!",
+                    peak: "This routine helped me see results in just 3 weeks!",
+                    outro: "Try this workout and let me know how it goes! Follow for more!"
+                }
+            },
+            food: {
+                titles: ["Easy Recipe Ideas", "Quick Meal Prep", "Food That Looks Good"],
+                hashtags: ["#easyrecipes", "#foodtiktok", "#mealprep", "#cookinghacks", "#recipeideas", "#foodie"],
+                hook: "Want to cook restaurant-quality meals at home?",
+                script: {
+                    intro: "Let me show you this super easy recipe that tastes amazing!",
+                    setup: "You only need a few simple ingredients for this dish.",
+                    core: "The secret is in the seasoning and cooking technique.",
+                    show: "Watch how quickly this comes together—so satisfying!",
+                    peak: "The final result looks and tastes incredible!",
+                    outro: "What should I make next? Comment your requests below!"
+                }
+            },
+            travel: {
+                titles: ["Travel Destinations You Need", "Hidden Gems Worldwide", "Adventure Awaits"],
+                hashtags: ["#travelinspo", "#wanderlust", "#travelguide", "#hiddengems", "#adventuretime", "#exploremore"],
+                hook: "Ready to discover your next travel destination?",
+                script: {
+                    intro: "Let me take you to this incredible hidden gem!",
+                    setup: "This place is perfect for adventure seekers and culture lovers.",
+                    core: "The best spots are often the ones tourists don't know about.",
+                    show: "Here's everything you need to know to plan your trip!",
+                    peak: "This moment made the entire journey worth it!",
+                    outro: "Where should I explore next? Drop your suggestions!"
+                }
+            }
+        };
+
+        function loadTemplate(templateName) {
+            const template = templates[templateName];
+            document.getElementById('character').value = template.character;
+            document.getElementById('location').value = template.location;
+            document.getElementById('category').value = template.category;
+            document.getElementById('customScenes').value = template.scenes.join('\n');
+        }
+
+        function generateScenes() {
+            const character = document.getElementById('character').value || "Character";
+            const location = document.getElementById('location').value || "Location";
+            const visualStyle = document.getElementById('visualStyle').value;
+            const category = document.getElementById('category').value;
+            const customScenes = document.getElementById('customScenes').value;
+
+            const scenes = customScenes 
+                ? customScenes.split('\n').filter(s => s.trim())
+                : templates.museum.scenes;
+
+            const videoTemplate = videoTemplates[category];
+
+            let output = '<div class="scene-card">';
+            output += '<div class="scene-header">';
+            output += '<div class="scene-title">📸 Image Generation Prompt</div>';
+            output += '<button class="copy-btn" onclick="copyToClipboard(\'imagePrompt\')">Copy</button>';
+            output += '</div>';
+            
+            const imagePrompt = `Create a 3x2 grid contact sheet of the same character in ${location}. Visual style features ${visualStyle} with a raw street-photography feel.
+
+Grid Layout: Arrange exactly as a 3x2 grid (3 images on the top row, 3 images on the bottom row).
+
+Visual Constraint: Absolutely NO frame labels, captions, or numbering in the generated contact sheet. Scene-specific text is okay.
+
+Character: ${character}
+
+Frames:
+${scenes.map((scene, i) => `${i + 1}. ${scene}`).join('\n')}`;
+
+            output += `<div class="prompt-text" id="imagePrompt">${imagePrompt}</div>`;
+            output += '</div>';
+
+            output += '<div class="video-section">';
+            output += '<div class="video-header">🎥 TikTok Video Script</div>';
+            
+            output += '<div class="video-details">';
+            output += '<div class="detail-label">Suggested Titles:</div>';
+            output += '<div class="detail-content">' + videoTemplate.titles.join(' • ') + '</div>';
+            output += '</div>';
+
+            output += '<div class="video-details">';
+            output += '<div class="detail-label">Hashtags:</div>';
+            output += '<div class="tags">' + videoTemplate.hashtags.map(tag => `<span class="tag">${tag}</span>`).join('') + '</div>';
+            output += '</div>';
+
+            output += '<div class="video-details">';
+            output += '<div class="detail-label">Hook:</div>';
+            output += '<div class="detail-content">' + videoTemplate.hook + '</div>';
+            output += '</div>';
+
+            const scriptContent = `INTRO:
+Grab attention with a stylish reveal.
+Script: "${videoTemplate.script.intro}"
+
+SETUP:
+Show a quick montage.
+Script: "${videoTemplate.script.setup}"
+
+CORE:
+Explain the key elements.
+Script: "${videoTemplate.script.core}"
+
+SHOW:
+Demonstrate the transformation.
+Script: "${videoTemplate.script.show}"
+
+PEAK:
+Highlight the most exciting moment.
+Script: "${videoTemplate.script.peak}"
+
+OUTRO:
+Encourage engagement.
+Script: "${videoTemplate.script.outro}"`;
+
+            output += '<div class="video-details">';
+            output += '<div class="scene-header">';
+            output += '<div class="detail-label">Full Script:</div>';
+            output += '<button class="copy-btn" onclick="copyToClipboard(\'videoScript\')">Copy</button>';
+            output += '</div>';
+            output += `<div class="prompt-text" id="videoScript">${scriptContent}</div>`;
+            output += '</div>';
+
+            output += '</div>';
+
+            document.getElementById('output').innerHTML = output;
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = '✓ Copied!';
+                btn.style.background = '#38a169';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Show empty state initially
+        document.getElementById('output').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🎬</div>
+                <h3>Ready to Create Viral Content?</h3>
+                <p>Fill in the details above and click "Generate Scenes & Video Script" to get started!</p>
+            </div>
+        `;
+    </script>
+</body>
+</html>
