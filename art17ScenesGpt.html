@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TikTok Scene & Image Prompt Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0e0e0e;
+      color: #eaeaea;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+    button {
+      background: #ffffff;
+      color: #000;
+      border: none;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .card {
+      background: #161616;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      background: #0b0b0b;
+      color: #eaeaea;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 10px;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .label {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📸 TikTok Image Scene + Video Idea Generator</h1>
+<p>
+  Generates brutal-flash museum image prompts + TikTok video scripts
+  designed for fashion & style content.
+</p>
+
+<button onclick="generate()">Generate Scene Set</button>
+
+<div id="output"></div>
+
+<script>
+const baseImagePrompt = `
+Create a 3x2 grid contact sheet of the same character in late-night Austin, Texas Museum.
+Visual style features brutal on-camera flash, crushed blacks, blown highlights, and heavy film grain
+with a raw street-photography feel.
+
+Grid Layout:
+Arrange exactly as a 3x2 grid (3 Images on the top row, 3 images on the bottom row).
+Absolutely NO frame labels, captions, or numbering.
+
+Frames:
+1. Full body shot of the character viewing art, mirror reflecting flash like glass.
+2. Tight close-up of eyes and nose, face partially obscured by glare from shine.
+3. Character stepping down a graffiti-covered display, flash freezing one foot mid-air.
+4. Overhead shot of the character seated alone in the museum, harsh flash flattening the space.
+5. Side profile leaning into an art exhibit, background disappearing into pure black.
+6. Character pressed close to an art print, flash glare scattering across scratched glass.
+`;
+
+const visualModifiers = [
+  "emotionally distant, candid, unposed",
+  "restless movement energy, nightlife tension",
+  "introspective mood, fashion-forward posture",
+  "editorial fashion attitude, anti-polish aesthetic",
+  "youth culture meets fine art contrast"
+];
+
+const tiktokTitles = [
+  "Effortless Outfit Ideas",
+  "Fashion Hauls for Inspiration",
+  "Style Tips for Every Day",
+  "How to Look Put-Together Fast",
+  "Minimal Pieces, Maximum Style"
+];
+
+const hooks = [
+  "Want to elevate your style with simple outfit hacks?",
+  "Here’s how to look stylish without overthinking it.",
+  "You don’t need more clothes — just better combos.",
+  "Steal these outfit tricks in under 30 seconds.",
+  "Watch how one outfit turns into five looks."
+];
+
+function generate() {
+  const modifier = visualModifiers[Math.floor(Math.random() * visualModifiers.length)];
+  const title = tiktokTitles[Math.floor(Math.random() * tiktokTitles.length)];
+  const hook = hooks[Math.floor(Math.random() * hooks.length)];
+
+  const imagePrompt = `
+${baseImagePrompt}
+
+Additional Direction:
+${modifier}
+Late-night museum silence, flash dominates the scene, raw fashion-documentary energy.
+No text, no UI, no labels, no borders.
+`.trim();
+
+  const tiktokScript = `
+Title:
+${title}
+
+Hashtags:
+#outfitinspo #fashiontips #stylesecrets #outfitideas #dailyfashion #tinyhaul
+
+Hook:
+${hook}
+
+Intro:
+“Ever wonder how to look chic in minutes? Let’s explore easy outfit tips.”
+
+Setup:
+“Here are some quick, trendy looks you can copy for any day of the week.”
+
+Core:
+“Mix basics like jeans and tees with statement accessories for instant style.”
+
+Show:
+“Watch how switching accessories transforms the same outfit into a new look!”
+
+Peak:
+“This effortless switch makes the outfit pop — ready to try this yourself?”
+
+Outro:
+“Drop your favorite look in the comments and follow for more.”
+`.trim();
+
+  document.getElementById("output").innerHTML = `
+    <div class="card">
+      <h2>🖼 Image Generation Prompt</h2>
+      <div class="label">Copy into your image generator</div>
+      <textarea readonly>${imagePrompt}</textarea>
+    </div>
+
+    <div class="card">
+      <h2>🎬 TikTok Video Script</h2>
+      <div class="label">Voiceover + caption structure</div>
+      <textarea readonly>${tiktokScript}</textarea>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
