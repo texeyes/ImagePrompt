@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Image Prompt Generator</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #00e5ff; /* Cyan */
+            --accent-secondary: #ff007f; /* Magenta */
+            --lock-color: #ffd700; /* Gold */
+            --border-radius: 8px;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        button {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            flex: 1 1 150px;
+        }
+
+        button:hover {
+            background: var(--accent-color);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+        }
+
+        button.chaos {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+
+        button.chaos:hover {
+            background: var(--accent-secondary);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+
+        /* --- Prompt Display --- */
+        .prompt-container {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            color: #fff;
+            padding: 15px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            resize: vertical;
+            box-sizing: border-box;
+            line-height: 1.4;
+        }
+
+        .copy-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            flex: 0;
+            width: auto;
+        }
+
+        /* --- Filter Grid --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .filter-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .filter-card:hover {
+            border-color: #555;
+        }
+
+        .filter-header {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* The "Wheel" Display */
+        .wheel-display {
+            background: #121212;
+            padding: 10px;
+            border-radius: 4px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wheel-display.locked {
+            border: 1px solid var(--lock-color);
+            background: #252210;
+        }
+
+        .wheel-display:hover {
+            background: #2a2a2a;
+        }
+        
+        .wheel-display.locked:hover {
+            background: #252210;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            color: var(--lock-color);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .wheel-display.locked .lock-icon {
+            opacity: 1;
+        }
+
+        .wheel-display.rolling {
+            color: var(--accent-color);
+            filter: blur(0.5px);
+        }
+
+        .multi-tag {
+            display: inline-block;
+            background: #333;
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin: 2px;
+            font-size: 0.85rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Synapse Prompt Engine</h1>
+
+    <div class="controls">
+        <button onclick="roll(1)">1. Standard Roll<br><small>(1 per filter)</small></button>
+        <button onclick="roll(2)">2. Sparse Roll<br><small>(Random Filters)</small></button>
+        <button onclick="roll(3)">3. Rich Roll<br><small>(1-2 per filter)</small></button>
+        <button class="chaos" onclick="roll(4)">4. Chaos Mode<br><small>(Total Random)</small></button>
+    </div>
+
+    <div class="prompt-container">
+        <textarea id="finalPrompt" readonly placeholder="Generate a prompt to see results here..."></textarea>
+        <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+    </div>
+
+    <div id="filterGrid" class="grid">
+        </div>
+
+<script>
+    // --- DATA ---
+    const filtersData = {
+        "Archetype": [
+            "Clockwork ballerina automaton (steampunk dancer)", "Futuristic pop-star / performer (sci‑fi set)", "Anime heroine (intense close-up, holding prop)",
+            "Masked wasteland guitarist (post-apocalyptic rocker)", "Mythic tri-faced deity / oracle (ceremonial figure)", "Photoreal car‑culture pinup (parking-lot glamour)",
+            "Cyberpunk silhouette subject (profile/double-exposure portrait)", "Cute “odd mascot” character (round head, deadpan)", "Retro-future desert explorers (tiny figures in dunes)",
+            "Japanese schoolgirl athlete (tennis)", "Techwear “space monk” / padded astronaut streetwear (kanji coat, goggles)", "Vintage motel fashion lead (pastel suit + sunflower)",
+            "Street-dance crew lead (baggy pants, street pose)", "Flat-shaded “MV dancer” (clean background choreography)", "Glitch-entity silhouette (VHS/scanline profile)",
+            "Paper-quilling creature (rolled paper anatomy fish)", "Matching-outfit human + pet duo (dance partners)", "Pirate cat captain / crew (cats on ships)",
+            "Neon creature mascot (fuzzy 3D character in neon outfit)", "Luminous antler spirit (white hair/filaments, spotlight)"
+        ],
+        "Species": [
+            "Human (photoreal)", "Human (anime/cel-shaded)", "Human (painterly stylized realism)", "Android / cyborg", "Full automaton (visible mechanics)",
+            "Deity / supernatural entity", "Masked/helmeted human (identity obscured)", "Mascot creature (simple geometry/toon)", "3D fuzzy creature (plush-like, big eyes)",
+            "Animal (cat, realistic)", "Anthropomorphic animal (cat pirate, cat crew)", "Abstract spirit entity (hair/filament body)", "Paper craft creature (quilling/paper sculpture)"
+        ],
+        "Genre": [
+            "Steampunk / clockwork fantasy", "Clean retro-futurism (white/cyan sci‑fi)", "Cyberpunk neon megacity", "Retro-future “space age” desert sci‑fi",
+            "Post-apocalyptic desert punk", "Mythic-fantasy / temple-city cosmology", "Anime slice-of-life (school)", "Anime action drama (intense close-up)",
+            "Modern photoreal nightlife / car meet", "Vintage Americana roadside (motel)", "Street dance / urban choreography", "Vaporwave / glitch-core digital realm",
+            "Whimsical children’s cartoon world", "Stop-motion craft / handmade world", "Fantasy seafaring (pirate cats at sea)"
+        ],
+        "Art Medium": [
+            "Photoreal editorial photo", "Cinematic “film still”", "3D character render (robot/creature emphasis)", "Anime cel-shaded illustration",
+            "Cute kids-anime / simple toon", "Graphic neon illustration (cyberpunk poster)", "Painterly fantasy portrait (polished)", "Retro-futurist matte painting / poster art",
+            "VHS/glitch aesthetic (scanlines + RGB split)[graphixly]", "Flat vector / minimal-shading animation look", "Paper quilling macro photo look (rolled strips visible)[youtube]",
+            "Stop-motion / claymation vibe (handmade texture)"
+        ],
+        "Silhouette": [
+            "Ballerina tutu silhouette (structured skirt)", "Bodysuit / hourglass silhouette", "Profile silhouette (head/neck outline dominant)",
+            "Double-exposure silhouette (city inside silhouette)[reddit]", "Close-up face silhouette (eyes dominate)", "Oversized mask/helmet silhouette (round goggles)",
+            "Spiked helmet silhouette", "Tri-faced / multi-head silhouette", "Long draped robe silhouette", "Oversized parka/coat silhouette (puffy techwear)",
+            "Tailored suit silhouette (boxy vintage)", "Baggy streetwear silhouette (wide pants)", "Tiny figures vs massive structure (epic wide)",
+            "Small “toon mascot” silhouette (big head, tiny limbs)", "Fuzzy creature silhouette (spiky fur/feathers)", "Antler/crown silhouette (hair like branching antlers)",
+            "Paper-quilling relief silhouette (flat-but-3D coils)"
+        ],
+        "Face/Head": [
+            "Glowing eyes (amber/gold)", "Golden irises (anime intensity)", "Full face mask with round goggles", "Ski goggles / visor goggles",
+            "Helmet with cloth wraps / padded hood", "Spikes/horns on helmet", "Triple faces (front + two profiles)", "Regal crown / flame-spike halo headdress",
+            "Minimal dot/line eyes (toon deadpan)", "Profile face with inner-city overlay (double exposure)[reddit]", "Glitch silhouette face (RGB tearing, scanlines)[graphixly]",
+            "Big glossy “mascot eyes” (3D plush vibe)", "Cat facial markings (tabby/white patches)", "Antlered hair/filament “mane” framing face"
+        ],
+        "Outfit": [
+            "Metal tutu + mechanical corset plating", "Rhinestone/reflective stage bodysuit", "Sci‑fi cutout bodysuit + white boots", "Cyberpunk techwear layers (harness, straps)",
+            "Post-apoc jumpsuit / utility suit", "Heavy chains + layered scarves/straps", "Ceremonial robe + stacked neck rings", "Bikini / neon swim set (car-meet)",
+            "Japanese sailor uniform (sailor fuku)[easy-peasy]", "Oversized kanji parka/coat + goggles (space-techwear)", "Tailored pastel suit (vintage editorial)",
+            "Street dance fit: baggy jeans + cropped top + sneakers", "Minimal “MV dancer” outfit (simple shapes, bright blocks)", "Matching tropical print set (human + pet)",
+            "Pirate attire (tricorn hat, tiny coat/vest, sash)", "Neon creature outfit (glow-trim top + skirt/leg warmers)", "No outfit (spirit made of hair/light)"
+        ],
+        "Materials": [
+            "Brass / bronze / copper plating", "Rivets, gears, filigree micro-detail", "Chrome accents / mirror metal", "Patina, oxidation, tarnish",
+            "Glossy synthetic fabric (latex-like)", "Sequins/rhinestones/glitter fabric", "Heavy quilted fabric (puffer insulation)", "Canvas straps + stitched patches",
+            "Weathered ceramic/painted mask texture", "Worn denim + scuffed sneakers", "Tailored wool suit texture (matte)", "Film grain (vintage photo)",
+            "Scanlines + chromatic aberration (VHS/glitch)[graphixly]", "Rolled paper coils (paper quilling texture)[youtube]", "Fuzzy plush fur (short pile) / feather-fur hybrid",
+            "Wet ocean spray + weathered wood (pirate ship)"
+        ],
+        "Typography": [
+            "Large kanji block print on garment (red on white)", "Neon sign typography (vertical signage in city)", "“CRT test-bar” screen blocks (cyberpunk alley)",
+            "No text (clean output)"
+        ],
+        "Prop": [
+            "Soap bar (foreground prop)", "Electric guitar", "Tennis racket", "Sports car (teal/turquoise)", "Portal rings / circular frames",
+            "Wired earbud/headphone cable (profile cyberpunk)", "Quilted/utility bag (techwear)", "Sunflower (vintage editorial)", "Neon signage + CRT monitors (environment props)",
+            "Retro aircraft/space-age vehicle (desert)", "Pirate ship cannons/ropes/sails", "Paper-craft “reef” background elements (quilling scene)",
+            "Pet duo prop: matching scarf/outfit accessory"
+        ],
+        "Action/Pose": [
+            "Mid‑pirouette / dance flourish", "Stage stance / performance pose", "Intense close-up “confronting camera”", "Holding a prop toward camera (soap-forward)",
+            "Seated guitarist playing", "Walking through crowd (cyberpunk street)", "Still profile portrait (graphic silhouette)", "School athlete “ready stance” (racket up)",
+            "Tiny figures walking across dunes (epic scale)", "Deadpan mascot “standing in crowd” (comedy)", "Editorial stand, front-facing (motel)",
+            "Street-dance power stance (mid-move)", "Minimal choreography pose (flat background)", "Duo dance (human + pet mirroring pose)",
+            "Naval standoff / ship battle tableau (pirate cats)", "“Spirit hovering” (no ground contact)"
+        ],
+        "Setting": [
+            "Smoky stage with ember bokeh", "White futuristic tunnel / concentric rings", "Neon cyberpunk alley (dense signs, cables, screens)",
+            "Anime festival street / crowd background", "Schoolyard / street crossing (slice-of-life)", "Desert dunes (vast negative space)",
+            "Retro-future desert outpost + strange tower", "Mythic skyline / temple city in distance", "Rooftop/parking garage at night (city bokeh)",
+            "Vintage roadside motel (pastel doors)", "Minimal graphic backdrop (bold shapes, stripes)", "Digital void / glitch space (abstract gradients)",
+            "Underwater craft scene (paper reef / quilling ocean)", "Bright colorful street (Latin/Caribbean palette street)", "Open ocean with ships (pirate cats)"
+        ],
+        "Atmosphere": [
+            "Ember haze / smoke", "Neon glow bloom", "Rain-slick reflections (cyberpunk option)", "Volumetric fog + rim haze", "Dreamlike clouds “divine aura”",
+            "Heat haze over sand dunes", "CRT scanlines (VHS)", "RGB split / chromatic aberration[graphixly]", "Datamosh tearing / glitch streaks",
+            "Double-exposure blend (scene inside silhouette)[reddit]", "Soft pastel wash (vintage editorial)", "Underwater caustics (if doing ocean)",
+            "Floating paper fibers/dust (craft macro vibe)", "God-ray spotlight cone (spirit/antler creature)"
+        ],
+        "Lighting": [
+            "Warm tungsten spotlight + haze", "Cinematic rim light", "High-key softbox studio lighting", "Cool cyan fill light", "Neon magenta/cyan bounce",
+            "Golden hour desert light", "Overcast soft light (slice-of-life/photo)", "Backlit silhouette (graphic profile)", "Washed midday sun (motel exterior)",
+            "Flat even “animation lighting” (MV dancer)", "RGB/emissive edge lighting (glitch-core)", "Underwater soft diffuse light + caustics",
+            "Single overhead spotlight (stage/spirit reveal)"
+        ],
+        "Color Palette": [
+            "Brass/gold/sepia (warm metallic)", "Cyan/white/silver (clean sci‑fi)", "Hot pink + teal + electric blue (neon cyberpunk)", "Orange/teal anime grade",
+            "Desert beige + sky cyan + peach sunset", "Gold + ember red + black (ritual/deity)", "Neon pink + turquoise (car-meet pop)", "Muted dusty palette (wasteland punk)",
+            "Pastel peach + mint + baby blue (motel/vintage)", "Primary blocks (yellow/blue/red)", "Vaporwave gradient (magenta → cyan → purple)",
+            "CRT palette (oversaturated + scanline)", "Tropical green + orange + warm sun (matching outfits dance)", "Ocean teal + sailcloth beige + wood brown (pirate cats)",
+            "Paper-craft rainbow (quilling fish macro)"
+        ],
+        "Composition": [
+            "Symmetrical center framing (portal/rings)", "Full-body hero shot", "Medium shot (waist-up)", "Extreme close-up (eyes + prop)",
+            "Foreground prop emphasis (soap near lens)", "Profile silhouette composition (face left/right)", "Double exposure silhouette portrait[reddit]",
+            "Wide establishing shot (tiny humans vs massive structure)", "Rule-of-thirds portrait (photo/video feel)", "Shallow DOF subject isolation (bokeh lights)",
+            "Flat centered “character sheet” (animation pose)", "Macro close-up (paper quilling texture, extreme detail)[youtube]",
+            "Two-subject framing (human + pet side-by-side)", "Action wide (two ships facing off)"
+        ],
+        "Detail Density": [
+            "Ultra-intricate micro-mechanics", "Clean minimal surfaces", "Hyper-detailed neon city clutter", "Painterly “high polish” deity portrait",
+            "Gritty texture-forward (dust/grime)", "Fashion editorial clean detail (fabric + skin)", "Minimal toon detail (mascot)",
+            "Glitch detail (artifacts > realism)", "Macro craft detail (paper coils, fibers)[youtube]", "Plush-fur microdetail (individual fibers)",
+            "Ocean scene detail (rigging, ropes, sails)"
+        ],
+        "Mood": [
+            "Regal / ceremonial", "Confident / glamorous", "Aggressive / confrontational", "Mysterious / masked", "Ethereal / divine", "Playful pop-energy",
+            "Gritty rebel rocker", "Nostalgic retro-future wonder", "Cozy slice-of-life", "Surreal / introspective (double exposure)", "Lonely Americana (motel)",
+            "Hype / kinetic (street dance)", "Uncanny digital apparition (glitch)", "Whimsical craft nostalgia (paper quilling)", "Cute absurdist duo (matching outfits)",
+            "Swashbuckling comedic epic (pirate cats)", "Awe/majestic (antler spirit spotlight)"
+        ]
+    };
+
+    // State management
+    const state = {};
+    const keys = Object.keys(filtersData);
+
+    // Initialize State
+    keys.forEach(key => {
+        state[key] = {
+            selected: [], // Array of strings
+            locked: false
+        };
+    });
+
+    // --- SETUP UI ---
+    const grid = document.getElementById('filterGrid');
+
+    function initGrid() {
+        grid.innerHTML = '';
+        keys.forEach(key => {
+            const card = document.createElement('div');
+            card.className = 'filter-card';
+            
+            const header = document.createElement('div');
+            header.className = 'filter-header';
+            header.innerHTML = `<span>${key}</span>`;
+            card.appendChild(header);
+
+            const display = document.createElement('div');
+            display.className = 'wheel-display';
+            display.id = `display-${key}`;
+            display.textContent = "-";
+            display.onclick = () => toggleLock(key);
+
+            const lockIcon = document.createElement('span');
+            lockIcon.className = 'lock-icon';
+            lockIcon.innerHTML = '&#128274;'; // Padlock character
+            display.appendChild(lockIcon);
+
+            card.appendChild(display);
+            grid.appendChild(card);
+        });
+    }
+
+    // --- LOGIC ---
+
+    function getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function toggleLock(key) {
+        // Can only lock if there is a selection
+        if(state[key].selected.length === 0 && !state[key].locked) return;
+
+        state[key].locked = !state[key].locked;
+        const display = document.getElementById(`display-${key}`);
+        if(state[key].locked) {
+            display.classList.add('locked');
+        } else {
+            display.classList.remove('locked');
+        }
+    }
+
+    function updateDisplay(key) {
+        const display = document.getElementById(`display-${key}`);
+        const selection = state[key].selected;
+        
+        // Clear previous content (keep lock icon logic handled by CSS/Parent)
+        // We re-add lock icon span to ensure it exists
+        display.innerHTML = ''; 
+        
+        const lockIcon = document.createElement('span');
+        lockIcon.className = 'lock-icon';
+        lockIcon.innerHTML = '&#128274;';
+        display.appendChild(lockIcon);
+
+        if (selection.length === 0) {
+            const span = document.createElement('span');
+            span.textContent = "—";
+            span.style.opacity = "0.3";
+            display.appendChild(span);
+        } else if (selection.length === 1) {
+            const span = document.createElement('span');
+            span.textContent = selection[0];
+            display.appendChild(span);
+        } else {
+            // Multiple items
+            selection.forEach(item => {
+                const tag = document.createElement('div');
+                tag.className = 'multi-tag';
+                tag.textContent = item;
+                display.appendChild(tag);
+            });
+        }
+    }
+
+    async function roll(mode) {
+        const finalPromptArea = document.getElementById('finalPrompt');
+        finalPromptArea.value = "Rolling...";
+
+        // Trigger animation
+        keys.forEach(key => {
+            if(!state[key].locked) {
+                const display = document.getElementById(`display-${key}`);
+                display.classList.add('rolling');
+                display.querySelector('span:not(.lock-icon)')?.remove(); // remove text
+            }
+        });
+
+        // Small delay for visual effect
+        await new Promise(r => setTimeout(r, 400));
+
+        keys.forEach(key => {
+            if (state[key].locked) return; // Skip locked filters
+
+            const options = filtersData[key];
+            state[key].selected = []; // Reset selection
+
+            if (mode === 1) {
+                // Button 1: One random choice from each filter
+                state[key].selected.push(getRandomItem(options));
+            } 
+            else if (mode === 2) {
+                // Button 2: Random filters (subset) + 1 option
+                // 60% chance to include a filter
+                if (Math.random() > 0.4) {
+                    state[key].selected.push(getRandomItem(options));
+                }
+            } 
+            else if (mode === 3) {
+                // Button 3: At least 1 choice, max 2
+                state[key].selected.push(getRandomItem(options));
+                // 30% chance to add a second item from same category
+                if (Math.random() > 0.7) {
+                    let second = getRandomItem(options);
+                    if(second !== state[key].selected[0]) {
+                        state[key].selected.push(second);
+                    }
+                }
+            } 
+            else if (mode === 4) {
+                // Button 4: Chaos (Total Random)
+                // Randomly decide if filter is active (80% chance)
+                if (Math.random() > 0.2) {
+                    // Randomly decide count (1 to 3)
+                    const count = Math.floor(Math.random() * 3) + 1;
+                    for(let i=0; i<count; i++) {
+                        let item = getRandomItem(options);
+                        if(!state[key].selected.includes(item)){
+                            state[key].selected.push(item);
+                        }
+                    }
+                }
+            }
+
+            // Remove rolling class and update text
+            const display = document.getElementById(`display-${key}`);
+            display.classList.remove('rolling');
+            updateDisplay(key);
+        });
+
+        constructPrompt();
+    }
+
+    function constructPrompt() {
+        let promptParts = [];
+        keys.forEach(key => {
+            if (state[key].selected.length > 0) {
+                // Join multiple choices within a category with " + "
+                promptParts.push(state[key].selected.join(" + "));
+            }
+        });
+        
+        const finalString = promptParts.join(", ");
+        document.getElementById('finalPrompt').value = finalString;
+    }
+
+    function copyToClipboard() {
+        const copyText = document.getElementById("finalPrompt");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); 
+        navigator.clipboard.writeText(copyText.value);
+        
+        const btn = document.querySelector('.copy-btn');
+        const originalText = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => btn.textContent = originalText, 1500);
+    }
+
+    // Initialize
+    initGrid();
+
+</script>
+
+</body>
+</html>
