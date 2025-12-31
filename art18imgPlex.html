@@ -1,1004 +1,866 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Prompt Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Image Prompt Generator</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+      color:#fff; min-height:100vh; padding:20px; overflow-x:hidden;
+    }
+    .container{max-width:1400px;margin:0 auto}
+    header{text-align:center;margin-bottom:22px}
+    h1{
+      font-size:2.2em;margin-bottom:8px;
+      background:linear-gradient(45deg,#ff006e,#00f5ff,#ffb703);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .subtitle{font-size:.95em;color:#aaa;margin-bottom:10px}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
+    .button-controls{
+      display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+      margin-bottom:16px;padding:16px;
+      background:rgba(255,255,255,.03);
+      border-radius:15px;border:1px solid rgba(255,255,255,.1);
+    }
+    .control-btn{
+      padding:12px 20px;font-size:.92em;font-weight:700;
+      border:2px solid;border-radius:999px;cursor:pointer;
+      transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+      text-transform:uppercase;letter-spacing:.8px; user-select:none;
+    }
+    .control-btn:active{transform:translateY(1px)}
+    .btn-1{border-color:#ff006e;color:#ff006e;background:rgba(255,0,110,.1)}
+    .btn-1:hover{background:rgba(255,0,110,.18);box-shadow:0 0 18px rgba(255,0,110,.45)}
+    .btn-2{border-color:#00f5ff;color:#00f5ff;background:rgba(0,245,255,.1)}
+    .btn-2:hover{background:rgba(0,245,255,.18);box-shadow:0 0 18px rgba(0,245,255,.45)}
+    .btn-3{border-color:#ffb703;color:#ffb703;background:rgba(255,183,3,.1)}
+    .btn-3:hover{background:rgba(255,183,3,.18);box-shadow:0 0 18px rgba(255,183,3,.40)}
+    .btn-4{border-color:#a371ff;color:#a371ff;background:rgba(163,113,255,.1)}
+    .btn-4:hover{background:rgba(163,113,255,.18);box-shadow:0 0 18px rgba(163,113,255,.45)}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+    .prompt-section{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:20px;padding:18px 18px 14px;
+      backdrop-filter: blur(10px);
+      margin-bottom:18px;
+    }
+    .prompt-section h2{font-size:1.15em;margin-bottom:10px;color:#ff006e}
+    .prompt-output{
+      background:rgba(0,0,0,.4);
+      border:2px solid rgba(255,0,110,.3);
+      border-radius:15px;padding:16px;
+      min-height:90px;line-height:1.6;font-size:.95em;color:#eaeaea;
+      white-space:pre-wrap;word-break:break-word;
+    }
+    .prompt-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .copy-btn,.export-btn,.clear-all-btn{
+      flex:1;min-width:170px;padding:11px 12px;border:2px solid;border-radius:12px;
+      font-weight:800;cursor:pointer;transition:all .2s ease;background:rgba(255,255,255,.05);
+      user-select:none;
+    }
+    .copy-btn{border-color:#00f5ff;color:#00f5ff}
+    .copy-btn:hover{background:rgba(0,245,255,.15);box-shadow:0 0 14px rgba(0,245,255,.35)}
+    .export-btn{border-color:#ffb703;color:#ffb703}
+    .export-btn:hover{background:rgba(255,183,3,.15);box-shadow:0 0 14px rgba(255,183,3,.35)}
+    .clear-all-btn{border-color:#ff006e;color:#ff006e}
+    .clear-all-btn:hover{background:rgba(255,0,110,.15);box-shadow:0 0 14px rgba(255,0,110,.35)}
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+    .instruction-box{
+      background:rgba(163,113,255,.1);
+      border:1px solid rgba(163,113,255,.3);
+      border-radius:12px;
+      padding:12px 14px;
+      margin-bottom:18px;
+      font-size:.88em;color:#ddd;
+    }
+    .instruction-box strong{color:#a371ff}
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #ff006e, #00f5ff, #ffb703);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px}
+    .wheel-section{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;padding:18px;
+      backdrop-filter: blur(10px);
+    }
+    .category-label{font-size:.78em;color:#aaa;margin-bottom:8px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
+    .wheel-container{
+      position:relative;width:100%;height:300px;
+      background:rgba(0,0,0,.28);
+      border-radius:14px;border:2px solid rgba(0,245,255,.22);
+      overflow:hidden;margin-bottom:12px;
+    }
+    .wheel{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      font-size:.85em;font-weight:700;text-align:center;padding:10px;
+      transition: transform .55s cubic-bezier(.68,-.55,.265,1.55);
+      transform-style:preserve-3d;
+    }
+    .wheel-item{
+      position:absolute;width:90%;height:62px;
+      display:flex;align-items:center;justify-content:center;
+      padding:10px 12px;border-radius:12px;cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .wheel-item:hover{background:rgba(255,255,255,.14);transform:scale(1.03)}
+    .wheel-controls{display:flex;gap:10px;margin-bottom:10px}
+    .spin-btn{
+      flex:1;padding:10px;background:linear-gradient(45deg,#00f5ff,#0099ff);
+      border:none;color:#000;border-radius:12px;font-weight:900;cursor:pointer;
+      transition:transform .15s ease, box-shadow .2s ease; user-select:none;
+    }
+    .spin-btn:hover{transform:translateY(-1px);box-shadow:0 10px 18px rgba(0,245,255,.25)}
+    .spin-btn:disabled{opacity:.5;cursor:not-allowed}
+    .lock-btn{
+      padding:10px 12px;background:rgba(255,183,3,.18);
+      border:2px solid #ffb703;color:#ffb703;border-radius:12px;font-weight:900;cursor:pointer;
+      transition:background .2s ease; user-select:none;
+    }
+    .lock-btn:hover{background:rgba(255,183,3,.26)}
+    .current-selection{
+      background:rgba(0,0,0,.28);
+      border:1px solid rgba(0,245,255,.25);
+      padding:10px 12px;border-radius:12px;
+      font-size:.9em;min-height:42px;
+      display:flex;align-items:center;justify-content:center;
+      color:#00f5ff;font-weight:700;text-align:center;
+    }
+    .lockedGlow{
+      border-color:rgba(255,183,3,.55) !important;
+      box-shadow:0 0 16px rgba(255,183,3,.25);
+    }
 
-        .subtitle {
-            font-size: 0.95em;
-            color: #aaa;
-            margin-bottom: 30px;
-        }
+    .toast{
+      position:fixed;bottom:16px;right:16px;
+      background:rgba(0,245,255,.18);
+      border:2px solid #00f5ff;color:#00f5ff;
+      padding:12px 14px;border-radius:12px;z-index:1000;
+      animation: slideIn .25s ease;
+      max-width:min(420px, calc(100vw - 32px));
+    }
+    @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-        .button-controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .control-btn {
-            padding: 14px 28px;
-            font-size: 0.95em;
-            font-weight: 600;
-            border: 2px solid;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-1 {
-            border-color: #ff006e;
-            color: #ff006e;
-            background: rgba(255, 0, 110, 0.1);
-        }
-
-        .btn-1:hover {
-            background: rgba(255, 0, 110, 0.2);
-            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
-        }
-
-        .btn-2 {
-            border-color: #00f5ff;
-            color: #00f5ff;
-            background: rgba(0, 245, 255, 0.1);
-        }
-
-        .btn-2:hover {
-            background: rgba(0, 245, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
-        }
-
-        .btn-3 {
-            border-color: #ffb703;
-            color: #ffb703;
-            background: rgba(255, 183, 3, 0.1);
-        }
-
-        .btn-3:hover {
-            background: rgba(255, 183, 3, 0.2);
-            box-shadow: 0 0 20px rgba(255, 183, 3, 0.5);
-        }
-
-        .btn-4 {
-            border-color: #a371ff;
-            color: #a371ff;
-            background: rgba(163, 113, 255, 0.1);
-        }
-
-        .btn-4:hover {
-            background: rgba(163, 113, 255, 0.2);
-            box-shadow: 0 0 20px rgba(163, 113, 255, 0.5);
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .wheel-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .wheel-section h2 {
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            color: #00f5ff;
-        }
-
-        .wheel-container {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            border: 2px solid rgba(0, 245, 255, 0.3);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .wheel {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85em;
-            font-weight: 600;
-            text-align: center;
-            padding: 10px;
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform-style: preserve-3d;
-        }
-
-        .wheel-item {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .wheel-item:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
-        }
-
-        .wheel-item.locked {
-            border-color: #ffb703;
-            background: rgba(255, 183, 3, 0.2);
-            box-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
-        }
-
-        .wheel-item.locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 0.8em;
-        }
-
-        .wheel-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .spin-btn {
-            flex: 1;
-            padding: 10px;
-            background: linear-gradient(45deg, #00f5ff, #0099ff);
-            border: none;
-            color: #000;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .spin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 245, 255, 0.4);
-        }
-
-        .spin-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .lock-btn {
-            padding: 10px 15px;
-            background: rgba(255, 183, 3, 0.2);
-            border: 2px solid #ffb703;
-            color: #ffb703;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .lock-btn:hover {
-            background: rgba(255, 183, 3, 0.3);
-        }
-
-        .clear-all-btn {
-            padding: 10px 15px;
-            background: rgba(255, 0, 110, 0.2);
-            border: 2px solid #ff006e;
-            color: #ff006e;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .clear-all-btn:hover {
-            background: rgba(255, 0, 110, 0.3);
-        }
-
-        .category-label {
-            font-size: 0.8em;
-            color: #aaa;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .current-selection {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 245, 255, 0.3);
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.9em;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #00f5ff;
-            font-weight: 500;
-        }
-
-        .prompt-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            grid-column: 1 / -1;
-        }
-
-        .prompt-section h2 {
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            color: #ff006e;
-        }
-
-        .prompt-output {
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 0, 110, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            min-height: 150px;
-            line-height: 1.8;
-            font-size: 0.95em;
-            color: #e0e0e0;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .prompt-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .copy-btn, .export-btn {
-            flex: 1;
-            min-width: 150px;
-            padding: 12px;
-            border: 2px solid;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .copy-btn {
-            border-color: #00f5ff;
-            color: #00f5ff;
-        }
-
-        .copy-btn:hover {
-            background: rgba(0, 245, 255, 0.15);
-            box-shadow: 0 0 15px rgba(0, 245, 255, 0.4);
-        }
-
-        .export-btn {
-            border-color: #ffb703;
-            color: #ffb703;
-        }
-
-        .export-btn:hover {
-            background: rgba(255, 183, 3, 0.15);
-            box-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 245, 255, 0.2);
-            border: 2px solid #00f5ff;
-            color: #00f5ff;
-            padding: 15px 25px;
-            border-radius: 10px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .filter-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .tag {
-            display: inline-block;
-            background: rgba(163, 113, 255, 0.2);
-            border: 1px solid rgba(163, 113, 255, 0.5);
-            color: #a371ff;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 500;
-        }
-
-        .tag.locked {
-            background: rgba(255, 183, 3, 0.2);
-            border-color: rgba(255, 183, 3, 0.5);
-            color: #ffb703;
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .wheel-container {
-                height: 300px;
-            }
-        }
-
-        .instruction-box {
-            background: rgba(163, 113, 255, 0.1);
-            border: 1px solid rgba(163, 113, 255, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 0.85em;
-            color: #ddd;
-        }
-
-        .instruction-box strong {
-            color: #a371ff;
-        }
-    </style>
+    @media (max-width: 1024px){
+      .main-grid{grid-template-columns:1fr}
+      h1{font-size:1.75em}
+      .wheel-container{height:280px}
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>✨ AI Image Prompt Generator</h1>
-            <p class="subtitle">Generate unique, dynamic prompts for AI image generation</p>
-        </header>
+  <div class="container">
+    <header>
+      <h1>AI Image Prompt Generator</h1>
+      <p class="subtitle">Generate unique, dynamic prompts with wheels + locks</p>
+    </header>
 
-        <div class="button-controls">
-            <button class="control-btn btn-1" onclick="generateMode1()">
-                🎯 One Per Filter
-            </button>
-            <button class="control-btn btn-2" onclick="generateMode2()">
-                🎲 Random Filters
-            </button>
-            <button class="control-btn btn-3" onclick="generateMode3()">
-                ⚙️ 1-2 Per Filter
-            </button>
-            <button class="control-btn btn-4" onclick="generateMode4()">
-                🌀 Total Chaos
-            </button>
-        </div>
-
-        <div class="instruction-box">
-            <strong>💡 How to use:</strong> Select a generation mode or manually spin each wheel. Click any item to lock it in place. Use "Clear All" to reset locked items. Copy or export your final prompt.
-        </div>
-
-        <div class="main-grid" id="wheelsContainer">
-            <!-- Wheels will be generated here by JavaScript -->
-        </div>
-
-        <div class="prompt-section">
-            <h2>📝 Your Generated Prompt</h2>
-            <div class="prompt-output" id="promptOutput">
-                Your prompt will appear here...
-            </div>
-            <div class="prompt-actions">
-                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy Prompt</button>
-                <button class="export-btn" onclick="exportAsText()">💾 Export as Text</button>
-            </div>
-        </div>
+    <div class="button-controls">
+      <button class="control-btn btn-1" onclick="generateMode1()">One Per Filter</button>
+      <button class="control-btn btn-2" onclick="generateMode2()">Random Filters</button>
+      <button class="control-btn btn-3" onclick="generateMode3()">1–2 Per Filter</button>
+      <button class="control-btn btn-4" onclick="generateMode4()">Total Chaos</button>
     </div>
 
-    <script>
-        const filters = {
-            'Archetype': [
-                'Clockwork ballerina automaton (steampunk dancer)',
-                'Futuristic pop-star / performer (sci‑fi set)',
-                'Anime heroine (intense close-up, holding prop)',
-                'Masked wasteland guitarist (post-apocalyptic rocker)',
-                'Mythic tri-faced deity / oracle (ceremonial figure)',
-                'Photoreal car‑culture pinup (parking-lot glamour)',
-                'Cyberpunk silhouette subject (profile/double-exposure portrait)',
-                'Cute "odd mascot" character (round head, deadpan)',
-                'Retro-future desert explorers (tiny figures in dunes)',
-                'Japanese schoolgirl athlete (tennis)',
-                'Techwear "space monk" / padded astronaut streetwear (kanji coat, goggles)',
-                'Vintage motel fashion lead (pastel suit + sunflower)',
-                'Street-dance crew lead (baggy pants, street pose)',
-                'Flat-shaded "MV dancer" (clean background choreography)',
-                'Glitch-entity silhouette (VHS/scanline profile)',
-                'Paper-quilling creature (rolled paper anatomy fish)',
-                'Matching-outfit human + pet duo (dance partners)',
-                'Pirate cat captain / crew (cats on ships)',
-                'Neon creature mascot (fuzzy 3D character in neon outfit)',
-                'Luminous antler spirit (white hair/filaments, spotlight)'
-            ],
-            'Species': [
-                'Human (photoreal)',
-                'Human (anime/cel-shaded)',
-                'Human (painterly stylized realism)',
-                'Android / cyborg',
-                'Full automaton (visible mechanics)',
-                'Deity / supernatural entity',
-                'Masked/helmeted human (identity obscured)',
-                'Mascot creature (simple geometry/toon)',
-                '3D fuzzy creature (plush-like, big eyes)',
-                'Animal (cat, realistic)',
-                'Anthropomorphic animal (cat pirate, cat crew)',
-                'Abstract spirit entity (hair/filament body)',
-                'Paper craft creature (quilling/paper sculpture)'
-            ],
-            'Genre': [
-                'Steampunk / clockwork fantasy',
-                'Clean retro-futurism (white/cyan sci‑fi)',
-                'Cyberpunk neon megacity',
-                'Retro-future "space age" desert sci‑fi',
-                'Post-apocalyptic desert punk',
-                'Mythic-fantasy / temple-city cosmology',
-                'Anime slice-of-life (school)',
-                'Anime action drama (intense close-up)',
-                'Modern photoreal nightlife / car meet',
-                'Vintage Americana roadside (motel)',
-                'Street dance / urban choreography',
-                'Vaporwave / glitch-core digital realm',
-                'Whimsical children\'s cartoon world',
-                'Stop-motion craft / handmade world',
-                'Fantasy seafaring (pirate cats at sea)'
-            ],
-            'Art Medium': [
-                'Photoreal editorial photo',
-                'Cinematic "film still"',
-                '3D character render (robot/creature emphasis)',
-                'Anime cel-shaded illustration',
-                'Cute kids-anime / simple toon',
-                'Graphic neon illustration (cyberpunk poster)',
-                'Painterly fantasy portrait (polished)',
-                'Retro-futurist matte painting / poster art',
-                'VHS/glitch aesthetic (scanlines + RGB split)',
-                'Flat vector / minimal-shading animation look',
-                'Paper quilling macro photo look (rolled strips visible)',
-                'Stop-motion / claymation vibe (handmade texture)'
-            ],
-            'Character Silhouette': [
-                'Ballerina tutu silhouette (structured skirt)',
-                'Bodysuit / hourglass silhouette',
-                'Profile silhouette (head/neck outline dominant)',
-                'Double-exposure silhouette (city inside silhouette)',
-                'Close-up face silhouette (eyes dominate)',
-                'Oversized mask/helmet silhouette (round goggles)',
-                'Spiked helmet silhouette',
-                'Tri-faced / multi-head silhouette',
-                'Long draped robe silhouette',
-                'Oversized parka/coat silhouette (puffy techwear)',
-                'Tailored suit silhouette (boxy vintage)',
-                'Baggy streetwear silhouette (wide pants)',
-                'Tiny figures vs massive structure (epic wide)',
-                'Small "toon mascot" silhouette (big head, tiny limbs)',
-                'Fuzzy creature silhouette (spiky fur/feathers)',
-                'Antler/crown silhouette (hair like branching antlers)',
-                'Paper-quilling relief silhouette (flat-but-3D coils)'
-            ],
-            'Face/Head': [
-                'Glowing eyes (amber/gold)',
-                'Golden irises (anime intensity)',
-                'Full face mask with round goggles',
-                'Ski goggles / visor goggles',
-                'Helmet with cloth wraps / padded hood',
-                'Spikes/horns on helmet',
-                'Triple faces (front + two profiles)',
-                'Regal crown / flame-spike halo headdress',
-                'Minimal dot/line eyes (toon deadpan)',
-                'Profile face with inner-city overlay (double exposure)',
-                'Glitch silhouette face (RGB tearing, scanlines)',
-                'Big glossy "mascot eyes" (3D plush vibe)',
-                'Cat facial markings (tabby/white patches)',
-                'Antlered hair/filament "mane" framing face'
-            ],
-            'Outfit': [
-                'Metal tutu + mechanical corset plating',
-                'Rhinestone/reflective stage bodysuit',
-                'Sci‑fi cutout bodysuit + white boots',
-                'Cyberpunk techwear layers (harness, straps)',
-                'Post-apoc jumpsuit / utility suit',
-                'Heavy chains + layered scarves/straps',
-                'Ceremonial robe + stacked neck rings',
-                'Bikini / neon swim set (car-meet)',
-                'Japanese sailor uniform (sailor fuku)',
-                'Oversized kanji parka/coat + goggles (space-techwear)',
-                'Tailored pastel suit (vintage editorial)',
-                'Street dance fit: baggy jeans + cropped top + sneakers',
-                'Minimal "MV dancer" outfit (simple shapes, bright blocks)',
-                'Matching tropical print set (human + pet) (coordinated costume)',
-                'Pirate attire (tricorn hat, tiny coat/vest, sash)',
-                'Neon creature outfit (glow-trim top + skirt/leg warmers)',
-                'No outfit (spirit made of hair/light)'
-            ],
-            'Materials': [
-                'Brass / bronze / copper plating',
-                'Rivets, gears, filigree micro-detail',
-                'Chrome accents / mirror metal',
-                'Patina, oxidation, tarnish',
-                'Glossy synthetic fabric (latex-like)',
-                'Sequins/rhinestones/glitter fabric',
-                'Heavy quilted fabric (puffer insulation)',
-                'Canvas straps + stitched patches',
-                'Weathered ceramic/painted mask texture',
-                'Worn denim + scuffed sneakers',
-                'Tailored wool suit texture (matte)',
-                'Film grain (vintage photo)',
-                'Scanlines + chromatic aberration (VHS/glitch)',
-                'Rolled paper coils (paper quilling texture)',
-                'Fuzzy plush fur (short pile) / feather-fur hybrid',
-                'Wet ocean spray + weathered wood (pirate ship)'
-            ],
-            'Typography': [
-                'Large kanji block print on garment (red on white)',
-                'Neon sign typography (vertical signage in city)',
-                '"CRT test-bar" screen blocks (cyberpunk alley)',
-                'No text (clean output)'
-            ],
-            'Prop': [
-                'Soap bar (foreground prop)',
-                'Electric guitar',
-                'Tennis racket',
-                'Sports car (teal/turquoise)',
-                'Portal rings / circular frames',
-                'Wired earbud/headphone cable (profile cyberpunk)',
-                'Quilted/utility bag (techwear)',
-                'Sunflower (vintage editorial)',
-                'Neon signage + CRT monitors (environment props)',
-                'Retro aircraft/space-age vehicle (desert)',
-                'Pirate ship cannons/ropes/sails',
-                'Paper-craft "reef" background elements (quilling scene)',
-                'Pet duo prop: matching scarf/outfit accessory'
-            ],
-            'Action/Pose': [
-                'Mid‑pirouette / dance flourish',
-                'Stage stance / performance pose',
-                'Intense close-up "confronting camera"',
-                'Holding a prop toward camera (soap-forward)',
-                'Seated guitarist playing',
-                'Walking through crowd (cyberpunk street)',
-                'Still profile portrait (graphic silhouette)',
-                'School athlete "ready stance" (racket up)',
-                'Tiny figures walking across dunes (epic scale)',
-                'Deadpan mascot "standing in crowd" (comedy)',
-                'Editorial stand, front-facing (motel)',
-                'Street-dance power stance (mid-move)',
-                'Minimal choreography pose (flat background)',
-                'Duo dance (human + pet mirroring pose)',
-                'Naval standoff / ship battle tableau (pirate cats)',
-                '"Spirit hovering" (no ground contact)'
-            ],
-            'Setting': [
-                'Smoky stage with ember bokeh',
-                'White futuristic tunnel / concentric rings',
-                'Neon cyberpunk alley (dense signs, cables, screens)',
-                'Anime festival street / crowd background',
-                'Schoolyard / street crossing (slice-of-life)',
-                'Desert dunes (vast negative space)',
-                'Retro-future desert outpost + strange tower',
-                'Mythic skyline / temple city in distance',
-                'Rooftop/parking garage at night (city bokeh)',
-                'Vintage roadside motel (pastel doors)',
-                'Minimal graphic backdrop (bold shapes, stripes)',
-                'Digital void / glitch space (abstract gradients)',
-                'Underwater craft scene (paper reef / quilling ocean)',
-                'Bright colorful street (Latin/Caribbean palette street)',
-                'Open ocean with ships (pirate cats)'
-            ],
-            'Atmosphere': [
-                'Ember haze / smoke',
-                'Neon glow bloom',
-                'Rain-slick reflections (cyberpunk option)',
-                'Volumetric fog + rim haze',
-                'Dreamlike clouds "divine aura"',
-                'Heat haze over sand dunes',
-                'CRT scanlines (VHS)',
-                'RGB split / chromatic aberration',
-                'Datamosh tearing / glitch streaks',
-                'Double-exposure blend (scene inside silhouette)',
-                'Soft pastel wash (vintage editorial)',
-                'Underwater caustics (if doing ocean)',
-                'Floating paper fibers/dust (craft macro vibe)',
-                'God-ray spotlight cone (spirit/antler creature)'
-            ],
-            'Lighting': [
-                'Warm tungsten spotlight + haze',
-                'Cinematic rim light',
-                'High-key softbox studio lighting',
-                'Cool cyan fill light',
-                'Neon magenta/cyan bounce',
-                'Golden hour desert light',
-                'Overcast soft light (slice-of-life/photo)',
-                'Backlit silhouette (graphic profile)',
-                'Washed midday sun (motel exterior)',
-                'Flat even "animation lighting" (MV dancer)',
-                'RGB/emissive edge lighting (glitch-core)',
-                'Underwater soft diffuse light + caustics',
-                'Single overhead spotlight (stage/spirit reveal)'
-            ],
-            'Color Palette': [
-                'Brass/gold/sepia (warm metallic)',
-                'Cyan/white/silver (clean sci‑fi)',
-                'Hot pink + teal + electric blue (neon cyberpunk)',
-                'Orange/teal anime grade',
-                'Desert beige + sky cyan + peach sunset',
-                'Gold + ember red + black (ritual/deity)',
-                'Neon pink + turquoise (car-meet pop)',
-                'Muted dusty palette (wasteland punk)',
-                'Pastel peach + mint + baby blue (motel/vintage)',
-                'Primary blocks (yellow/blue/red)',
-                'Vaporwave gradient (magenta → cyan → purple)',
-                'CRT palette (oversaturated + scanline)',
-                'Tropical green + orange + warm sun (matching outfits dance)',
-                'Ocean teal + sailcloth beige + wood brown (pirate cats)',
-                'Paper-craft rainbow (quilling fish macro)'
-            ],
-            'Composition': [
-                'Symmetrical center framing (portal/rings)',
-                'Full-body hero shot',
-                'Medium shot (waist-up)',
-                'Extreme close-up (eyes + prop)',
-                'Foreground prop emphasis (soap near lens)',
-                'Profile silhouette composition (face left/right)',
-                'Double exposure silhouette portrait',
-                'Wide establishing shot (tiny humans vs massive structure)',
-                'Rule-of-thirds portrait (photo/video feel)',
-                'Shallow DOF subject isolation (bokeh lights)',
-                'Flat centered "character sheet" (animation pose)',
-                'Macro close-up (paper quilling texture, extreme detail)',
-                'Two-subject framing (human + pet side-by-side)',
-                'Action wide (two ships facing off)'
-            ],
-            'Detail Density': [
-                'Ultra-intricate micro-mechanics',
-                'Clean minimal surfaces',
-                'Hyper-detailed neon city clutter',
-                'Painterly "high polish" deity portrait',
-                'Gritty texture-forward (dust/grime)',
-                'Fashion editorial clean detail (fabric + skin)',
-                'Minimal toon detail (mascot)',
-                'Glitch detail (artifacts > realism)',
-                'Macro craft detail (paper coils, fibers)',
-                'Plush-fur microdetail (individual fibers)',
-                'Ocean scene detail (rigging, ropes, sails)'
-            ],
-            'Mood': [
-                'Regal / ceremonial',
-                'Confident / glamorous',
-                'Aggressive / confrontational',
-                'Mysterious / masked',
-                'Ethereal / divine',
-                'Playful pop-energy',
-                'Gritty rebel rocker',
-                'Nostalgic retro-future wonder',
-                'Cozy slice-of-life',
-                'Surreal / introspective (double exposure)',
-                'Lonely Americana (motel)',
-                'Hype / kinetic (street dance)',
-                'Uncanny digital apparition (glitch)',
-                'Whimsical craft nostalgia (paper quilling)',
-                'Cute absurdist duo (matching outfits)',
-                'Swashbuckling comedic epic (pirate cats)',
-                'Awe/majestic (antler spirit spotlight)'
-            ]
-        };
+    <!-- Prompt moved under buttons -->
+    <div class="prompt-section">
+      <h2>Your Generated Prompt</h2>
+      <div class="prompt-output" id="promptOutput">Your prompt will appear here...</div>
+      <div class="prompt-actions">
+        <button class="copy-btn" onclick="copyToClipboard()">Copy Prompt</button>
+        <button class="export-btn" onclick="exportAsText()">Export as Text</button>
+        <button class="clear-all-btn" onclick="clearAllLocks()">Clear All Locks</button>
+      </div>
+    </div>
 
-        const state = {
-            selections: {},
-            locked: {},
-            spinning: {}
-        };
+    <div class="instruction-box">
+      <strong>How to use:</strong> Spin a wheel or click an option to select it. Lock any category to keep it fixed during generation.
+      Prompts are auto-built below the buttons. “No duplicates” avoids repeated concepts like “cat” across multiple filters.
+    </div>
 
-        // Initialize state
-        Object.keys(filters).forEach(category => {
-            state.selections[category] = filters[category][0];
-            state.locked[category] = false;
-            state.spinning[category] = false;
-        });
+    <div class="main-grid" id="wheelsContainer"></div>
+  </div>
 
-        function initializeWheels() {
-            const container = document.getElementById('wheelsContainer');
-            let html = '';
+  <script>
+    // Filters (your full set)
+    const filters = {
+      "Archetype": [
+        "Clockwork ballerina automaton (steampunk dancer)",
+        "Futuristic pop-star / performer (sci‑fi set)",
+        "Anime heroine (intense close-up, holding prop)",
+        "Masked wasteland guitarist (post-apocalyptic rocker)",
+        "Mythic tri-faced deity / oracle (ceremonial figure)",
+        "Photoreal car‑culture pinup (parking-lot glamour)",
+        "Cyberpunk silhouette subject (profile/double-exposure portrait)",
+        "Cute “odd mascot” character (round head, deadpan)",
+        "Retro-future desert explorers (tiny figures in dunes)",
+        "Japanese schoolgirl athlete (tennis)",
+        "Techwear “space monk” / padded astronaut streetwear (kanji coat, goggles)",
+        "Vintage motel fashion lead (pastel suit + sunflower)",
+        "Street-dance crew lead (baggy pants, street pose)",
+        "Flat-shaded “MV dancer” (clean background choreography)",
+        "Glitch-entity silhouette (VHS/scanline profile)",
+        "Paper-quilling creature (rolled paper anatomy fish)",
+        "Matching-outfit human + pet duo (dance partners)",
+        "Pirate cat captain / crew (cats on ships)",
+        "Neon creature mascot (fuzzy 3D character in neon outfit)",
+        "Luminous antler spirit (white hair/filaments, spotlight)"
+      ],
+      "Species / being type": [
+        "Human (photoreal)",
+        "Human (anime/cel-shaded)",
+        "Human (painterly stylized realism)",
+        "Android / cyborg",
+        "Full automaton (visible mechanics)",
+        "Deity / supernatural entity",
+        "Masked/helmeted human (identity obscured)",
+        "Mascot creature (simple geometry/toon)",
+        "3D fuzzy creature (plush-like, big eyes)",
+        "Animal (cat, realistic)",
+        "Anthropomorphic animal (cat pirate, cat crew)",
+        "Abstract spirit entity (hair/filament body)",
+        "Paper craft creature (quilling/paper sculpture)"
+      ],
+      "Genre / world": [
+        "Steampunk / clockwork fantasy",
+        "Clean retro-futurism (white/cyan sci‑fi)",
+        "Cyberpunk neon megacity",
+        "Retro-future “space age” desert sci‑fi",
+        "Post-apocalyptic desert punk",
+        "Mythic-fantasy / temple-city cosmology",
+        "Anime slice-of-life (school)",
+        "Anime action drama (intense close-up)",
+        "Modern photoreal nightlife / car meet",
+        "Vintage Americana roadside (motel)",
+        "Street dance / urban choreography",
+        "Vaporwave / glitch-core digital realm",
+        "Whimsical children’s cartoon world",
+        "Stop-motion craft / handmade world",
+        "Fantasy seafaring (pirate cats at sea)"
+      ],
+      "Art medium / rendering mode": [
+        "Photoreal editorial photo",
+        "Cinematic “film still”",
+        "3D character render (robot/creature emphasis)",
+        "Anime cel-shaded illustration",
+        "Cute kids-anime / simple toon",
+        "Graphic neon illustration (cyberpunk poster)",
+        "Painterly fantasy portrait (polished)",
+        "Retro-futurist matte painting / poster art",
+        "VHS/glitch aesthetic (scanlines + RGB split)",
+        "Flat vector / minimal-shading animation look",
+        "Paper quilling macro photo look (rolled strips visible)",
+        "Stop-motion / claymation vibe (handmade texture)"
+      ],
+      "Character silhouette (big shapes)": [
+        "Ballerina tutu silhouette (structured skirt)",
+        "Bodysuit / hourglass silhouette",
+        "Profile silhouette (head/neck outline dominant)",
+        "Double-exposure silhouette (city inside silhouette)",
+        "Close-up face silhouette (eyes dominate)",
+        "Oversized mask/helmet silhouette (round goggles)",
+        "Spiked helmet silhouette",
+        "Tri-faced / multi-head silhouette",
+        "Long draped robe silhouette",
+        "Oversized parka/coat silhouette (puffy techwear)",
+        "Tailored suit silhouette (boxy vintage)",
+        "Baggy streetwear silhouette (wide pants)",
+        "Tiny figures vs massive structure (epic wide)",
+        "Small “toon mascot” silhouette (big head, tiny limbs)",
+        "Fuzzy creature silhouette (spiky fur/feathers)",
+        "Antler/crown silhouette (hair like branching antlers)",
+        "Paper-quilling relief silhouette (flat-but-3D coils)"
+      ],
+      "Face / head motif": [
+        "Glowing eyes (amber/gold)",
+        "Golden irises (anime intensity)",
+        "Full face mask with round goggles",
+        "Ski goggles / visor goggles",
+        "Helmet with cloth wraps / padded hood",
+        "Spikes/horns on helmet",
+        "Triple faces (front + two profiles)",
+        "Regal crown / flame-spike halo headdress",
+        "Minimal dot/line eyes (toon deadpan)",
+        "Profile face with inner-city overlay (double exposure)",
+        "Glitch silhouette face (RGB tearing, scanlines)",
+        "Big glossy “mascot eyes” (3D plush vibe)",
+        "Cat facial markings (tabby/white patches)",
+        "Antlered hair/filament “mane” framing face"
+      ],
+      "Outfit (wardrobe set)": [
+        "Metal tutu + mechanical corset plating",
+        "Rhinestone/reflective stage bodysuit",
+        "Sci‑fi cutout bodysuit + white boots",
+        "Cyberpunk techwear layers (harness, straps)",
+        "Post-apoc jumpsuit / utility suit",
+        "Heavy chains + layered scarves/straps",
+        "Ceremonial robe + stacked neck rings",
+        "Bikini / neon swim set (car-meet)",
+        "Japanese sailor uniform (sailor fuku)",
+        "Oversized kanji parka/coat + goggles (space-techwear)",
+        "Tailored pastel suit (vintage editorial)",
+        "Street dance fit: baggy jeans + cropped top + sneakers",
+        "Minimal “MV dancer” outfit (simple shapes, bright blocks)",
+        "Matching tropical print set (human + pet) (coordinated costume)",
+        "Pirate attire (tricorn hat, tiny coat/vest, sash)",
+        "Neon creature outfit (glow-trim top + skirt/leg warmers)",
+        "No outfit (spirit made of hair/light)"
+      ],
+      "Materials & textures": [
+        "Brass / bronze / copper plating",
+        "Rivets, gears, filigree micro-detail",
+        "Chrome accents / mirror metal",
+        "Patina, oxidation, tarnish",
+        "Glossy synthetic fabric (latex-like)",
+        "Sequins/rhinestones/glitter fabric",
+        "Heavy quilted fabric (puffer insulation)",
+        "Canvas straps + stitched patches",
+        "Weathered ceramic/painted mask texture",
+        "Worn denim + scuffed sneakers",
+        "Tailored wool suit texture (matte)",
+        "Film grain (vintage photo)",
+        "Scanlines + chromatic aberration (VHS/glitch)",
+        "Rolled paper coils (paper quilling texture)",
+        "Fuzzy plush fur (short pile) / feather-fur hybrid",
+        "Wet ocean spray + weathered wood (pirate ship)"
+      ],
+      "Typography / symbols (optional overlay)": [
+        "Large kanji block print on garment (red on white)",
+        "Neon sign typography (vertical signage in city)",
+        "“CRT test-bar” screen blocks (cyberpunk alley)",
+        "No text (clean output)"
+      ],
+      "Prop (held or featured)": [
+        "Soap bar (foreground prop)",
+        "Electric guitar",
+        "Tennis racket",
+        "Sports car (teal/turquoise)",
+        "Portal rings / circular frames",
+        "Wired earbud/headphone cable (profile cyberpunk)",
+        "Quilted/utility bag (techwear)",
+        "Sunflower (vintage editorial)",
+        "Neon signage + CRT monitors (environment props)",
+        "Retro aircraft/space-age vehicle (desert)",
+        "Pirate ship cannons/ropes/sails",
+        "Paper-craft “reef” background elements (quilling scene)",
+        "Pet duo prop: matching scarf/outfit accessory"
+      ],
+      "Action / pose": [
+        "Mid‑pirouette / dance flourish",
+        "Stage stance / performance pose",
+        "Intense close-up “confronting camera”",
+        "Holding a prop toward camera (soap-forward)",
+        "Seated guitarist playing",
+        "Walking through crowd (cyberpunk street)",
+        "Still profile portrait (graphic silhouette)",
+        "School athlete “ready stance” (racket up)",
+        "Tiny figures walking across dunes (epic scale)",
+        "Deadpan mascot “standing in crowd” (comedy)",
+        "Editorial stand, front-facing (motel)",
+        "Street-dance power stance (mid-move)",
+        "Minimal choreography pose (flat background)",
+        "Duo dance (human + pet mirroring pose)",
+        "Naval standoff / ship battle tableau (pirate cats)",
+        "“Spirit hovering” (no ground contact)"
+      ],
+      "Setting / location": [
+        "Smoky stage with ember bokeh",
+        "White futuristic tunnel / concentric rings",
+        "Neon cyberpunk alley (dense signs, cables, screens)",
+        "Anime festival street / crowd background",
+        "Schoolyard / street crossing (slice-of-life)",
+        "Desert dunes (vast negative space)",
+        "Retro-future desert outpost + strange tower",
+        "Mythic skyline / temple city in distance",
+        "Rooftop/parking garage at night (city bokeh)",
+        "Vintage roadside motel (pastel doors)",
+        "Minimal graphic backdrop (bold shapes, stripes)",
+        "Digital void / glitch space (abstract gradients)",
+        "Underwater craft scene (paper reef / quilling ocean)",
+        "Bright colorful street (Latin/Caribbean palette street)",
+        "Open ocean with ships (pirate cats)"
+      ],
+      "Atmosphere / VFX": [
+        "Ember haze / smoke",
+        "Neon glow bloom",
+        "Rain-slick reflections (cyberpunk option)",
+        "Volumetric fog + rim haze",
+        "Dreamlike clouds “divine aura”",
+        "Heat haze over sand dunes",
+        "CRT scanlines (VHS)",
+        "RGB split / chromatic aberration",
+        "Datamosh tearing / glitch streaks",
+        "Double-exposure blend (scene inside silhouette)",
+        "Soft pastel wash (vintage editorial)",
+        "Underwater caustics (if doing ocean)",
+        "Floating paper fibers/dust (craft macro vibe)",
+        "God-ray spotlight cone (spirit/antler creature)"
+      ],
+      "Lighting style": [
+        "Warm tungsten spotlight + haze",
+        "Cinematic rim light",
+        "High-key softbox studio lighting",
+        "Cool cyan fill light",
+        "Neon magenta/cyan bounce",
+        "Golden hour desert light",
+        "Overcast soft light (slice-of-life/photo)",
+        "Backlit silhouette (graphic profile)",
+        "Washed midday sun (motel exterior)",
+        "Flat even “animation lighting” (MV dancer)",
+        "RGB/emissive edge lighting (glitch-core)",
+        "Underwater soft diffuse light + caustics",
+        "Single overhead spotlight (stage/spirit reveal)"
+      ],
+      "Color palette": [
+        "Brass/gold/sepia (warm metallic)",
+        "Cyan/white/silver (clean sci‑fi)",
+        "Hot pink + teal + electric blue (neon cyberpunk)",
+        "Orange/teal anime grade",
+        "Desert beige + sky cyan + peach sunset",
+        "Gold + ember red + black (ritual/deity)",
+        "Neon pink + turquoise (car-meet pop)",
+        "Muted dusty palette (wasteland punk)",
+        "Pastel peach + mint + baby blue (motel/vintage)",
+        "Primary blocks (yellow/blue/red)",
+        "Vaporwave gradient (magenta → cyan → purple)",
+        "CRT palette (oversaturated + scanline)",
+        "Tropical green + orange + warm sun (matching outfits dance)",
+        "Ocean teal + sailcloth beige + wood brown (pirate cats)",
+        "Paper-craft rainbow (quilling fish macro)"
+      ],
+      "Composition / framing": [
+        "Symmetrical center framing (portal/rings)",
+        "Full-body hero shot",
+        "Medium shot (waist-up)",
+        "Extreme close-up (eyes + prop)",
+        "Foreground prop emphasis (soap near lens)",
+        "Profile silhouette composition (face left/right)",
+        "Double exposure silhouette portrait",
+        "Wide establishing shot (tiny humans vs massive structure)",
+        "Rule-of-thirds portrait (photo/video feel)",
+        "Shallow DOF subject isolation (bokeh lights)",
+        "Flat centered “character sheet” (animation pose)",
+        "Macro close-up (paper quilling texture, extreme detail)",
+        "Two-subject framing (human + pet side-by-side)",
+        "Action wide (two ships facing off)"
+      ],
+      "Detail density": [
+        "Ultra-intricate micro-mechanics",
+        "Clean minimal surfaces",
+        "Hyper-detailed neon city clutter",
+        "Painterly “high polish” deity portrait",
+        "Gritty texture-forward (dust/grime)",
+        "Fashion editorial clean detail (fabric + skin)",
+        "Minimal toon detail (mascot)",
+        "Glitch detail (artifacts > realism)",
+        "Macro craft detail (paper coils, fibers)",
+        "Plush-fur microdetail (individual fibers)",
+        "Ocean scene detail (rigging, ropes, sails)"
+      ],
+      "Mood / attitude": [
+        "Regal / ceremonial",
+        "Confident / glamorous",
+        "Aggressive / confrontational",
+        "Mysterious / masked",
+        "Ethereal / divine",
+        "Playful pop-energy",
+        "Gritty rebel rocker",
+        "Nostalgic retro-future wonder",
+        "Cozy slice-of-life",
+        "Surreal / introspective (double exposure)",
+        "Lonely Americana (motel)",
+        "Hype / kinetic (street dance)",
+        "Uncanny digital apparition (glitch)",
+        "Whimsical craft nostalgia (paper quilling)",
+        "Cute absurdist duo (matching outfits)",
+        "Swashbuckling comedic epic (pirate cats)",
+        "Awe/majestic (antler spirit spotlight)"
+      ]
+    };
 
-            Object.keys(filters).forEach((category, index) => {
-                const isLastColumn = (index + 1) % 2 === 0;
-                html += `
-                    <div class="wheel-section">
-                        <div class="category-label">${category}</div>
-                        <div class="wheel-container" id="wheel-${category}">
-                            <div class="wheel" id="wheel-inner-${category}">
-                                ${generateWheelItems(category)}
-                            </div>
-                        </div>
-                        <div class="wheel-controls">
-                            <button class="spin-btn" onclick="spinWheel('${category}')" id="spin-${category}">
-                                🎡 Spin
-                            </button>
-                            <button class="lock-btn" onclick="toggleLock('${category}')" id="lock-${category}">
-                                🔓 Unlock
-                            </button>
-                        </div>
-                        <div class="current-selection" id="selection-${category}">
-                            ${state.selections[category]}
-                        </div>
-                    </div>
-                `;
-            });
+    const state = { selections: {}, locked: {}, spinning: {} };
 
-            html += `
-                <button class="control-btn" style="grid-column: 1 / -1; margin-top: 20px; background: rgba(255, 0, 110, 0.2); border-color: #ff006e; color: #ff006e;" onclick="clearAllLocks()">
-                    🗑️ Clear All Locks
-                </button>
-            `;
+    // --- Concept De-Dupe ---
+    // Hard rule: once a concept appears in an earlier chosen item, later selections avoid any item containing that concept.
+    const conceptRules = [
+      { key: "cat", patterns: [/\bcat\b/i, /\btabby\b/i, /\bkitten\b/i, /\bfeline\b/i] },
+      { key: "pirate", patterns: [/\bpirate\b/i, /\btricorn\b/i, /\bship\b/i, /\bcannons?\b/i, /\bsails?\b/i] },
+      { key: "glitch", patterns: [/\bglitch\b/i, /\bVHS\b/i, /\bscanlines?\b/i, /\bRGB\b/i, /\bdatamosh\b/i, /\bchromatic aberration\b/i, /\bCRT\b/i] },
+      { key: "kanji", patterns: [/\bkanji\b/i] },
+      { key: "quilling", patterns: [/\bquilling\b/i, /\brolled paper\b/i, /\bpaper coils?\b/i, /\bpaper-craft\b/i] },
+      { key: "cyberpunk", patterns: [/\bcyberpunk\b/i, /\bmegacity\b/i] },
+      { key: "neon", patterns: [/\bneon\b/i] },
+      { key: "tennis", patterns: [/\btennis\b/i, /\bracket\b/i] },
+      { key: "guitar", patterns: [/\bguitar\b/i] },
+      { key: "sunflower", patterns: [/\bsunflower\b/i] },
+      { key: "motel", patterns: [/\bmotel\b/i, /\broadside\b/i] },
+      { key: "desert", patterns: [/\bdesert\b/i, /\bdunes?\b/i, /\boutpost\b/i] }
+    ];
 
-            container.innerHTML = html;
-            updatePrompt();
+    function extractConcepts(text) {
+      const found = new Set();
+      for (const rule of conceptRules) {
+        if (rule.patterns.some(re => re.test(text))) found.add(rule.key);
+      }
+      return found;
+    }
+
+    function optionConflicts(optionText, usedConcepts) {
+      const optionConcepts = extractConcepts(optionText);
+      for (const c of optionConcepts) if (usedConcepts.has(c)) return true;
+      return false;
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // Avoid conflicts; if everything conflicts, fallback to any random choice.
+    function pickNonConflictingOption(category, usedConcepts) {
+      const items = filters[category];
+      const candidates = shuffle(items);
+      const ok = candidates.find(item => !optionConflicts(item, usedConcepts));
+      return ok ?? items[Math.floor(Math.random() * items.length)];
+    }
+
+    // For Mode 3: choose 1–2 items per category (joined with " + ") while deduping across the whole prompt.
+    function pickOneOrTwoNonConflicting(category, usedConcepts) {
+      const items = filters[category];
+      const wantTwo = Math.random() < 0.40; // 40% chance of 2
+      const chosen = [];
+
+      const candidates = shuffle(items);
+
+      for (const item of candidates) {
+        if (!optionConflicts(item, usedConcepts)) {
+          chosen.push(item);
+          extractConcepts(item).forEach(c => usedConcepts.add(c));
+          if (!wantTwo || chosen.length >= 2) break;
         }
+      }
 
-        function generateWheelItems(category) {
-            const items = filters[category];
-            const itemCount = items.length;
-            const anglePerItem = 360 / itemCount;
+      // If nothing chosen (edge case), allow 1 random fallback
+      if (chosen.length === 0) chosen.push(items[Math.floor(Math.random() * items.length)]);
+      return chosen;
+    }
 
-            return items.map((item, index) => {
-                const angle = index * anglePerItem;
-                return `
-                    <div class="wheel-item" onclick="selectItem('${category}', ${index})" 
-                         style="transform: rotateZ(${angle}deg) translateY(-150px) rotateZ(-${angle}deg);"
-                         title="${item}">
-                        ${item}
-                    </div>
-                `;
-            }).join('');
+    // Create wheels UI
+    function generateWheelItems(category) {
+      const items = filters[category];
+      const itemCount = items.length;
+      const anglePerItem = 360 / itemCount;
+
+      // translateY tuned for container height
+      const radius = 120;
+
+      return items.map((item, index) => {
+        const angle = index * anglePerItem;
+        return `
+          <div class="wheel-item"
+               onclick="selectItem('${escapeQuotes(category)}', ${index})"
+               style="transform: rotateZ(${angle}deg) translateY(-${radius}px) rotateZ(-${angle}deg);"
+               title="${escapeHtml(item)}">
+            ${escapeHtml(item)}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeQuotes(s){ return s.replaceAll("\\", "\\\\").replaceAll("'", "\\'"); }
+    function escapeHtml(s){
+      return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    function initialize() {
+      Object.keys(filters).forEach(category => {
+        state.selections[category] = filters[category][0];
+        state.locked[category] = false;
+        state.spinning[category] = false;
+      });
+
+      const container = document.getElementById("wheelsContainer");
+      container.innerHTML = Object.keys(filters).map(category => `
+        <div class="wheel-section">
+          <div class="category-label">${escapeHtml(category)}</div>
+          <div class="wheel-container" id="wheel-${cssSafe(category)}">
+            <div class="wheel" id="wheel-inner-${cssSafe(category)}">
+              ${generateWheelItems(category)}
+            </div>
+          </div>
+          <div class="wheel-controls">
+            <button class="spin-btn" id="spin-${cssSafe(category)}" onclick="spinWheel('${escapeQuotes(category)}')">Spin</button>
+            <button class="lock-btn" id="lock-${cssSafe(category)}" onclick="toggleLock('${escapeQuotes(category)}')">🔓 Unlock</button>
+          </div>
+          <div class="current-selection" id="selection-${cssSafe(category)}">${escapeHtml(state.selections[category])}</div>
+        </div>
+      `).join("");
+
+      updatePrompt();
+    }
+
+    function cssSafe(s){ return s.replaceAll(/[^a-zA-Z0-9_-]/g, "_"); }
+
+    function updateWheelDisplay(category) {
+      document.getElementById(`selection-${cssSafe(category)}`).textContent = state.selections[category];
+      const wc = document.getElementById(`wheel-${cssSafe(category)}`);
+      if (state.locked[category]) wc.classList.add("lockedGlow"); else wc.classList.remove("lockedGlow");
+    }
+
+    function spinWheel(category) {
+      if (state.locked[category] || state.spinning[category]) return;
+
+      state.spinning[category] = true;
+      const spinBtn = document.getElementById(`spin-${cssSafe(category)}`);
+      spinBtn.disabled = true;
+
+      const items = filters[category];
+      const itemCount = items.length;
+      const anglePerItem = 360 / itemCount;
+
+      const spins = 4 + Math.random() * 5;
+      const randomIndex = Math.floor(Math.random() * itemCount);
+      const finalAngle = spins * 360 + randomIndex * anglePerItem;
+
+      const wheel = document.getElementById(`wheel-inner-${cssSafe(category)}`);
+      wheel.style.transform = `rotateZ(-${finalAngle}deg)`;
+
+      setTimeout(() => {
+        state.selections[category] = items[randomIndex];
+        updateWheelDisplay(category);
+        state.spinning[category] = false;
+        spinBtn.disabled = false;
+        updatePrompt();
+      }, 560);
+    }
+
+    function selectItem(category, index) {
+      if (state.locked[category]) return;
+
+      const items = filters[category];
+      const itemCount = items.length;
+      const anglePerItem = 360 / itemCount;
+      const finalAngle = index * anglePerItem;
+
+      const wheel = document.getElementById(`wheel-inner-${cssSafe(category)}`);
+      wheel.style.transform = `rotateZ(-${finalAngle}deg)`;
+
+      state.selections[category] = items[index];
+      updateWheelDisplay(category);
+      updatePrompt();
+    }
+
+    function toggleLock(category) {
+      state.locked[category] = !state.locked[category];
+      const lockBtn = document.getElementById(`lock-${cssSafe(category)}`);
+
+      if (state.locked[category]) {
+        lockBtn.textContent = "🔒 Locked";
+        lockBtn.style.background = "rgba(255,183,3,.28)";
+        showToast(`Locked: ${category}`);
+      } else {
+        lockBtn.textContent = "🔓 Unlock";
+        lockBtn.style.background = "rgba(255,183,3,.18)";
+        showToast(`Unlocked: ${category}`);
+      }
+      updateWheelDisplay(category);
+    }
+
+    function clearAllLocks() {
+      Object.keys(state.locked).forEach(category => {
+        state.locked[category] = false;
+        const lockBtn = document.getElementById(`lock-${cssSafe(category)}`);
+        if (lockBtn) {
+          lockBtn.textContent = "🔓 Unlock";
+          lockBtn.style.background = "rgba(255,183,3,.18)";
         }
+        updateWheelDisplay(category);
+      });
+      showToast("All locks cleared");
+    }
 
-        function spinWheel(category) {
-            if (state.locked[category] || state.spinning[category]) return;
+    // Prompt building: do NOT repeat concept characteristics in the final prompt.
+    // Implementation: we already dedupe during generation modes; this also does a final cleanup pass.
+    function buildPromptFromSelections() {
+      const used = new Set();
+      const parts = [];
 
-            state.spinning[category] = true;
-            const spinBtn = document.getElementById(`spin-${category}`);
-            spinBtn.disabled = true;
+      for (const category of Object.keys(filters)) {
+        const value = state.selections[category];
 
-            const items = filters[category];
-            const itemCount = items.length;
-            const anglePerItem = 360 / itemCount;
-            const spins = 5 + Math.random() * 5;
-            const randomIndex = Math.floor(Math.random() * itemCount);
-            const finalAngle = spins * 360 + randomIndex * anglePerItem;
+        // If Mode 3 stored "a + b", split it into subparts for de-dupe checking.
+        const subparts = String(value).split(" + ").map(s => s.trim()).filter(Boolean);
 
-            const wheel = document.getElementById(`wheel-inner-${category}`);
-            wheel.style.transform = `rotateZ(-${finalAngle}deg)`;
-
-            setTimeout(() => {
-                state.selections[category] = items[randomIndex];
-                updateWheelDisplay(category);
-                state.spinning[category] = false;
-                spinBtn.disabled = false;
-                updatePrompt();
-            }, 500);
-        }
-
-        function selectItem(category, index) {
-            if (state.locked[category]) return;
-
-            const items = filters[category];
-            const itemCount = items.length;
-            const anglePerItem = 360 / itemCount;
-            const finalAngle = index * anglePerItem;
-
-            const wheel = document.getElementById(`wheel-inner-${category}`);
-            wheel.style.transform = `rotateZ(-${finalAngle}deg)`;
-
-            state.selections[category] = items[index];
-            updateWheelDisplay(category);
-            updatePrompt();
-        }
-
-        function updateWheelDisplay(category) {
-            const display = document.getElementById(`selection-${category}`);
-            display.textContent = state.selections[category];
-        }
-
-        function toggleLock(category) {
-            state.locked[category] = !state.locked[category];
-            const lockBtn = document.getElementById(`lock-${category}`);
-            const wheelContainer = document.getElementById(`wheel-${category}`);
-            
+        for (const sp of subparts) {
+          const conflicts = optionConflicts(sp, used);
+          if (!conflicts) {
+            parts.push(sp);
+            extractConcepts(sp).forEach(c => used.add(c));
+          } else {
+            // If user locked this category, keep it anyway (locking is explicit user intent)
             if (state.locked[category]) {
-                lockBtn.textContent = '🔒 Locked';
-                lockBtn.style.background = 'rgba(255, 183, 3, 0.3)';
-                wheelContainer.classList.add('locked');
-            } else {
-                lockBtn.textContent = '🔓 Unlock';
-                lockBtn.style.background = 'rgba(255, 183, 3, 0.2)';
-                wheelContainer.classList.remove('locked');
+              parts.push(sp);
+              extractConcepts(sp).forEach(c => used.add(c));
             }
+          }
         }
+      }
+      return parts.join(", ");
+    }
 
-        function clearAllLocks() {
-            Object.keys(state.locked).forEach(category => {
-                if (state.locked[category]) {
-                    toggleLock(category);
-                }
-            });
+    function updatePrompt() {
+      const prompt = buildPromptFromSelections();
+      document.getElementById("promptOutput").textContent = prompt || "Your prompt will appear here...";
+    }
+
+    // Mode 1: one random choice from each filter (deduped)
+    function generateMode1() {
+      const used = new Set();
+
+      // Seed with locked concepts first
+      for (const category of Object.keys(filters)) {
+        if (state.locked[category]) extractConcepts(state.selections[category]).forEach(c => used.add(c));
+      }
+
+      for (const category of Object.keys(filters)) {
+        if (!state.locked[category]) {
+          const choice = pickNonConflictingOption(category, used);
+          state.selections[category] = choice;
+          extractConcepts(choice).forEach(c => used.add(c));
+          updateWheelDisplay(category);
         }
+      }
 
-        function generateMode1() {
-            // One random choice from each filter
-            Object.keys(filters).forEach(category => {
-                if (!state.locked[category]) {
-                    const items = filters[category];
-                    const randomIndex = Math.floor(Math.random() * items.length);
-                    state.selections[category] = items[randomIndex];
-                    updateWheelDisplay(category);
-                }
-            });
-            updatePrompt();
-            showToast('✅ Mode 1: One per filter applied!');
+      updatePrompt();
+      showToast("Mode 1 applied (one per filter, deduped)");
+    }
+
+    // Mode 2: random subset of filters emphasized; others kept but minimized (still deduped)
+    function generateMode2() {
+      const cats = Object.keys(filters);
+      const used = new Set();
+
+      // Seed with locked
+      for (const category of cats) {
+        if (state.locked[category]) extractConcepts(state.selections[category]).forEach(c => used.add(c));
+      }
+
+      const randomCount = Math.max(3, Math.min(cats.length, 3 + Math.floor(Math.random() * (cats.length - 2))));
+      const emphasized = new Set(shuffle(cats).slice(0, randomCount));
+
+      for (const category of cats) {
+        if (state.locked[category]) continue;
+
+        // If not emphasized, bias to first 3 options (typically more “generic”), but still dedupe
+        const pool = emphasized.has(category) ? filters[category] : filters[category].slice(0, Math.min(3, filters[category].length));
+        const candidates = shuffle(pool);
+        const ok = candidates.find(item => !optionConflicts(item, used)) ?? pickNonConflictingOption(category, used);
+
+        state.selections[category] = ok;
+        extractConcepts(ok).forEach(c => used.add(c));
+        updateWheelDisplay(category);
+      }
+
+      updatePrompt();
+      showToast("Mode 2 applied (random filters emphasized, deduped)");
+    }
+
+    // Mode 3: at least 1 choice per filter, no more than 2 choices per filter (deduped)
+    function generateMode3() {
+      const used = new Set();
+
+      // Seed with locked
+      for (const category of Object.keys(filters)) {
+        if (state.locked[category]) extractConcepts(state.selections[category]).forEach(c => used.add(c));
+      }
+
+      for (const category of Object.keys(filters)) {
+        if (!state.locked[category]) {
+          const picks = pickOneOrTwoNonConflicting(category, used);
+          state.selections[category] = picks.join(" + ");
+          updateWheelDisplay(category);
         }
+      }
 
-        function generateMode2() {
-            // Random filters are chosen with one option from chosen filters
-            const categoryKeys = Object.keys(filters);
-            const randomCount = 3 + Math.floor(Math.random() * (categoryKeys.length - 3));
-            const selectedCategories = categoryKeys.sort(() => 0.5 - Math.random()).slice(0, randomCount);
+      updatePrompt();
+      showToast("Mode 3 applied (1–2 per filter, deduped)");
+    }
 
-            Object.keys(filters).forEach(category => {
-                if (!state.locked[category]) {
-                    if (selectedCategories.includes(category)) {
-                        const items = filters[category];
-                        const randomIndex = Math.floor(Math.random() * items.length);
-                        state.selections[category] = items[randomIndex];
-                    } else {
-                        // Use a generic/neutral option or leave empty
-                        const items = filters[category];
-                        state.selections[category] = items[Math.floor(Math.random() * Math.min(3, items.length))];
-                    }
-                    updateWheelDisplay(category);
-                }
-            });
-            updatePrompt();
-            showToast('🎲 Mode 2: Random filters applied!');
+    // Mode 4: total chaos (still deduped, but more aggressive randomization; locks respected)
+    function generateMode4() {
+      const used = new Set();
+
+      // Seed with locked
+      for (const category of Object.keys(filters)) {
+        if (state.locked[category]) extractConcepts(state.selections[category]).forEach(c => used.add(c));
+      }
+
+      // Randomize category order to change “who claims” a concept first
+      const categories = shuffle(Object.keys(filters));
+
+      for (const category of categories) {
+        if (!state.locked[category]) {
+          const choice = pickNonConflictingOption(category, used);
+          state.selections[category] = choice;
+          extractConcepts(choice).forEach(c => used.add(c));
+          updateWheelDisplay(category);
         }
+      }
 
-        function generateMode3() {
-            // At least one choice from each filter but no more than 2
-            Object.keys(filters).forEach(category => {
-                if (!state.locked[category]) {
-                    const items = filters[category];
-                    const randomIndex = Math.floor(Math.random() * items.length);
-                    state.selections[category] = items[randomIndex];
-                    updateWheelDisplay(category);
-                }
-            });
-            updatePrompt();
-            showToast('⚙️ Mode 3: 1-2 per filter applied!');
-        }
+      updatePrompt();
+      showToast("Mode 4 applied (chaos, deduped)");
+    }
 
-        function generateMode4() {
-            // Complete random for everything
-            Object.keys(filters).forEach(category => {
-                if (!state.locked[category]) {
-                    const items = filters[category];
-                    const randomIndex = Math.floor(Math.random() * items.length);
-                    state.selections[category] = items[randomIndex];
-                    updateWheelDisplay(category);
-                }
-            });
-            updatePrompt();
-            showToast('🌀 Mode 4: Total chaos mode engaged!');
-        }
+    async function copyToClipboard() {
+      const text = document.getElementById("promptOutput").textContent;
+      try {
+        await navigator.clipboard.writeText(text); // Requires secure context (HTTPS) in many browsers. [MDN]
+        showToast("Prompt copied to clipboard");
+      } catch (e) {
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        showToast("Copied (fallback)");
+      }
+    }
+    // Clipboard secure context note: navigator.clipboard.writeText is restricted in many browsers unless HTTPS. [page:1]
 
-        function updatePrompt() {
-            const promptParts = Object.keys(filters).map(category => 
-                `${state.selections[category]}`
-            ).filter(part => part.trim());
+    function exportAsText() {
+      const text = document.getElementById("promptOutput").textContent;
+      const a = document.createElement("a");
+      a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(text);
+      a.download = "ai_prompt.txt";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("Exported as ai_prompt.txt");
+    }
 
-            const prompt = promptParts.join(', ');
-            document.getElementById('promptOutput').textContent = prompt;
-        }
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2600);
+    }
 
-        function copyToClipboard() {
-            const prompt = document.getElementById('promptOutput').textContent;
-            navigator.clipboard.writeText(prompt).then(() => {
-                showToast('📋 Prompt copied to clipboard!');
-            });
-        }
-
-        function exportAsText() {
-            const prompt = document.getElementById('promptOutput').textContent;
-            const element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(prompt));
-            element.setAttribute('download', 'ai_prompt.txt');
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-            showToast('💾 Prompt exported as text!');
-        }
-
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Initialize on load
-        window.addEventListener('load', initializeWheels);
-    </script>
+    window.addEventListener("load", initialize);
+  </script>
 </body>
 </html>
