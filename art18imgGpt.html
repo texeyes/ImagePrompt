@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TikTok Script → Image Prompt Factory (Filtered)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0c0c0c;
+      color: #eaeaea;
+      padding: 20px;
+    }
+    h1, h2 {
+      font-weight: 600;
+    }
+    textarea, select {
+      width: 100%;
+      background: #0a0a0a;
+      color: #eaeaea;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    textarea { min-height: 180px; }
+    button {
+      background: #ffffff;
+      color: #000;
+      border: none;
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .card {
+      background: #151515;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .row > div {
+      flex: 1;
+      min-width: 200px;
+    }
+    .label {
+      font-size: 12px;
+      opacity: 0.65;
+      margin-bottom: 4px;
+    }
+    .copied {
+      color: #7CFF7C;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎬 Script → Image Prompt Factory</h1>
+
+<div class="label">TikTok Video Script</div>
+<textarea id="scriptInput" placeholder="Paste TikTok Video Script here..."></textarea>
+
+<div class="row">
+  <div>
+    <div class="label">Output Type</div>
+    <select id="outputType">
+      <option value="contact">Contact Sheet (Multi-Scene)</option>
+      <option value="single">Single Frame (Hero)</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="label">Primary Aesthetic Accent</div>
+    <select id="accent">
+      <option>High contrast focal subject</option>
+      <option>Isolation in negative space</option>
+      <option>Motion frozen in time</option>
+      <option>Emotional intimacy</option>
+      <option>Visual metaphor dominance</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="label">Style Overlay</div>
+    <select id="style">
+      <option>None</option>
+      <option>ukiyo-e art influence</option>
+      <option>custom sticker-like accents in physical space</option>
+      <option>illustrated custom iconography influence</option>
+      <option>fragmented / fractal glass light refraction</option>
+      <option>retro mono-tech editorial feel</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="label">Story Psychology</div>
+    <select id="story">
+      <option>Novelty</option>
+      <option>Certainty</option>
+      <option>Significance</option>
+      <option>Connection</option>
+      <option>Growth</option>
+      <option>Contribution</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="label">MASS Focus</div>
+    <select id="mass">
+      <option>Moment → Emotion → Shift → Solution</option>
+      <option>Moment-heavy</option>
+      <option>Emotion-heavy</option>
+      <option>Shift-heavy</option>
+      <option>Solution-heavy</option>
+    </select>
+  </div>
+</div>
+
+<button onclick="generatePrompt()">Generate & Copy Prompt</button>
+
+<div id="output"></div>
+
+<script>
+function generatePrompt() {
+  const script = document.getElementById("scriptInput").value.trim();
+  if (!script) return;
+
+  const outputType = document.getElementById("outputType").value;
+  const accent = document.getElementById("accent").value;
+  const style = document.getElementById("style").value;
+  const story = document.getElementById("story").value;
+  const mass = document.getElementById("mass").value;
+
+  const layout = outputType === "contact"
+    ? "Create a cohesive multi-scene contact sheet. Each frame represents a different story beat but feels like the same shoot."
+    : "Create a single, high-impact hero frame that visually implies a full story arc.";
+
+  const prompt = `
+Create image content specifically designed for TikTok video creation.
+
+ABSOLUTE CONSTRAINT:
+Absolutely NO words, letters, typography, captions, signage, symbols, numbers, or readable text of any kind anywhere in any image.
+
+Visual Foundation:
+Photorealistic, hyper-realistic, ultra-detailed cinematic realism.
+DSLR full-frame look, prime lens clarity, shallow depth of field.
+Natural imperfections, candid documentary feel, real-world lighting.
+Visible texture: skin pores, fabric creases, dust, reflections, wear.
+Motion blur and camera grain allowed where appropriate.
+
+Lighting:
+Mixed lighting sources, real-time shadows, falloff, specular highlights.
+Backlit glow with occasional overexposed highlights.
+
+Aesthetic Structure:
+Apply strong composition logic using contrast, isolation, grouping, and movement.
+Primary accent: ${accent}.
+One dominant focal point per scene — everything else supports it.
+
+Style Influence:
+${style !== "None" ? style + ", applied subtly and cohesively." : "No additional style overlay."}
+
+Story Psychology:
+Optimize visuals for ${story} — designed to keep viewers watching.
+
+Narrative Method:
+Use MASS structure (${mass}) to guide scene progression and emotional flow.
+
+Layout Direction:
+${layout}
+
+Continuity Rules:
+Same character, same visual universe.
+Scene-to-scene evolution in emotion, framing, and motion.
+Optimized for small-screen clarity and fast TikTok cuts.
+`.trim();
+
+  navigator.clipboard.writeText(prompt);
+
+  document.getElementById("output").innerHTML = `
+    <div class="card">
+      <h2>🖼 Mega Image Prompt</h2>
+      <textarea readonly>${prompt}</textarea>
+      <div class="copied">✓ Prompt copied to clipboard</div>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
