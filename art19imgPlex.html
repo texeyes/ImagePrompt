@@ -1,0 +1,967 @@
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Builder (Self‑Contained)</title>
+  <style>
+    :root{
+      --bg:#0b0f17; --panel:#111827; --muted:#94a3b8; --text:#e5e7eb;
+      --stroke:#22304a; --accent:#60a5fa; --good:#34d399;
+      --field:#0f172a; --chip:#0b1222;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:24px;
+      background:linear-gradient(180deg,#070a10, var(--bg));
+      color:var(--text); font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+    .wrap{max-width:1200px; margin:0 auto; display:grid; gap:16px; grid-template-columns: 420px 1fr;}
+    @media (max-width: 980px){ .wrap{grid-template-columns: 1fr;} }
+    header{max-width:1200px; margin:0 auto 16px auto;}
+    h1{margin:0 0 6px 0; font-size:20px; letter-spacing:.2px}
+    .sub{margin:0; color:var(--muted); font-size:13px; line-height:1.35}
+    .card{
+      background:rgba(17,24,39,.92);
+      border:1px solid var(--stroke);
+      border-radius:14px;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 12px 14px;
+      border-bottom:1px solid var(--stroke);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .hd h2{margin:0; font-size:14px; font-weight:650; letter-spacing:.2px}
+    .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    button{
+      appearance:none; border:1px solid var(--stroke);
+      background:var(--field); color:var(--text);
+      padding:8px 10px; border-radius:10px;
+      font-size:12px; cursor:pointer;
+    }
+    button:hover{border-color:#2f4369}
+    button.primary{border-color:rgba(96,165,250,.55); background:rgba(96,165,250,.12)}
+    button.good{border-color:rgba(52,211,153,.55); background:rgba(52,211,153,.12)}
+    .bd{padding:14px}
+    .grid{display:grid; gap:12px}
+    .field label{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-size:12px; color:var(--muted); margin-bottom:6px;
+    }
+    .req{color:#fca5a5; font-size:11px}
+    select, textarea, input[type="text"]{
+      width:100%;
+      background:var(--field);
+      color:var(--text);
+      border:1px solid var(--stroke);
+      border-radius:10px;
+      padding:10px 10px;
+      font-size:13px;
+      outline:none;
+    }
+    select:focus, textarea:focus, input[type="text"]:focus{border-color:rgba(96,165,250,.75); box-shadow:0 0 0 3px rgba(96,165,250,.12)}
+    textarea{min-height:120px; resize:vertical; line-height:1.35}
+    .help{margin-top:6px; color:var(--muted); font-size:12px; line-height:1.35}
+    .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+    .chip{
+      background:var(--chip);
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      padding:6px 9px;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .chip b{color:var(--text); font-weight:650}
+    .split{
+      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
+    }
+    @media (max-width: 520px){ .split{grid-template-columns: 1fr;} }
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .note{color:var(--muted); font-size:12px; margin-top:10px; line-height:1.35}
+    .small{font-size:11px; color:var(--muted)}
+    .toast{
+      position:fixed; right:18px; bottom:18px;
+      background:#0b1222; border:1px solid #22304a; color:var(--text);
+      padding:10px 12px; border-radius:12px; font-size:12px;
+      opacity:0; transform:translateY(8px); pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      max-width:360px;
+    }
+    .toast.show{opacity:1; transform:translateY(0)}
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Prompt Builder</h1>
+    <p class="sub">
+      Pick one option per category, then copy the generated prompt (spec + condensed prompt). This is a single-file, offline HTML app.
+    </p>
+  </header>
+
+  <div class="wrap">
+    <section class="card" id="builderCard">
+      <div class="hd">
+        <h2>Filters</h2>
+        <div class="actions">
+          <button id="randomizeBtn" class="primary" title="Randomly pick an option in each category">Randomize</button>
+          <button id="resetBtn" title="Clear selections">Reset</button>
+          <button id="copyPromptBtn" class="good" title="Copy the condensed prompt to clipboard">Copy Prompt</button>
+          <button id="copySpecBtn" title="Copy the full spec to clipboard">Copy Spec</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid" id="form"></div>
+
+        <div class="field" style="margin-top:14px">
+          <label>
+            Extra notes (optional)
+            <span class="small">Appends to both outputs</span>
+          </label>
+          <textarea id="extraNotes" placeholder="Add any extra constraints: camera, lens, negatives, composition, aspect ratio, etc."></textarea>
+          <div class="help">Tip: use this for one-off tweaks without changing the structured selections.</div>
+        </div>
+
+        <div class="chips" id="chips"></div>
+        <div class="note">
+          Output style: a readable “Spec” block + a condensed “Prompt” line (useful for image/video models). This mirrors the common pattern of separating structured fields from final text output. <span class="small">(Concept aligns with schema-driven prompting UIs.)</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Generated Output</h2>
+        <div class="actions">
+          <button id="copyAllBtn" class="good" title="Copy spec + prompt">Copy All</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="split">
+          <div class="field">
+            <label>Spec (human-readable)</label>
+            <textarea id="specOut" class="mono" readonly></textarea>
+          </div>
+          <div class="field">
+            <label>Condensed prompt</label>
+            <textarea id="promptOut" class="mono" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">Copied.</div>
+
+<script>
+/**
+ * Self-contained dynamic prompt builder driven by a JSON config.
+ * Pattern: categories -> options; selection -> spec + condensed prompt.
+ * (Dynamic forms from JSON config are a common approach in JS form builders.)  [web:22][web:25]
+ */
+
+const CONFIG = {
+  version: "1.0",
+  generator_name: "Prompt Builder",
+  categories: [
+    {
+      key: "archetype",
+      label: "Archetype",
+      description: "High-level character/concept archetype.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"clockwork_sovereign", label:"Clockwork Sovereign", description:"A mechanical deity and time-keeper oracle; a steampunk god-emperor and cyborg priest of order." },
+        { value:"cursed_gorgon", label:"Cursed Gorgon", description:"Medusa reimagined as a tragic feminine monster; a snake-haired figure of dangerous allure and mythic sorrow." },
+        { value:"minimalist_light_sculpture", label:"Minimalist Light Sculpture", description:"An experiential architectural pavilion and contemporary light installation; a meditative art object in a public square." },
+        { value:"eccentric_fashion_outsider", label:"Eccentric Fashion Outsider", description:"Surrealist dandy and oddball sophisticate; a Wes Anderson-style character." },
+        { value:"art_deco_android", label:"Art Deco Android", description:"Luxury cyborg and streamline moderne automaton; a 1920s-30s retro-futurist mannequin." },
+        { value:"wasteland_scavenger", label:"Wasteland Scavenger", description:"Post-apocalyptic survivor and weathered explorer; a dieselpunk spacefarer in ruins." },
+        { value:"desert_wanderer", label:"Desert Wanderer", description:"Rugged frontier icon and southwestern rancher; a stylized vaquero." },
+        { value:"swamp_thing", label:"Swamp Thing", description:"Moss-covered nature-possessed cowboy; an ecological horror figure." },
+        { value:"tropical_ambassador", label:"Tropical Ambassador", description:"Exotic island wildlife icon; a stylized naturalist specimen of a blue iguana." },
+        { value:"deep_sea_leviathan", label:"Deep Sea Leviathan", description:"Maritime monster and Lovecraftian horror; a stylized vintage kraken illustration." },
+        { value:"sacred_ancestor", label:"Sacred Ancestor", description:"Ancient Easter Island Moai; a painted indigenous monument and eternal stone guardian." },
+        { value:"ornithological_specimen", label:"Ornithological Specimen", description:"Decorative wildlife portrait; a dignified blue-footed booby presented as ornamental nature art." },
+        { value:"digital_consciousness", label:"Digital Consciousness", description:"Futuristic AI identity; a luxury data sculpture and translucent wireframe mannequin." },
+        { value:"coastal_youth_icon", label:"Coastal Youth Icon", description:"Athletic surfer boy; a beach lifestyle adventurer and romantic coastal wanderer." },
+        { value:"liminal_urban_resident", label:"Liminal Urban Resident", description:"Night wanderer in solitude; a cinematic figure in a 24-hour urban laundromat." },
+        { value:"visionary_totem", label:"Visionary Totem", description:"Shamanic owl spirit; a psychedelic Op Art icon of wisdom and altered perception." },
+        { value:"tropical_goddess", label:"Tropical Goddess", description:"Aspirational island dreamer; a natural beauty icon in a luxury beach paradise." },
+
+        { value:"lone_romantic_cowboy", label:"Lone romantic cowboy", description:"A vintage nocturnal campfire companion." },
+        { value:"campfire_storyteller", label:"Campfire storyteller", description:"A storybook western range rider." },
+        { value:"sacred_landscape_guardian", label:"Sacred landscape guardian", description:"A contemporary Aboriginal fusion icon." },
+        { value:"modern_minimalist_cowboy", label:"Modern minimalist cowboy", description:"A solitary contemporary rancher." },
+        { value:"nocturnal_diner_patron", label:"Nocturnal diner patron", description:"A working-class night owl seeking comfort." },
+        { value:"ironic_internet_icon", label:"Ironic internet icon", description:"A \"chonky\" psychedelic meme unicorn." },
+        { value:"modern_fashion_muse", label:"Modern fashion muse", description:"A brooding, style-conscious male model." },
+        { value:"sacred_feminine_matriarch", label:"Sacred feminine matriarch reimagined", description:"A surreal Madonna and Child protected by mythical beasts." },
+        { value:"third_eye_visionary", label:"Third-eye visionary and psychedelic guru", description:"A surreal, bearded countercultural prophet." },
+        { value:"tank_girl_adventurer", label:"Post-apocalyptic desert pilot and wasteland rocker", description:"A \"Tank Girl\" style sci-fi adventurer." },
+        { value:"modern_rural_beauty", label:"Modern rural beauty", description:"A wistful anime \"waifu\" in a pastoral setting." },
+        { value:"idealized_fitness_model", label:"Idealized fitness model", description:"An aspirational beauty influencer in a commercial swimwear shoot." },
+        { value:"carefree_genz_vacationer", label:"Carefree Gen-Z vacationer", description:"A viral \"life of the party\" influencer flexing a luxury lifestyle." },
+        { value:"quirky_alien_character", label:"Quirky alien character", description:"A practical effects monster performer in a cosplay showcase." }
+      ]
+    },
+
+    {
+      key: "species",
+      label: "Species / Being Type",
+      description: "What the subject literally is (human, android, creature, monument, installation, etc.).",
+      required: true,
+      multi: false,
+      options: [
+        { value:"human_machine_hybrid_male", label:"Human-machine hybrid or android", description:"A cybernetic male figure integrated with clockwork." },
+        { value:"mythological_gorgon_female", label:"Mythological creature", description:"A female Gorgon combining human features with serpentine attributes." },
+        { value:"inanimate_installation_with_scale_figure", label:"N/A (Inanimate architectural installation)", description:"Includes a human figure in a winter coat for scale." },
+        { value:"maritime_couture_muse", label:"Maritime Couture Muse", description:"Ocean goddess and sea queen; a nature-adorned high-fashion icon." },
+        { value:"folk_art_companion_dog", label:"Folk Art Companion", description:"Decorative stylized guardian; a primitive art motif of a faithful sighthound." },
+        { value:"biomech_tuna", label:"Biomechanical Specimen", description:"Engineered organism and technical fantasy diagram; a steampunk bluefin tuna." },
+        { value:"architectural_sanctuary", label:"Architectural Sanctuary", description:"Luxury resort oasis and tropical modernist paradise; an Instagram-perfect destination." },
+        { value:"gentlemanly_satan", label:"Gentlemanly Satan", description:"Sophisticated evil; a Victorian-era devil figure." },
+
+        { value:"human_female_refined", label:"Human female", description:"Young adult with refined, fashionable beauty." },
+        { value:"domestic_dog_whippet", label:"Domestic dog", description:"Greyhound or whippet breed rendered in a folk art style." },
+        { value:"tuna_mechanical_hybrid", label:"Tuna fish (bluefin) reimagined", description:"A mechanical/cybernetic hybrid." },
+        { value:"architectural_human_figure", label:"Architectural human figure", description:"A human figure used for scale in architecture." },
+        { value:"demonic_victorian_male", label:"Demonic entity in human form", description:"Male devil in Victorian gentleman’s attire." },
+
+        { value:"human_male_androgynous", label:"Human male", description:"Young adult with androgynous styling." },
+        { value:"female_form_android", label:"Female-form android", description:"An artificial being combining human and machine aesthetics." },
+        { value:"pressure_suit_human", label:"Human in pressure suit", description:"Human in a bulky environmental protection/pressure suit." },
+        { value:"human_male_adult", label:"Human male (adult)", description:"Adult with masculine features." },
+        { value:"plant_human_chimera", label:"Plant-human chimera", description:"A humanoid figure overgrown with living moss and lichen." },
+        { value:"blue_morph_iguana", label:"Blue-morph iguana", description:"A tropical lizard." },
+        { value:"kraken_squid", label:"Giant squid / kraken", description:"Kraken-like cephalopod." },
+        { value:"stone_moai", label:"Stone ancestral monument (Moai)", description:"Ancestral stone monument." },
+        { value:"blue_footed_booby", label:"Blue-footed booby", description:"Tropical seabird." },
+        { value:"digital_wireframe_avatar", label:"Digital human-form avatar", description:"Wireframe mannequin / digital avatar." },
+        { value:"human_male_athlete", label:"Human male athlete", description:"Young adult athlete." },
+        { value:"human_female_urbanite", label:"Human female urbanite", description:"Young adult urbanite." },
+        { value:"owl_totem", label:"Owl spirit totem", description:"Indeterminate owl species as spiritual totem." },
+        { value:"human_female_athletic", label:"Human female (athletic)", description:"Young adult with an athletic build." },
+
+        { value:"cowboy_with_horse", label:"Adult human cowboy with horse", description:"Cowboy with a horse companion." },
+        { value:"cowboy_horse_small_trio", label:"Human cowboy, horse, and small dog/coyote", description:"Trio composition." },
+        { value:"cowboy_horse_dots", label:"Human cowboy and horse (dots)", description:"Rendered in dots / pointillist abstraction." },
+        { value:"young_adult_human_female", label:"Young adult human female", description:"Young adult human female." },
+        { value:"rotund_fantasy_unicorn", label:"Rotund fantasy unicorn", description:"A chonky unicorn character." },
+
+        { value:"madonna_child_with_beasts", label:"Human female with infant + beasts", description:"Madonna/child flanked by chimeras, demons, a dragon, and an owl." },
+        { value:"three_eyed_guru", label:"Three-eyed human male guru", description:"Surrounded by anthropomorphic symbols and tiny figures." },
+        { value:"female_adventurer_with_cat", label:"Human female adventurer + tabby cat", description:"Adventurer accompanied by a tabby cat." },
+        { value:"anime_stylized_female", label:"Stylized human female (anime)", description:"Anime-style female." },
+        { value:"athletic_female", label:"Athletic human female", description:"Athletic female." },
+        { value:"goblin_alien_fx", label:"Fantasy goblin-alien", description:"Humanoid in elaborate prosthetics." }
+      ]
+    },
+
+    {
+      key: "genre",
+      label: "Genre / World",
+      description: "Narrative + worldbuilding frame.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"steampunk_clockpunk", label:"Steampunk/Clockpunk mythology", description:"A fusion of Art Nouveau elegance and Industrial Revolution machinery." },
+        { value:"dark_fantasy_greek", label:"Dark fantasy & mythological realism", description:"A gothic horror reimagining of Greek antiquity." },
+        { value:"contemporary_minimalist_art", label:"Contemporary minimalist art", description:"Experiential urban design and public light installations." },
+        { value:"high_fashion_editorial", label:"High-fashion editorial", description:"Fantasy realism and coastal luxury glamour." },
+        { value:"decorative_folk_art", label:"Decorative arts", description:"Folk art and mid-century primitive modernism." },
+        { value:"steampunk_dieselpunk_science", label:"Steampunk/Dieselpunk technical fantasy", description:"Jules Verne-inspired scientific romance." },
+        { value:"luxury_resort_architecture", label:"Contemporary luxury architecture", description:"Tropical resort design and high-end hospitality." },
+        { value:"gothic_victorian_demon", label:"Gothic horror", description:"Victorian dark fantasy and classic literary demon portraiture." },
+        { value:"surrealist_photography", label:"Surrealist photography", description:"Quirky indie film aesthetic and art gallery whimsy." },
+        { value:"art_deco_retrofuturism", label:"Retro-futurism", description:"Art Deco sci-fi and 1920s modernism." },
+        { value:"post_apocalyptic_dieselpunk", label:"Post-apocalyptic dieselpunk", description:"Hard sci-fi realism inspired by Fallout or Borderlands." },
+        { value:"southwestern_americana", label:"Southwestern Americana", description:"1960s-70s tourism poster art." },
+        { value:"southern_gothic_ecohorror", label:"Dark fantasy eco-horror", description:"Southern Gothic supernatural western." },
+        { value:"tropical_naturalist_art", label:"Tropical naturalist art", description:"Contemporary wildlife illustration and island tourism graphics." },
+        { value:"maritime_mythology", label:"Maritime mythology", description:"Victorian sea monster documentation and gothic oceanography." },
+        { value:"polynesian_heritage", label:"Archaeology + contemporary art", description:"Polynesian cultural heritage documentation." },
+        { value:"modern_natural_history", label:"Modern natural history", description:"Contemporary decorative wildlife illustration." },
+        { value:"cyberpunk_luxury", label:"Cyberpunk luxury", description:"Digital consciousness and interface design." },
+        { value:"surf_culture_illustration", label:"Surf culture illustration", description:"Graphic novel beach lifestyle aesthetic." },
+        { value:"neo_noir_urban_realism", label:"Neo-noir urban realism", description:"Nocturnal city life and liminal spaces." },
+        { value:"visionary_psychedelic", label:"Visionary psychedelic art", description:"1960s counterculture and Op Art exploration." },
+        { value:"lifestyle_vacation_portrait", label:"Lifestyle fashion portraiture", description:"Tropical vacation and aspirational travel imagery." },
+        { value:"vintage_western_photo", label:"Vintage western photography", description:"Nostalgic Old West Americana." },
+        { value:"midcentury_western_illustration", label:"Mid-century western illustration", description:"Children's book aesthetic." },
+        { value:"aboriginal_fusion", label:"Contemporary Aboriginal fine art", description:"Indigenous cultural fusion." },
+        { value:"modern_vector_western", label:"Modern vector western", description:"Commercial poster illustration." },
+        { value:"urban_diner_realism", label:"Urban nocturnal realism", description:"Cinematic diner culture." },
+        { value:"internet_vaporwave", label:"Internet vaporwave art", description:"Psychedelic meme aesthetic." },
+        { value:"fashion_editorial", label:"Contemporary fashion editorial", description:"Artistic portraiture." },
+        { value:"surrealist_religious_collage", label:"Surrealist religious collage", description:"Neo-medieval fantasy + magical realism." },
+        { value:"psychedelic_comix", label:"Psychedelic underground comix", description:"Spiritual surrealism + retro 70s counterculture." },
+        { value:"post_apoc_scifi_concept", label:"Post-apocalyptic sci-fi", description:"Desert punk concept art." },
+        { value:"slice_of_life_anime", label:"Slice-of-life anime", description:"Pastoral countryside aesthetic." },
+        { value:"high_end_commercial_photo", label:"High-end commercial photography", description:"Fitness and wellness advertising." },
+        { value:"viral_social_vlog", label:"Viral social media vlog", description:"Aspirational travel/lifestyle content." },
+        { value:"creature_fx_showcase", label:"Creature effects showcase", description:"TikTok cosplay + practical FX performance." }
+      ]
+    },
+
+    {
+      key: "medium",
+      label: "Art Medium / Rendering Mode",
+      description: "How it’s rendered: photo, 3D, illustration, printmaking, etc.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"3d_relief_physical", label:"High-detail 3D render (relief metalwork)", description:"Photorealistic material physics; sculptural relief with ornate metalwork." },
+        { value:"cinematic_3d_vfx", label:"Cinematic 3D render (creature VFX)", description:"Film-quality VFX; practical effects aesthetic focused on creature design." },
+        { value:"architectural_photo_or_viz", label:"Architectural photography / 3D viz", description:"Clean, minimal fine-art documentation." },
+        { value:"fashion_photo", label:"Photorealistic fashion render/photo", description:"Magazine-quality post-processing." },
+        { value:"linocut_woodblock", label:"Linocut / woodblock print", description:"Traditional printmaking with watercolor washes." },
+        { value:"technical_illustration", label:"Hand-drawn technical illustration", description:"Pen & ink with watercolor wash and blueprint aesthetics." },
+        { value:"hdr_archviz", label:"Photorealistic 3D architectural visualization (HDR)", description:"Hyperreal magazine aesthetic." },
+        { value:"red_ink_sketch", label:"Pen & ink sketch (red ink)", description:"Loose gestural red ink drawing on white paper." },
+        { value:"vintage_film_composite", label:"Photorealistic digital composite (vintage grade)", description:"Cinematic vintage film grading." },
+        { value:"3d_art_deco_polish", label:"High-end 3D render (chrome/porcelain)", description:"Polished chrome and porcelain visualization." },
+        { value:"cel_shaded_comic", label:"Cel-shaded 3D / comic illustration", description:"Bold line work and flat fills." },
+        { value:"screenprint_poster", label:"Screen print / retro poster", description:"Limited palette; t-shirt graphic aesthetic." },
+        { value:"digital_painting", label:"Digital painting", description:"Gestural brushwork; matte painting concept." },
+        { value:"vibrant_ink_illustration", label:"Digital illustration (ink line)", description:"Vibrant fills with strong ink line work." },
+        { value:"engraving_woodcut", label:"Engraving / woodcut", description:"Vintage scientific illustration with distressed paper." },
+        { value:"photo_with_paint_overlay", label:"Photo/3D with painted overlay", description:"Photoreal base with painted digital overlay." },
+        { value:"mixed_media_collage", label:"Mixed media digital collage", description:"Gouache bird + patterned paper textures." },
+        { value:"gold_lattice_wireframe", label:"High-end 3D lattice wireframe", description:"Metallic wireframe modeling with photoreal textures." },
+        { value:"manga_celshade", label:"Digital illustration (manga cel-shading)", description:"Clean cel-shading and manga line work." },
+        { value:"analog_film_square", label:"Analog film photography (square)", description:"Cinematic green-cyan grade." },
+        { value:"op_art_hard_edge", label:"Hard-edge Op Art painting", description:"Precise symmetrical Op Art patterns." },
+        { value:"natural_light_lifestyle", label:"Natural light lifestyle photography", description:"Shallow depth of field." },
+        { value:"vintage_color_photo", label:"Vintage color photography", description:"Hand-tinted 1950s film look." },
+        { value:"expressionist_sketch", label:"Expressionist watercolor/ink sketch", description:"Loose gestures." },
+        { value:"dot_painting", label:"Aboriginal dot painting", description:"Acrylic pointillism." },
+        { value:"vector_geometric", label:"Digital vector art", description:"Flat geometric shapes and gradients." },
+        { value:"analog_film_grain", label:"Analog film (heavy grain)", description:"Cinematic color grading." },
+        { value:"lofi_glitch_halftone", label:"Lo-fi illustration (halftone/glitch)", description:"Halftone screens and glitch effects." },
+        { value:"gel_lit_photo", label:"High-end digital photography (gels)", description:"Professional colored gel lighting." },
+        { value:"watercolor_gouache_cutouts", label:"Mixed media watercolor/gouache cutouts", description:"Paper cutout collage." },
+        { value:"risograph_vector", label:"Riso-style digital illustration", description:"Flat vector colors with slight grain." },
+        { value:"clean_cel_shading", label:"Digital cel-shading", description:"Clean ink outlines and flat comic-book coloring." },
+        { value:"anime_cel", label:"High-quality anime cel-shading", description:"Smooth edges; painterly background." },
+        { value:"hyper_polished_studio", label:"Photoreal studio photo/3D", description:"Hyper-polished studio quality." },
+        { value:"vertical_smartphone_screenshot", label:"Vertical smartphone video screenshot", description:"Vibrant, compressed consumer footage." },
+        { value:"vertical_practical_fx_video", label:"Vertical smartphone practical FX video", description:"Practical makeup/prosthetics; no digital VFX." }
+      ]
+    },
+
+    {
+      key: "head",
+      label: "Face / Head Motif",
+      description: "Primary head/face silhouette and defining motif.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"stoic_masc_deco_crown", label:"Stoic masculine face + Art Deco crown", description:"Intense gaze; geometric crown; segmented metal plates integrated into skull." },
+        { value:"gorgon_eye_snakes", label:"Reptilian eye in snakes", description:"Haunting yellow-green eye; olive skin with dark scrollwork tattoos/scarification." },
+        { value:"na_installation", label:"N/A (installation)", description:"Abstract installation piece." },
+        { value:"classic_beauty_filgree", label:"Classic European beauty + filigree", description:"Porcelain skin, copper eyeshadow; hair with gold filigree & turquoise." },
+        { value:"dog_geometric_muzzle", label:"Simplified geometric head (sighthound)", description:"Narrow long muzzle; minimal features suggested by patterns." },
+        { value:"tuna_porthole_eye", label:"Mechanical tuna head", description:"Large eye as porthole lens with visible machinery." },
+        { value:"devil_horns_stare", label:"Masculine face + horns", description:"Sharp features; intense stare; prominent horns." },
+        { value:"bald_sunglasses", label:"Bald head + amber sunglasses", description:"Expressionless, stoic." },
+        { value:"porcelain_eyes_closed", label:"Porcelain face (eyes closed)", description:"Dramatic eyeliner; dark lips; contemplative." },
+        { value:"helmet_cyclops", label:"Dome helmet (Cyclops lens)", description:"Single glowing red lens." },
+        { value:"sombrero_beard_profile", label:"Bearded profile under sombrero", description:"Strong jaw; traditional wide-brim sombrero." },
+        { value:"moss_obscured", label:"Obscured by moss/hat", description:"Hidden by weathered hat + hanging Spanish moss." },
+        { value:"iguana_profile", label:"Reptilian profile", description:"Detailed iris; crown of spiky dorsal scales." },
+        { value:"kraken_eye_tentacles", label:"Leviathan eye + tentacles", description:"Large focal eye; tentacles emerge from base." },
+        { value:"moai_painted", label:"Stylized Moai stone face", description:"Heavy brow; elongated nose; abstract color-block paint." },
+        { value:"booby_profile", label:"Blue-footed booby profile", description:"Turquoise-blue beak; cream eyes." },
+        { value:"gold_lattice_voids", label:"Golden lattice skull voids", description:"Eye sockets as circular voids in see-through skull." },
+        { value:"surfer_3q_smile", label:"Surfer 3/4 profile", description:"Windswept hair; confident slight smile." },
+        { value:"laundromat_anonymous", label:"Anonymous (distant angle)", description:"Face obscured by distance and back-three-quarter angle." },
+        { value:"owl_hypnotic", label:"Hypnotic concentric eyes", description:"Radial patterns emanating from central beak." },
+        { value:"sun_kissed_gaze", label:"Dreamy upward gaze", description:"Water droplets; gold hoop earrings." },
+        { value:"shadowed_hat", label:"Shadowed face under hat", description:"Anonymous silhouette under wide brim." },
+        { value:"deadpan_unicorn", label:"Deadpan cute unicorn face", description:"Black dot eyes; striped horn." },
+        { value:"bearded_model_intense", label:"Handsome bearded face", description:"Intense gaze; styled hair." },
+        { value:"halo_madonna", label:"Serene face + halo", description:"Pale European face with golden halo; contrasted by beast masks." },
+        { value:"third_eye_mystic", label:"Bearded mystic + third eye", description:"Turquoise hair; prominent third eye." },
+        { value:"goggles_adventurer", label:"Adventurer with goggles", description:"Turquoise cap; determined expression." },
+        { value:"anime_turquoise_eyes", label:"Anime face (turquoise eyes)", description:"Coral lips; lime-yellow bob." },
+        { value:"fitness_symmetry", label:"Fitness beauty symmetry", description:"Pro makeup; high ponytail; direct engagement." },
+        { value:"vacation_sunglasses_smile", label:"Sunglasses smile", description:"Windblown hair; genuine joy." },
+        { value:"alien_mask_grotesque", label:"Grotesque alien mask", description:"Massive black eyes; turquoise skin; crooked yellow teeth." }
+      ]
+    },
+
+    {
+      key: "outfit",
+      label: "Outfit (Wardrobe Set)",
+      description: "Wardrobe / costume description.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"ceremonial_gear_armor", label:"Ceremonial body-armor fused to body", description:"Weathered teal-patina mandarin collar; chest plate of gears and symbols." },
+        { value:"installation_coat_scale", label:"Scale figure winter coat", description:"Dark, stark winter coat." },
+        { value:"haute_couture_shells", label:"Haute couture seashell bodice", description:"Cowries, pearls, turquoise stones, gold thread." },
+        { value:"folk_dog_collar", label:"Decorative neck collar", description:"Geometric dots and linear folk patterns." },
+        { value:"resort_arch_materials", label:"Architectural materials", description:"Teak wood, turquoise glass, dark stone." },
+        { value:"victorian_formal_devil", label:"Victorian formal menswear", description:"Tailored jacket, waistcoat, cravat." },
+        { value:"polkadot_robe_platforms", label:"Polka-dot robe + platforms", description:"Golden-yellow robe; tie; chunky black platform shoes." },
+        { value:"artdeco_vinyl_armor", label:"Glossy vinyl armor", description:"Black vinyl with yellow-gold art deco panels." },
+        { value:"pressure_suit_weathered", label:"Weathered pressure suit", description:"Cream-tan suit with blue-grey armor panels and pouches." },
+        { value:"vaquero_workshirt", label:"Turquoise-teal western work shirt", description:"Yellow-gold highlights." },
+        { value:"moss_consumed_cowboy", label:"Cowboy remnants consumed by moss", description:"Leather belt/boots/denim overtaken by living moss." },
+        { value:"business_formal_suit", label:"Business formal", description:"White collar; dark navy suit jacket." },
+        { value:"surfer_boardshorts", label:"Shirtless + board shorts", description:"Teal-blue board shorts; towel at waist." },
+        { value:"hoodie_jeans", label:"Casual hoodie + jeans", description:"Functional and nondescript." },
+        { value:"energy_field_feathers", label:"Feather energy field", description:"Decorative energy field covering entire form." },
+        { value:"bikini_terracotta", label:"Terracotta bikini", description:"Thin shoulder straps." },
+        { value:"dusty_rose_suit_hat", label:"Dusty rose suit + Stetson", description:"Romanticized western wear." },
+        { value:"bold_red_poncho", label:"Bold red poncho/serape", description:"Simplified forms." },
+        { value:"burgundy_workshirt", label:"Burgundy work shirt + denim", description:"Practical ranch wear." },
+        { value:"utility_dark", label:"Dark utility clothing", description:"Functional, nondescript." },
+        { value:"unicorn_none", label:"None (unicorn body)", description:"Pale yellow body with dark mane." },
+        { value:"blue_blazer", label:"Light blue blazer", description:"White crisp shirt." },
+        { value:"religious_robes", label:"Traditional religious robes", description:"Infant in white cloth." },
+        { value:"scavenger_gear_cat", label:"Scavenger gear", description:"Leather harness; baggy turquoise pants; canvas boots; with cat." },
+        { value:"summer_crop_denim", label:"Casual summer wear", description:"Black crop top; high-waisted denim jeans." },
+        { value:"black_bikini_gold", label:"Minimal black bikini (gold hardware)", description:"Sleek and athletic." },
+        { value:"white_polka_bikini", label:"Retro white bikini (polka dots)", description:"Playful and revealing." },
+        { value:"clown_collar", label:"Ruffled bubblegum-pink clown collar", description:"Over textured multicolored garment." }
+      ]
+    },
+
+    {
+      key: "materials",
+      label: "Materials & Textures",
+      description: "Surface/material language to emphasize.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"verdigris_metal", label:"Aged copper/brass verdigris", description:"Engraved metal with Art Nouveau flowing lines." },
+        { value:"skin_scales_real", label:"Realistic skin + wet serpent scales", description:"Subsurface scattering; pores; glistening scales." },
+        { value:"translucent_panels", label:"Translucent backlit panels", description:"Acrylic/resin; seamless gradients; reflective base." },
+        { value:"nacre_pearls_turquoise", label:"Nacre/pearls/turquoise", description:"Iridescent shell nacre; lustrous pearls; polished turquoise." },
+        { value:"paper_grain_ink", label:"Paper grain + ink", description:"Visible paper grain; varied line weights; crosshatching." },
+        { value:"chrome_porcelain", label:"Chrome + porcelain", description:"Mirror metals; glossy lacquer; matte porcelain." },
+        { value:"canvas_dirt_rust", label:"Canvas + dirt + rust", description:"Heavy canvas; chipped paint; oxidized rust." },
+        { value:"moss_vs_leather", label:"Living vegetation vs leather/denim", description:"Moss/fronds vs tattered denim and weathered leather." },
+        { value:"reptile_scales_petals", label:"Reptilian scales + petals", description:"Scale detail; leaf veins; soft petals." },
+        { value:"engraved_paper_distress", label:"Engraved lines on aged paper", description:"Cross-hatching on distressed paper." },
+        { value:"stone_vs_pigment", label:"Volcanic stone + modern pigment", description:"Weathered stone base contrasting matte paint." },
+        { value:"wireframe_gold_vs_fabric", label:"Gold lattice vs suit fabric", description:"Polished gold wireframe; cotton + matte suiting." },
+        { value:"film_grain_fluorescent", label:"Film grain + chrome + tiles", description:"Organic grain; chrome doors; glossy floor tiles." },
+        { value:"op_art_smooth_fields", label:"Smooth Op Art fields", description:"No visible brushstroke or grain." },
+        { value:"wet_skin_bokeh", label:"Wet skin + water bokeh", description:"Water droplets; glossy hair; reflective ripples." },
+        { value:"halftone_glitch", label:"Halftone + noise + glitch", description:"Retro halftone; digital noise; glitch artifacts." },
+        { value:"prosthetics_silicone_latex", label:"Silicone/latex prosthetics", description:"Wet organic prosthetics vs dry fabric." }
+      ]
+    },
+
+    {
+      key: "pose",
+      label: "Action / Pose",
+      description: "Body language and action.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"hieratic_frontal", label:"Hieratic frontal", description:"Static statue-like authority; arms rigid at sides." },
+        { value:"concealed_profile_snakes", label:"Concealed profile + writhing serpents", description:"One eye piercing; serpents in motion." },
+        { value:"installation_midstride_scale", label:"Installation + mid-stride scale figure", description:"Static installation; human figure mid-stride for scale." },
+        { value:"serene_regal_profile", label:"Serene regal profile", description:"Chin lifted; confident stance." },
+        { value:"alert_seated_dog", label:"Static seated dog", description:"Alert posture; facing left." },
+        { value:"swimming_profile_tuna", label:"Side-profile swimming", description:"Horizontal orientation for technical study." },
+        { value:"devil_seated_commanding", label:"Commanding seated", description:"Leaning back; frontal gaze; crossed legs." },
+        { value:"waiting_dangling_legs", label:"Passive waiting", description:"Seated; dangling legs; folded hands." },
+        { value:"sculptural_head_tilted", label:"Sculptural head tilted back", description:"Peaceful profile." },
+        { value:"survivor_threeq_back", label:"Active survivor stance", description:"Three-quarter back view walking/standing." },
+        { value:"stoic_desert_profile", label:"Stoic profile gaze", description:"Looking toward distant horizon." },
+        { value:"ominous_frontal", label:"Ominous frontal stance", description:"Grounded and confronting." },
+        { value:"basking_profile", label:"Resting/basking", description:"Head turned; noble profile." },
+        { value:"leviathan_vertical_float", label:"Vertical float/swim", description:"Tentacles drifting in current." },
+        { value:"guardian_moai", label:"Monumental guardian stance", description:"Head tilted slightly upward." },
+        { value:"booby_portrait", label:"Graceful upright portrait", description:"Alert seabird at rest." },
+        { value:"wireframe_contemplation", label:"Elegant 3/4 tilt", description:"Mannequin-like contemplation." },
+        { value:"surfer_relaxed", label:"Relaxed athletic stance", description:"Looking off-frame toward ocean." },
+        { value:"laundromat_still", label:"Solitary contemplation", description:"Standing still in quiet laundromat." },
+        { value:"op_art_confrontation", label:"Frontal confrontation", description:"Direct eye contact; symmetrical vibration." },
+        { value:"submerged_bliss", label:"Partially submerged bliss", description:"Head tilted back; sun-worship gesture." },
+        { value:"campfire_gazing", label:"Seated by fire", description:"Gazing into the fire." },
+        { value:"warming_hands", label:"Warming hands", description:"Peaceful gathering by fire." },
+        { value:"crosslegged_meditation", label:"Cross-legged meditation", description:"Spiritual connection." },
+        { value:"diner_eating", label:"Active eating", description:"Candid enjoyment; eyes closed." },
+        { value:"meme_ready_still", label:"Meme-ready stillness", description:"Static standing 'waiting' pose." },
+        { value:"brooding_threeq_turn", label:"Brooding three-quarter turn", description:"Intense gaze off-camera." },
+        { value:"throne_of_wisdom", label:"Throne of Wisdom", description:"Seated; guardians alert." },
+        { value:"hand_reaching", label:"Hieratic frontal + reaching hand", description:"Foreground hand reaches toward viewer." },
+        { value:"power_stance_guitar", label:"Power stance", description:"Wide-legged; guitar ready." },
+        { value:"model_contrapposto", label:"Contrapposto", description:"Relaxed; contemplative profile." },
+        { value:"commercial_hand_on_hip", label:"Commercial model pose", description:"Hand on hip; weight shifted." },
+        { value:"woo_girl_stride", label:"Celebration mid-stride", description:"Arms raised; 'woo-girl' energy." },
+        { value:"fx_showcase_frontal", label:"Frontal showcase", description:"Static to show costume details." }
+      ]
+    },
+
+    {
+      key: "setting",
+      label: "Setting / Location",
+      description: "Where the scene happens.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"sacred_shrine_frame", label:"Sacred altar/shrine", description:"Ornamental frame with columns/pilasters." },
+        { value:"shadowy_forest_ruins", label:"Shadowy forest ruins", description:"Overgrown; dapple-lit vines." },
+        { value:"european_plaza_dusk", label:"European plaza at dusk", description:"Neoclassical buildings; winter trees." },
+        { value:"soft_focus_beach", label:"Soft-focus beach", description:"Sandy beach; calm water; cloudy sky." },
+        { value:"abstract_pattern_space", label:"Abstract decorative background", description:"Pattern-filled space like textile/wallpaper." },
+        { value:"archival_paper_page", label:"Archival paper page", description:"Naturalist sketchbook/manual page." },
+        { value:"luxury_pool_corridor", label:"Luxury infinity pool corridor", description:"Indoor-outdoor tropical space; dark columns." },
+        { value:"palatial_interior", label:"Palatial interior", description:"Opulent drawing room/throne room." },
+        { value:"abandoned_industrial", label:"Abandoned industrial site", description:"Weathered tiles; water damage; decay." },
+        { value:"minimal_studio_mint", label:"Minimal studio gradient", description:"Pale mint gradient with linear light streaks." },
+        { value:"postapoc_tiled_plaza", label:"Post-apocalyptic tiled plaza", description:"Cracked tiles; dust-filled sky." },
+        { value:"sonoran_desert_sunset", label:"Sonoran desert at pink sunset", description:"Mountains and saguaro." },
+        { value:"isolated_swamp", label:"Isolated swamp/bayou", description:"Neutral atmospheric background." },
+        { value:"tropical_paradise_sunset", label:"Tropical paradise at sunset", description:"Coastal water; distant islands." },
+        { value:"deep_ocean_void", label:"Deep ocean void", description:"Dark mystical gradient." },
+        { value:"rapa_nui_storm", label:"Easter Island storm sky", description:"Rocky platform; stormy navy sky." },
+        { value:"grey_studio_void", label:"Neutral grey studio void", description:"Minimal gradient background." },
+        { value:"idealized_sun_disk", label:"Idealized beach sun disk", description:"Massive golden sun with cloud lines." },
+        { value:"laundromat_night", label:"24-hour laundromat", description:"Night; city lights through windows." },
+        { value:"black_inner_vision", label:"Black inner-vision void", description:"Pure black for max intensity." },
+        { value:"tropical_golden_hour", label:"Tropical golden hour", description:"Crystal water; white sand; palms." },
+        { value:"western_twilight", label:"Western wilderness twilight", description:"Silhouetted mountains." },
+        { value:"blue_night_prairie", label:"Abstracted blue night prairie", description:"Dreamlike open range." },
+        { value:"dreamtime_dotscape", label:"Dreamtime dotted landscape", description:"Dotted hills; starry sky." },
+        { value:"southwest_plain", label:"Southwestern desert plain", description:"Distant blue mountains." },
+        { value:"late_night_diner", label:"Late-night diner interior", description:"Red booth; neon window." },
+        { value:"psychedelic_void", label:"Psychedelic void", description:"Swirling pink/cyan patterns." },
+        { value:"dark_studio", label:"Minimal dark studio", description:"Deep teal or grey." },
+        { value:"liminal_collage_space", label:"Liminal collage shrine+jungle", description:"Gothic shrine meets tropical void." },
+        { value:"salt_flats_dunes", label:"Salt flats and dunes", description:"Post-apocalyptic desert." },
+        { value:"rapeseed_field", label:"Rapeseed field bloom", description:"Rolling hills; blue sky." },
+        { value:"resort_infinity_pool", label:"Luxury resort", description:"White sand; infinity pool." },
+        { value:"convention_dark_bg", label:"Convention/home dark bg", description:"Dark indeterminate background." }
+      ]
+    },
+
+    {
+      key: "vfx",
+      label: "Atmosphere / VFX",
+      description: "Environmental mood, haze, particles, grading vibe.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"museum_clarity", label:"Museum clarity", description:"Reverential sacred ambiance; no haze." },
+        { value:"moody_bokeh_particles", label:"Moody bokeh + particles", description:"Shallow depth; organic particles." },
+        { value:"ethereal_clean_twilight", label:"Ethereal clean twilight", description:"Internal glow vs crisp winter air." },
+        { value:"dreamy_sea_haze", label:"Dreamy sea haze", description:"Soft romantic quality." },
+        { value:"flat_graphic", label:"Flat graphic", description:"Pure pattern-to-color relationships." },
+        { value:"archival_document", label:"Archival document", description:"Slight aging/yellowing." },
+        { value:"paradise_glow", label:"Paradise glow", description:"Magical realism; humid tropical air." },
+        { value:"psychological_intensity", label:"Psychological intensity", description:"Focus on confrontational gaze." },
+        { value:"uncanny_valley", label:"Uncanny dreamlike", description:"Impossible details; uncanny valley." },
+        { value:"chromatic_aberration", label:"Transcendent glow", description:"Rainbow chromatic edges." },
+        { value:"gritty_dust", label:"Gritty dust", description:"Harsh survival weathering." },
+        { value:"poster_nostalgia", label:"Poster nostalgia", description:"Romanticized sunset glow." },
+        { value:"misty_fog_dread", label:"Uncanny dread fog", description:"Painterly mist; dissolving edges." },
+        { value:"joyful_paradise", label:"Joyful paradise", description:"Idealized vacation mood; birds in flight." },
+        { value:"antique_maritime_aura", label:"Antique maritime aura", description:"Antique document effects; supernatural." },
+        { value:"storm_tension", label:"Storm tension", description:"Dark clouds vs golden light." },
+        { value:"premium_clean_dof", label:"Premium clean DOF", description:"High-tech product visualization." },
+        { value:"melancholic_fluorescent_haze", label:"Melancholic fluorescent haze", description:"Grain; sickly green-cyan haze." },
+        { value:"optical_vibration", label:"Optical vibration", description:"Patterns pulse or radiate." },
+        { value:"romantic_sun_haze", label:"Romantic sun haze", description:"Water bokeh; shallow DOF." },
+        { value:"campfire_soft_focus", label:"Campfire soft-focus", description:"Warm fire glow vs blue night." },
+        { value:"glitchy_vaporwave", label:"Glitchy vaporwave", description:"Vibrating internet aesthetic." },
+        { value:"commercial_perfection", label:"Commercial perfection", description:"Crisp, controlled; no haze." },
+        { value:"high_energy_vlog", label:"High-energy vlog vibe", description:"Sun-drenched and vibrant." },
+        { value:"theatrical_grotesque", label:"Theatrical grotesque", description:"Dramatic shadows on textured skin." }
+      ]
+    },
+
+    {
+      key: "lighting",
+      label: "Lighting Style",
+      description: "Key/fill/rim logic and overall lighting character.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"diffused_sculptural", label:"Diffused sculptural lighting", description:"Soft shadows emphasize metal dimensionality." },
+        { value:"forest_chiaroscuro", label:"Forest chiaroscuro", description:"Naturalistic light with rim highlights." },
+        { value:"internal_glow_twilight", label:"Internally lit", description:"Warm internal glow vs cool dusk." },
+        { value:"golden_hour_diffused", label:"Golden hour / overcast", description:"Diffused modeling with metallic highlights." },
+        { value:"flat_silhouette", label:"Flat silhouette illumination", description:"Patterns via positive/negative space." },
+        { value:"even_technical", label:"Even technical lighting", description:"Diffused clarity; subtle shading." },
+        { value:"high_key_daylight", label:"High-key daylight", description:"Chandelier glow reflected in water." },
+        { value:"ink_weight_implied", label:"Implied via ink weight", description:"Crosshatching creates shadows." },
+        { value:"overcast_flat", label:"Soft overcast", description:"Minimal shadows." },
+        { value:"studio_golden_rim", label:"High-key studio + rim glow", description:"Golden rim light." },
+        { value:"harsh_sun_red_lens", label:"Harsh sun + red lens", description:"Strong shadows; helmet light." },
+        { value:"stylized_sunset_blocks", label:"Stylized sunset blocks", description:"Color-blocked dimensional modeling." },
+        { value:"soft_overhead_rim", label:"Soft overhead + rim", description:"Subtle rim on moss edges." },
+        { value:"backlit_paradise", label:"Backlit paradise", description:"Golden hour highlights." },
+        { value:"bioluminescent_spot", label:"Bioluminescent spotlight", description:"Cream-to-navy gradient lighting." },
+        { value:"golden_hour_chiaroscuro", label:"Golden hour chiaroscuro", description:"Bright side vs deep shadows." },
+        { value:"decorative_soft_even", label:"Decorative soft even", description:"Gentle modeling." },
+        { value:"sophisticated_studio_wire", label:"Sophisticated studio", description:"Soft key with reflective lattice." },
+        { value:"sunset_rim_ambient", label:"Warm sunset rim", description:"Golden ambient glow." },
+        { value:"fluorescent_overhead", label:"Harsh fluorescent tubes", description:"Cool green-cyan cast." },
+        { value:"flat_internal_color", label:"Flat internal illumination", description:"Pure color relationships." },
+        { value:"campfire_chiaroscuro", label:"Campfire vs twilight", description:"Warm fire glow vs cool blues." },
+        { value:"neon_clash", label:"Neon clash", description:"Fluorescent green + neon red." },
+        { value:"split_gels", label:"Split gels", description:"Cool cyan vs warm red." },
+        { value:"divine_halo_radiance", label:"Divine halo radiance", description:"Soft diffuse divine gold." },
+        { value:"midday_desert", label:"Midday desert sun", description:"Sharp minimal shadows." },
+        { value:"flattering_backlight", label:"Flattering backlight", description:"Warm sunlight; hair highlights." },
+        { value:"multi_point_studio", label:"Multi-point studio", description:"Key/fill/rim setup." },
+        { value:"smartphone_auto", label:"Smartphone auto-exposure", description:"Harsh bright tropical sun." },
+        { value:"dramatic_directional_studio", label:"Dramatic directional studio", description:"Emphasizes surface texture." }
+      ]
+    },
+
+    {
+      key: "palette",
+      label: "Color Palette",
+      description: "Dominant colors and contrasts.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"teal_patina_metal", label:"Teal patina + warm metals", description:"Teal/sea-green patina; bronze/copper/gold; muted cream frame." },
+        { value:"desat_earth_yellow_eye", label:"Desaturated earth + yellow eye", description:"Olives/tans/greys with bright yellow-green eye accent." },
+        { value:"pastel_sky_coral", label:"Pastel sky-to-coral gradient", description:"Sky blue → pale coral → orange-red; neutral grey env." },
+        { value:"oceanic_luxury", label:"Rich oceanic luxury", description:"Royal blue/navy/turquoise/teal + bronze/cream/copper." },
+        { value:"chartreuse_silhouette", label:"Chartreuse + black silhouette", description:"Yellow-green background; warm golden accents." },
+        { value:"steel_blue_brass", label:"Steel blue + brass", description:"Slate/steel blue with warm brass/copper on cream paper." },
+        { value:"turquoise_cyan_coral", label:"Turquoise/cyan + coral", description:"Vivid turquoise/cyan; dark browns/blacks; coral accents." },
+        { value:"mono_red_ink", label:"Monochrome red ink", description:"Red ink on cream paper." },
+        { value:"amber_cream_cool_grey", label:"Amber/cream vs cool grey", description:"Warm amber/cream against cool grey-blue/black." },
+        { value:"mint_porcelain_gold", label:"Mint + porcelain + gold", description:"Pastel mint, porcelain white, glossy black, yellow-gold." },
+        { value:"postapoc_desat", label:"Post-apocalyptic desat", description:"Cream-tan, blue-grey, sun-bleached beige with red." },
+        { value:"marigold_magenta_turq", label:"Bold limited palette", description:"Marigold yellow, magenta, turquoise, navy." },
+        { value:"organic_greens", label:"Organic greens", description:"Olive/sage/forest + weathered browns." },
+        { value:"tropical_vibrant", label:"Vibrant tropicals", description:"Turquoise lizard, hot pink flowers, emerald foliage." },
+        { value:"maritime_triad", label:"Maritime triad", description:"Blood-red, bone-white, navy on aged beige paper." },
+        { value:"pink_blue_orange_stone", label:"Pink/blue/orange vs stone", description:"Vibrant pink/blue/orange against grey stone & navy clouds." },
+        { value:"blue_orange_comp", label:"Blue-orange complementary", description:"Turquoise subject vs amber/mustard patterns." },
+        { value:"luxury_metallic", label:"Luxury metallic", description:"Polished gold, crisp white, deep navy, neutral grey." },
+        { value:"sunset_teal_balance", label:"Warm sunset + teal", description:"Golden-orange balanced by teal accents." },
+        { value:"institutional_green_cast", label:"Institutional green-cyan", description:"Green-cyan cast with off-white/grey tones." },
+        { value:"psychedelic_hi", label:"High-intensity psychedelia", description:"Electric blue, coral-orange, fire-engine red." },
+        { value:"paradise_turq_bronze", label:"Paradise turquoise + bronze", description:"Turquoise water, bronze skin, lush greens." },
+        { value:"faded_vintage_rose", label:"Faded vintage tones", description:"Dusty rose, orange fire, deep blue sky." },
+        { value:"cmyk_vibe", label:"CMYK print vibe", description:"Hot magenta, cyan, yellow." },
+        { value:"split_cyan_coral", label:"Split cyan/coral", description:"Cyan and coral red against dark teal." },
+        { value:"acid_turquoise_purple", label:"Acid turquoise + purple", description:"Acidic turquoise and purple skin; bubblegum pink accents." }
+      ]
+    },
+
+    {
+      key: "detail",
+      label: "Detail Density",
+      description: "How busy the image is.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"maximalist_horror_vacui", label:"Maximalist (horror vacui)", description:"Every surface covered in intricate detail." },
+        { value:"hyperreal_focal", label:"Hyper-real focal detail", description:"Extreme clarity in focal areas; soft falloff elsewhere." },
+        { value:"minimalist", label:"Minimalist", description:"Pure form; seamless transitions; little ornamentation." },
+        { value:"extremely_high", label:"Extremely high", description:"Hundreds/thousands of micro-details." },
+        { value:"medium", label:"Medium", description:"Balanced simplification." },
+        { value:"low_medium", label:"Low-medium", description:"Clean shapes, essential details." },
+        { value:"video_limited", label:"Medium (video-limited)", description:"Visually busy but limited by compression." }
+      ]
+    },
+
+    {
+      key: "mood",
+      label: "Mood / Attitude",
+      description: "Emotional tone and character attitude.",
+      required: true,
+      multi: false,
+      options: [
+        { value:"divine_order", label:"Divine mechanical order", description:"Sacred solemnity and cold authority." },
+        { value:"tragic_beauty", label:"Tragic beauty", description:"Cursed isolation and haunted vulnerability." },
+        { value:"sublime_tranquility", label:"Sublime tranquility", description:"Gentle beauty in simplicity; meditative wonder." },
+        { value:"serene_sophistication", label:"Serene sophistication", description:"Luxury artistry meets nature’s treasures." },
+        { value:"naive_charm", label:"Naive charm", description:"Whimsical, dignified folk sincerity." },
+        { value:"scientific_curiosity", label:"Scientific curiosity", description:"Meticulous technical imagination." },
+        { value:"aspirational_luxury", label:"Aspirational luxury", description:"Exclusive comfort and beauty." },
+        { value:"sophisticated_menace", label:"Sophisticated menace", description:"Dark charisma; cultured villainy." },
+        { value:"deadpan_absurdist", label:"Deadpan absurdist humor", description:"Whimsical loneliness; quirky melancholy." },
+        { value:"elegant_serenity", label:"Elegant serenity", description:"Artificial perfection; art deco optimism." },
+        { value:"gritty_resilience", label:"Gritty resilience", description:"World-weary endurance." },
+        { value:"rugged_independence", label:"Rugged independence", description:"Quiet pride in heritage." },
+        { value:"uncanny_dread", label:"Uncanny dread", description:"Nature reclaiming human form." },
+        { value:"cheerful_optimism", label:"Cheerful optimism", description:"Exotic beauty; ecosystem magic." },
+        { value:"sublime_terror", label:"Sublime terror", description:"Curiosity mixed with primordial fear." },
+        { value:"sacred_mysterious", label:"Sacred and mysterious", description:"Ancient power meets modern intervention." },
+        { value:"dignified_respectful", label:"Dignified and respectful", description:"Nature celebrated through craft." },
+        { value:"elegant_futuristic", label:"Elegant and futuristic", description:"Sophisticated data/identity intersection." },
+        { value:"youthful_optimistic", label:"Youthful and optimistic", description:"Endless summer freedom." },
+        { value:"melancholic_meditative", label:"Melancholic and meditative", description:"Quiet dignity in routines." },
+        { value:"shamanic_hypnotic", label:"Shamanic and hypnotic", description:"Portal to altered states." },
+        { value:"blissful_serene", label:"Blissful and serene", description:"Carefree luxury and natural beauty." },
+        { value:"romantic_solitude", label:"Romantic solitude", description:"Timeless frontier poetry." },
+        { value:"ironic_cuteness", label:"Ironic cuteness", description:"Wholesome internet absurdity." },
+        { value:"brooding_sophistication", label:"Intense masculine sophistication", description:"Serious and brooding." },
+        { value:"protective_sacred_feminine", label:"Protective sacred feminine", description:"Reverent, mysterious, protective power." },
+        { value:"rebellious_tough", label:"Rebellious and tough", description:"Wasteland survivor swagger." },
+        { value:"wistful_serene", label:"Wistful and serene", description:"Rural romanticism." },
+        { value:"commercial_empowerment", label:"Confident commercial empowerment", description:"Aspirational, poised." },
+        { value:"yolo_vacation", label:"YOLO vacation energy", description:"Carefree, indulgent, humorous." },
+        { value:"creepy_cute_performative", label:"Creepy-cute performative", description:"Whimsical grotesque charm." }
+      ]
+    }
+  ]
+};
+
+// ---- state ----
+const state = {
+  selections: {},   // key -> option.value
+  extraNotes: ""
+};
+
+// ---- DOM ----
+const $form = document.getElementById("form");
+const $chips = document.getElementById("chips");
+const $specOut = document.getElementById("specOut");
+const $promptOut = document.getElementById("promptOut");
+const $extraNotes = document.getElementById("extraNotes");
+const $toast = document.getElementById("toast");
+
+// ---- helpers ----
+function el(tag, attrs={}, children=[]) {
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const c of children) n.appendChild(c);
+  return n;
+}
+
+function findOption(categoryKey, value) {
+  const cat = CONFIG.categories.find(c => c.key === categoryKey);
+  if (!cat) return null;
+  return cat.options.find(o => o.value === value) || null;
+}
+
+function showToast(msg="Copied.") {
+  $toast.textContent = msg;
+  $toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> $toast.classList.remove("show"), 1200);
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Copied to clipboard.");
+  } catch (e) {
+    // fallback
+    const ta = el("textarea", { style:"position:fixed;left:-9999px;top:-9999px" });
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showToast("Copied (fallback).");
+  }
+}
+
+function randomPick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ---- build UI ----
+function buildForm() {
+  $form.innerHTML = "";
+
+  for (const cat of CONFIG.categories) {
+    const id = `sel_${cat.key}`;
+
+    const $labelRow = el("label", {}, [
+      el("span", { html: `${cat.label}` }),
+      el("span", { class:"req", html: cat.required ? "Required" : "" })
+    ]);
+
+    const $select = el("select", { id }, []);
+    $select.appendChild(el("option", { value:"" }, [document.createTextNode(`Select ${cat.label}…`)]));
+    for (const opt of cat.options) {
+      const o = el("option", { value: opt.value }, [document.createTextNode(opt.label)]);
+      $select.appendChild(o);
+    }
+
+    $select.addEventListener("change", () => {
+      state.selections[cat.key] = $select.value;
+      renderAll();
+    });
+
+    const $help = el("div", { class:"help", id:`help_${cat.key}` }, [document.createTextNode(cat.description || "")]);
+
+    const $field = el("div", { class:"field" }, [ $labelRow, $select, $help ]);
+    $form.appendChild($field);
+  }
+
+  // defaults: pick first option for each required category (so output isn't empty)
+  for (const cat of CONFIG.categories) {
+    if (cat.required && !state.selections[cat.key]) {
+      state.selections[cat.key] = cat.options[0]?.value || "";
+    }
+    const sel = document.getElementById(`sel_${cat.key}`);
+    if (sel) sel.value = state.selections[cat.key] || "";
+  }
+}
+
+function buildChips() {
+  $chips.innerHTML = "";
+  for (const cat of CONFIG.categories) {
+    const val = state.selections[cat.key];
+    if (!val) continue;
+    const opt = findOption(cat.key, val);
+    if (!opt) continue;
+
+    $chips.appendChild(el("div", { class:"chip" }, [
+      el("span", { html:`<b>${cat.label}:</b> ${opt.label}` })
+    ]));
+  }
+}
+
+// ---- output assembly ----
+function buildSpecText() {
+  const lines = [];
+  lines.push(`${CONFIG.generator_name} — Spec`);
+  lines.push("");
+
+  for (const cat of CONFIG.categories) {
+    const val = state.selections[cat.key];
+    if (!val) continue;
+    const opt = findOption(cat.key, val);
+    if (!opt) continue;
+    lines.push(`${cat.label}: ${opt.label}`);
+    if (opt.description) lines.push(`- ${opt.description}`);
+    lines.push("");
+  }
+
+  const extra = (state.extraNotes || "").trim();
+  if (extra) {
+    lines.push("Extra notes:");
+    lines.push(extra);
+    lines.push("");
+  }
+  return lines.join("\n").trim() + "\n";
+}
+
+function buildCondensedPrompt() {
+  const parts = [];
+  for (const cat of CONFIG.categories) {
+    const val = state.selections[cat.key];
+    if (!val) continue;
+    const opt = findOption(cat.key, val);
+    if (!opt) continue;
+
+    // Use prompt_text if provided, else a compact "Label — keywordy fragment"
+    const compact = opt.prompt_text
+      ? opt.prompt_text
+      : (opt.label + (opt.description ? `; ${opt.description}` : ""));
+
+    parts.push(compact);
+  }
+
+  let prompt = parts.join(" | ");
+
+  const extra = (state.extraNotes || "").trim();
+  if (extra) prompt += ` | ${extra}`;
+
+  return prompt.trim();
+}
+
+function validateRequired() {
+  const missing = [];
+  for (const cat of CONFIG.categories) {
+    if (!cat.required) continue;
+    const val = state.selections[cat.key];
+    if (!val) missing.push(cat.label);
+  }
+  return missing;
+}
+
+function renderAll() {
+  // Update per-category help text to show selected description
+  for (const cat of CONFIG.categories) {
+    const val = state.selections[cat.key];
+    const help = document.getElementById(`help_${cat.key}`);
+    if (!help) continue;
+
+    if (!val) {
+      help.textContent = cat.description || "";
+      continue;
+    }
+    const opt = findOption(cat.key, val);
+    help.textContent = opt?.description || cat.description || "";
+  }
+
+  buildChips();
+
+  const missing = validateRequired();
+  const spec = buildSpecText();
+  const prompt = buildCondensedPrompt();
+
+  $specOut.value = spec + (missing.length ? `\n[Missing required: ${missing.join(", ")}]\n` : "");
+  $promptOut.value = prompt + (missing.length ? `\n\nMissing required: ${missing.join(", ")}` : "");
+}
+
+// ---- wire buttons ----
+document.getElementById("resetBtn").addEventListener("click", () => {
+  state.selections = {};
+  state.extraNotes = "";
+  $extraNotes.value = "";
+  buildForm();
+  renderAll();
+  showToast("Reset.");
+});
+
+document.getElementById("randomizeBtn").addEventListener("click", () => {
+  for (const cat of CONFIG.categories) {
+    const opt = randomPick(cat.options);
+    state.selections[cat.key] = opt?.value || "";
+    const sel = document.getElementById(`sel_${cat.key}`);
+    if (sel) sel.value = state.selections[cat.key];
+  }
+  renderAll();
+  showToast("Randomized.");
+});
+
+document.getElementById("copyPromptBtn").addEventListener("click", () => {
+  copyText($promptOut.value);
+});
+
+document.getElementById("copySpecBtn").addEventListener("click", () => {
+  copyText($specOut.value);
+});
+
+document.getElementById("copyAllBtn").addEventListener("click", () => {
+  copyText($specOut.value + "\n\n---\n\n" + $promptOut.value);
+});
+
+$extraNotes.addEventListener("input", () => {
+  state.extraNotes = $extraNotes.value;
+  renderAll();
+});
+
+// ---- init ----
+buildForm();
+renderAll();
+</script>
+
+<!--
+Notes:
+- This file is self-contained (no external JS/CSS).
+- UI is generated dynamically from CONFIG (a JSON config → dynamic form pattern). [web:22][web:25]
+-->
+</body>
+</html>
