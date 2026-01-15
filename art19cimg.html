@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Universe Builder | Create Something Special</title>
+  <title>Universe Builder | Pure Tags</title>
   <style>
     /* 
        THEME: "Cosmic Creator" 
@@ -47,7 +47,7 @@
     }
     @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } }
 
-    /* Header: Welcoming and Special */
+    /* Header */
     header {
       max-width: 1200px; margin: 0 auto 24px auto;
       text-align: center;
@@ -277,7 +277,6 @@
       <div class="hd">
         <h2>Reality Output</h2>
         <div class="actions">
-           <!-- Consolidated Copy Buttons -->
            <button id="copyAllBtn" class="good" title="Copy everything">Copy All</button>
         </div>
       </div>
@@ -286,7 +285,6 @@
           <div class="field">
             <label>
                 <span>Spec Sheet</span>
-                <!-- SPECIFIC COPY BUTTON FOR SPEC -->
                 <button id="copySpecBtn" style="padding:2px 8px; font-size:10px; margin-left:auto">Copy Spec</button>
             </label>
             <textarea id="specOut" class="mono" readonly></textarea>
@@ -313,7 +311,7 @@
  * -----------------------------------------------------------
  */
 const CONFIG = {
-  version: "2.0 Cosmic",
+  version: "2.1 NoDesc",
   generator_name: "Universe Builder",
   categories: [
     {
@@ -636,7 +634,7 @@ const CONFIG = {
         { value:"commercial_hand_on_hip", label:"Commercial model pose", description:"Hand on hip; weight shifted." },
         { value:"woo_girl_stride", label:"Celebration mid-stride", description:"Arms raised; 'woo-girl' energy." },
         { value:"fx_showcase_frontal", label:"Frontal showcase", description:"Static to show costume details." }
-      ]
+     ]
     }
   ]
 };
@@ -712,6 +710,7 @@ function buildForm() {
 
 /**
  * 2. RENDER OUTPUTS
+ * UPDATED: Removes all "description" text from the final output boxes.
  */
 function renderAll() {
   const specLines = [];
@@ -723,12 +722,11 @@ function renderAll() {
     if (val) {
       const opt = cat.options.find(o => o.value === val);
       if (opt) {
-        // Spec format
+        // Spec format: Category: Selected Item Name (No description)
         specLines.push(`${cat.label}: ${opt.label}`);
-        specLines.push(`  → ${opt.description}`);
         
-        // Prompt format (Using description for maximum flavor)
-        promptParts.push(opt.description);
+        // Prompt format: Selected Item Name (No description)
+        promptParts.push(opt.label);
         
         // Chips
         activeChips.push({ label: cat.label, val: opt.label });
@@ -888,6 +886,9 @@ function showToast(msg) {
 buildForm();
 renderAll();
 
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
