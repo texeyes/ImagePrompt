@@ -3,176 +3,299 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prompt Builder (Advanced)</title>
+  <title>Universe Builder | Create Something Special</title>
   <style>
-    :root{
-      --bg:#0b0f17; --panel:#111827; --muted:#94a3b8; --text:#e5e7eb;
-      --stroke:#22304a; --accent:#60a5fa; --good:#34d399;
-      --field:#0f172a; --chip:#0b1222;
+    /* 
+       THEME: "Cosmic Creator" 
+       Inverse Primary Triad: Cyan (Blue-Green), Magenta (Red-Purple), Yellow.
+       Background: Deep Space Violet.
+    */
+    :root {
+      /* Deep Space Foundation */
+      --bg: #0f0518;          /* Very dark violet/black */
+      --panel: #1a0b2e;       /* Lighter violet panel */
+      --stroke: #361b54;      /* Border color */
+      
+      /* Typography */
+      --text: #e0d9f6;        /* Soft violet-white text */
+      --muted: #9ca3af;       /* Standard muted text */
+      
+      /* Inverse Primaries (Vibrant) */
+      --primary: #00f0ff;     /* CYAN: Main actions, highlights */
+      --secondary: #ff0099;   /* MAGENTA: Headers, accents */
+      --tertiary: #ffd700;    /* YELLOW: Chips, special highlights */
+      
+      /* Inputs */
+      --field: #240f3e;       /* Input background */
+      --chip-bg: #2d1b4e;     
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; padding:24px;
-      background:linear-gradient(180deg,#070a10, var(--bg));
-      color:var(--text); font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    }
-    .wrap{max-width:1200px; margin:0 auto; display:grid; gap:16px; grid-template-columns: 420px 1fr;}
-    @media (max-width: 980px){ .wrap{grid-template-columns: 1fr;} }
-    header{max-width:1200px; margin:0 auto 16px auto;}
-    h1{margin:0 0 6px 0; font-size:20px; letter-spacing:.2px}
-    .sub{margin:0; color:var(--muted); font-size:13px; line-height:1.35}
-    .card{
-      background:rgba(17,24,39,.92);
-      border:1px solid var(--stroke);
-      border-radius:14px;
-      box-shadow:0 14px 40px rgba(0,0,0,.35);
-      overflow:hidden;
-    }
-    .card .hd{
-      padding:14px 14px 12px 14px;
-      border-bottom:1px solid var(--stroke);
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
-    .hd h2{margin:0; font-size:14px; font-weight:650; letter-spacing:.2px}
-    /* Updated Actions bar for more buttons */
-    .actions{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; align-items:center}
+
+    * { box-sizing: border-box; }
     
-    button{
-      appearance:none; border:1px solid var(--stroke);
-      background:var(--field); color:var(--text);
-      padding:8px 10px; border-radius:10px;
-      font-size:12px; cursor:pointer;
+    body {
+      margin: 0; padding: 30px;
+      background: linear-gradient(135deg, #05010a 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
     }
-    button:hover{border-color:#2f4369}
-    button.primary{border-color:rgba(96,165,250,.55); background:rgba(96,165,250,.12)}
-    button.good{border-color:rgba(52,211,153,.55); background:rgba(52,211,153,.12)}
+
+    .wrap {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; gap: 24px; grid-template-columns: 420px 1fr;
+      animation: fadeIn 0.8s ease-out;
+    }
+    @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } }
+
+    /* Header: Welcoming and Special */
+    header {
+      max-width: 1200px; margin: 0 auto 24px auto;
+      text-align: center;
+      padding: 20px 0;
+    }
+    h1 {
+      margin: 0 0 8px 0; 
+      font-size: 32px; 
+      font-weight: 800;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .sub {
+      color: var(--text); opacity: 0.8; font-size: 15px; max-width: 600px; margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(26, 11, 46, 0.85); /* Glassy panel */
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: 0 12px 40px rgba(0, 240, 255, 0.05); /* Subtle cyan glow */
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+
+    .hd {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--stroke);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: rgba(0,0,0,0.2);
+    }
+    .hd h2 {
+      margin: 0; font-size: 15px; font-weight: 700; 
+      color: var(--secondary); text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    /* Action Buttons */
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+
+    button {
+      appearance: none; border: 1px solid var(--stroke);
+      background: var(--field); color: var(--text);
+      padding: 8px 12px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--text);
+      transform: translateY(-1px);
+    }
     
-    .bd{padding:14px}
-    .grid{display:grid; gap:12px}
-    .field label{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      font-size:12px; color:var(--muted); margin-bottom:6px;
+    /* Primary Action (Cyan) */
+    button.primary {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
     }
-    .req{color:#fca5a5; font-size:11px}
-    select, textarea, input[type="text"], input[type="number"]{
-      width:100%;
-      background:var(--field);
-      color:var(--text);
-      border:1px solid var(--stroke);
-      border-radius:10px;
-      padding:10px 10px;
-      font-size:13px;
-      outline:none;
+    button.primary:hover {
+      background: var(--primary); color: #000;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
     }
-    select:focus, textarea:focus, input[type="text"]:focus{border-color:rgba(96,165,250,.75); box-shadow:0 0 0 3px rgba(96,165,250,.12)}
-    textarea{min-height:120px; resize:vertical; line-height:1.35}
-    .help{margin-top:6px; color:var(--muted); font-size:12px; line-height:1.35}
-    .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
-    .chip{
-      background:var(--chip);
-      border:1px solid var(--stroke);
-      border-radius:999px;
-      padding:6px 9px;
-      font-size:11px;
-      color:var(--muted);
+
+    /* Secondary Action (Magenta/Pink - "Good" actions) */
+    button.good {
+      background: rgba(255, 0, 153, 0.15);
+      border-color: var(--secondary);
+      color: var(--secondary);
     }
-    .chip b{color:var(--text); font-weight:650}
-    .split{
-      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
+    button.good:hover {
+      background: var(--secondary); color: white;
+      box-shadow: 0 0 20px rgba(255, 0, 153, 0.4);
     }
-    @media (max-width: 520px){ .split{grid-template-columns: 1fr;} }
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-    .note{color:var(--muted); font-size:12px; margin-top:10px; line-height:1.35}
-    .small{font-size:11px; color:var(--muted)}
-    .toast{
-      position:fixed; right:18px; bottom:18px;
-      background:#0b1222; border:1px solid #22304a; color:var(--text);
-      padding:10px 12px; border-radius:12px; font-size:12px;
-      opacity:0; transform:translateY(8px); pointer-events:none;
-      transition: opacity .18s ease, transform .18s ease;
-      max-width:360px;
-    }
-    .toast.show{opacity:1; transform:translateY(0)}
+
+    /* Inputs & Layout */
+    .bd { padding: 20px; }
+    .grid { display: grid; gap: 16px; }
     
-    /* Control grouping styles */
+    .field label {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      font-size: 12px; color: var(--muted); margin-bottom: 8px; font-weight: 500;
+    }
+    
+    select, textarea, input[type="text"], input[type="number"] {
+      width: 100%;
+      background: var(--field);
+      color: var(--text);
+      border: 1px solid var(--stroke);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    select:focus, textarea:focus, input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+    }
+    
+    .help { margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.4; font-style: italic;}
+    
+    /* Chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .chip {
+      background: var(--chip-bg);
+      border: 1px solid var(--stroke);
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      border-left: 2px solid var(--tertiary); /* Yellow accent */
+    }
+    .chip b { color: var(--tertiary); font-weight: 600; margin-left: 4px; }
+
+    /* Outputs */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px){ .split { grid-template-columns: 1fr; } }
+    .mono { 
+      font-family: 'Menlo', 'Consolas', monospace; 
+      font-size: 12px; line-height: 1.5; color: #d4d4d4; 
+    }
+    textarea[readonly] { background: rgba(0,0,0,0.3); border-color: transparent; }
+
+    /* Controls Group (Number input + Btn) */
     .rnd-group {
-      display:inline-flex; gap:4px; align-items:center; 
-      background:var(--field); border:1px solid var(--stroke); 
-      border-radius:10px; padding:2px 4px 2px 8px;
+      display: inline-flex; gap: 4px; align-items: center; 
+      background: var(--field); border: 1px solid var(--stroke); 
+      border-radius: 8px; padding: 3px 4px 3px 8px;
     }
     .rnd-group input { 
-      border:none; background:transparent; width:30px; padding:0; height:auto; text-align:center; color:var(--accent);
+      border: none; background: transparent; width: 34px; padding: 0; 
+      height: auto; text-align: center; color: var(--tertiary); font-weight: bold;
     }
     .rnd-group button {
-      border:none; background:transparent; padding:4px 8px; color:var(--text); font-size:11px; border-radius:6px;
+      border: none; background: transparent; padding: 6px 8px; 
+      color: var(--text); font-size: 11px; margin: 0; box-shadow: none;
     }
-    .rnd-group button:hover { background:rgba(255,255,255,0.05); }
+    .rnd-group button:hover { background: rgba(255,255,255,0.1); color: #fff; transform: none; }
+
+    /* Custom Checkbox Toggle */
+    .toggle-label {
+      cursor: pointer; display: flex; align-items: center; gap: 6px; 
+      font-size: 11px; color: var(--primary); font-weight: 600;
+      user-select: none;
+      background: rgba(0, 240, 255, 0.05);
+      padding: 4px 8px; border-radius: 4px; border: 1px solid transparent;
+    }
+    .toggle-label:hover { border-color: rgba(0, 240, 255, 0.3); }
+    .toggle-label input { accent-color: var(--primary); }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed; right: 24px; bottom: 24px;
+      background: var(--secondary); color: #fff;
+      padding: 12px 20px; border-radius: 8px; font-weight: 600;
+      box-shadow: 0 10px 30px rgba(255, 0, 153, 0.4);
+      opacity: 0; transform: translateY(10px); pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Prompt Builder</h1>
+    <h1>Universe Builder</h1>
     <p class="sub">
-      Pick one option per category, then copy the generated prompt (spec + condensed prompt).
+      Welcome, Creator. You are the architect of this reality. <br>
+      Select your parameters below to generate something magnificent.
     </p>
   </header>
 
   <div class="wrap">
+    <!-- FILTER CARD -->
     <section class="card" id="builderCard">
       <div class="hd">
-        <h2>Filters</h2>
+        <h2>Parameters</h2>
         <div class="actions">
-          <!-- 1) Standard Randomize (Filters by Checkbox) -->
+          <!-- 1) Standard Randomize -->
           <button id="randomizeBtn" class="primary" title="Randomize only checked categories">Randomize Checked</button>
           
           <!-- 2) Random (N) Button -->
-          <div class="rnd-group">
+          <div class="rnd-group" title="Pick exactly N categories (only from checked)">
              <input type="number" id="rndCountInput" value="3" min="1" max="20">
-             <button id="rndCountBtn" title="Pick exactly N random categories">Rand(N)</button>
+             <button id="rndCountBtn">Rand(N)</button>
           </div>
 
           <!-- 3) Random (4-7) Button -->
-          <button id="rndRangeBtn" class="good" title="Pick 4 to 7 random categories">Rand(4-7)</button>
+          <button id="rndRangeBtn" class="primary" title="Pick 4 to 7 random categories (only from checked)">Rand(4-7)</button>
 
-          <div style="width:1px; height:20px; background:var(--stroke); margin:0 2px;"></div>
+          <div style="width:1px; height:20px; background:var(--stroke); margin:0 4px;"></div>
 
           <button id="resetBtn" title="Clear selections">Reset</button>
-          <!-- Removed individual copy buttons to save space, keeping Copy All below -->
         </div>
       </div>
       <div class="bd">
         <div class="grid" id="form"></div>
 
-        <div class="field" style="margin-top:14px">
+        <div class="field" style="margin-top:24px; border-top:1px solid var(--stroke); padding-top:16px;">
           <label>
-            Extra notes (optional)
-            <span class="small">Appends to both outputs</span>
+            <span style="color:var(--tertiary)">Extra Directives (Optional)</span>
+            <span style="font-size:10px; opacity:0.6">Appends to final output</span>
           </label>
-          <textarea id="extraNotes" placeholder="Add any extra constraints: camera, lens, negatives, composition, aspect ratio, etc."></textarea>
-          <div class="help">Tip: use this for one-off tweaks without changing the structured selections.</div>
+          <textarea id="extraNotes" placeholder="Add specific constraints: camera angles, lighting specificities, aspect ratios, or magical rules..."></textarea>
         </div>
 
         <div class="chips" id="chips"></div>
       </div>
     </section>
 
+    <!-- OUTPUT CARD -->
     <section class="card">
       <div class="hd">
-        <h2>Generated Output</h2>
+        <h2>Reality Output</h2>
         <div class="actions">
-          <button id="copyPromptBtn">Copy Prompt</button>
-          <button id="copyAllBtn" class="good" title="Copy spec + prompt">Copy All</button>
+           <!-- Consolidated Copy Buttons -->
+           <button id="copyAllBtn" class="good" title="Copy everything">Copy All</button>
         </div>
       </div>
       <div class="bd">
         <div class="split">
           <div class="field">
-            <label>Spec (human-readable)</label>
+            <label>
+                <span>Spec Sheet</span>
+                <!-- SPECIFIC COPY BUTTON FOR SPEC -->
+                <button id="copySpecBtn" style="padding:2px 8px; font-size:10px; margin-left:auto">Copy Spec</button>
+            </label>
             <textarea id="specOut" class="mono" readonly></textarea>
           </div>
           <div class="field">
-            <label>Condensed prompt</label>
+            <label>
+                <span>Condensed Prompt</span>
+                <button id="copyPromptBtn" style="padding:2px 8px; font-size:10px; margin-left:auto">Copy Prompt</button>
+            </label>
             <textarea id="promptOut" class="mono" readonly></textarea>
           </div>
         </div>
@@ -180,16 +303,18 @@
     </section>
   </div>
 
-  <div class="toast" id="toast">Copied.</div>
+  <div class="toast" id="toast">Captured! The universe awaits.</div>
 
 <script>
 /**
+ * -----------------------------------------------------------
  * CONFIGURATION
- * PASTE YOUR FULL OPTIONS LIST BACK INTO THE CATEGORIES BELOW
+ * PASTE YOUR ORIGINAL DATA BELOW WHERE INDICATED
+ * -----------------------------------------------------------
  */
 const CONFIG = {
-  version: "1.1",
-  generator_name: "Prompt Builder",
+  version: "2.0 Cosmic",
+  generator_name: "Universe Builder",
   categories: [
     {
       key: "archetype",
@@ -198,22 +323,30 @@ const CONFIG = {
       required: true,
       multi: false,
       options: [
+        // --- PASTE YOUR 'ARCHETYPE' OPTIONS HERE ---
         { value:"an artist", label:"Artist", description:"an artist who extremely into their art and top in the world." },
         { value:"vaca influencer", label:"Vacation Lifestyle Influencer", description:"Vacation Lifestyle Influencer." },
-        // ... PASTE THE REST OF YOUR 'ARCHETYPE' OPTIONS HERE ...
-        { value:"quirky_alien_character", label:"Quirky alien character", description:"A practical effects monster performer in a cosplay showcase." }
+        { value:"minimalist_light_sculpture", label:"Minimalist Light Sculpture", description:"An experiential architectural pavilion and contemporary light installation." },
+        { value:"eccentric_fashion_outsider", label:"Eccentric Fashion Outsider", description:"Surrealist dandy and oddball sophisticate; a Wes Anderson-style character." },
+        { value:"art_deco_android", label:"Art Deco Android", description:"Luxury cyborg and streamline moderne automaton; a 1920s-30s retro-futurist mannequin." },
+        { value:"wasteland_scavenger", label:"Wasteland Scavenger", description:"Post-apocalyptic survivor and weathered explorer; a dieselpunk spacefarer in ruins." },
+        { value:"desert_wanderer", label:"Desert Wanderer", description:"Rugged frontier icon and southwestern rancher; a stylized vaquero." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
       key: "species",
       label: "Species / Being Type",
-      description: "What the subject literally is.",
+      description: "What the subject literally is (human, android, creature, etc).",
       required: true,
       multi: false,
       options: [
-        { value:"human_machine_hybrid_male", label:"Human-machine hybrid", description:"A cybernetic male figure integrated with clockwork." },
-         // ... PASTE THE REST OF YOUR 'SPECIES' OPTIONS HERE ...
-        { value:"Sentient_Dessert_Creatures", label:"Sentient Dessert Creatures", description:"Sentient Dessert Creatures" }
+        // --- PASTE YOUR 'SPECIES' OPTIONS HERE ---
+        { value:"human_machine_hybrid_male", label:"Human-machine hybrid or android", description:"A cybernetic male figure integrated with clockwork." },
+        { value:"mythological_female", label:"Mythological creature", description:"A female Mythological character" },
+        { value:"inanimate_installation_with_scale_figure", label:"N/A (Inanimate architectural installation)", description:"Includes a human figure in a winter coat for scale." },
+        { value:"maritime_couture_muse", label:"Maritime Couture Muse", description:"Ocean goddess and sea queen; a nature-adorned high-fashion icon." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
@@ -223,21 +356,25 @@ const CONFIG = {
       required: true,
       multi: false,
       options: [
+        // --- PASTE YOUR 'GENRE' OPTIONS HERE ---
         { value:"Corporate_Mysticism", label:"Corporate Mysticism", description:"Corporate Mysticism: Late-Stage Capitalism Meets Magic." },
-         // ... PASTE THE REST OF YOUR 'GENRE' OPTIONS HERE ...
-        { value:"Bureaucratic_Fantasy", label:"Bureaucratic Fantasy", description:"Bureaucratic Fantasy" }
+        { value:"Cozy_Apocalypse", label:"Cozy Apocalypse", description:"Cozy Apocalypse The World Ended But We’re Vibing." },
+        { value:"contemporary_minimalist_art", label:"Contemporary minimalist art", description:"Experiential urban design and public light installations." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
       key: "medium",
       label: "Art Medium / Rendering Mode",
-      description: "How it’s rendered: photo, 3D, illustration, etc.",
+      description: "How it’s rendered: photo, 3D, illustration, printmaking, etc.",
       required: true,
       multi: false,
       options: [
-        { value:"3d_relief_physical", label:"High-detail 3D relief", description:"Photorealistic material physics; sculptural relief." },
-         // ... PASTE THE REST OF YOUR 'MEDIUM' OPTIONS HERE ...
-        { value:"vertical_practical_fx_video", label:"Vertical practical FX video", description:"Practical makeup/prosthetics; no digital VFX." }
+        // --- PASTE YOUR 'MEDIUM' OPTIONS HERE ---
+        { value:"3d_relief_physical", label:"High-detail 3D render (relief metalwork)", description:"Photorealistic material physics; sculptural relief with ornate metalwork." },
+        { value:"cinematic_3d_vfx", label:"Cinematic 3D render (creature VFX)", description:"Film-quality VFX; practical effects aesthetic focused on creature design." },
+        { value:"architectural_photo_or_viz", label:"Architectural photography / 3D viz", description:"Clean, minimal fine-art documentation." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
@@ -247,9 +384,10 @@ const CONFIG = {
       required: true,
       multi: false,
       options: [
-        { value:"Alien_dollface", label:"Alien dollface", description:"Glossy wet skin, high-contrast contour." },
-         // ... PASTE THE REST OF YOUR 'HEAD' OPTIONS HERE ...
-        { value:"alien_mask_grotesque", label:"Grotesque alien mask", description:"Massive black eyes; turquoise skin; crooked yellow teeth." }
+        // --- PASTE YOUR 'HEAD' OPTIONS HERE ---
+        { value:"Alien_dollface", label:"Alien dollface", description:"(prosthetic brow ridge + huge black eyes); glossy wet skin, high-contrast contour." },
+        { value:"Cyber_Sigilism", label:"Cyber Sigilism face-map", description:"symmetrical black chrome linework/sigils around eyes and cheeks." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
@@ -259,9 +397,10 @@ const CONFIG = {
       required: true,
       multi: false,
       options: [
-        { value:"ceremonial_gear_armor", label:"Ceremonial body-armor", description:"Weathered teal-patina mandarin collar." },
-         // ... PASTE THE REST OF YOUR 'OUTFIT' OPTIONS HERE ...
-        { value:"clown_collar", label:"Bubblegum-pink collar", description:"Over textured multicolored garment." }
+        // --- PASTE YOUR 'OUTFIT' OPTIONS HERE ---
+        { value:"ceremonial_gear_armor", label:"Ceremonial body-armor fused to body", description:"Weathered teal-patina mandarin collar; chest plate of gears and symbols." },
+        { value:"installation_coat_scale", label:"Scale figure winter coat", description:"Dark, stark winter coat." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
@@ -271,9 +410,10 @@ const CONFIG = {
       required: true,
       multi: false,
       options: [
+        // --- PASTE YOUR 'MATERIALS' OPTIONS HERE ---
         { value:"verdigris_metal", label:"Aged copper/brass verdigris", description:"Engraved metal with Art Nouveau flowing lines." },
-         // ... PASTE THE REST OF YOUR 'MATERIALS' OPTIONS HERE ...
-        { value:"prosthetics_silicone_latex", label:"Silicone/latex prosthetics", description:"Wet organic prosthetics vs dry fabric." }
+        { value:"skin_scales_real", label:"Realistic skin + wet serpent scales", description:"Subsurface scattering; pores; glistening scales." },
+        // ... (Paste remaining items) ...
       ]
     },
     {
@@ -283,9 +423,10 @@ const CONFIG = {
       required: true,
       multi: false,
       options: [
+        // --- PASTE YOUR 'POSE' OPTIONS HERE ---
         { value:"hieratic_frontal", label:"Hieratic frontal", description:"Static statue-like authority; arms rigid at sides." },
-         // ... PASTE THE REST OF YOUR 'POSE' OPTIONS HERE ...
-        { value:"op_art_confrontation", label:"Frontal confrontation", description:"Direct gaze."}
+        { value:"concealed_profile_snakes", label:"Concealed profile + writhing serpents", description:"One eye piercing; serpents in motion." },
+        // ... (Paste remaining items) ...
       ]
     }
   ]
@@ -293,7 +434,7 @@ const CONFIG = {
 
 // ---- App State ----
 const state = {
-  selections: {}, // map of category_key -> selected_value
+  selections: {}, 
   extraNotes: ""
 };
 
@@ -315,9 +456,10 @@ const el = (tag, props={}, children=[]) => {
 
 const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-// ---- Core Logic ----
-
-// 1. Build the dynamic form with Checkboxes
+/**
+ * 1. BUILD FORM
+ * Creates dropdowns + "Include" checkboxes.
+ */
 function buildForm() {
   $form.innerHTML = "";
 
@@ -328,14 +470,14 @@ function buildForm() {
     const $chk = el("input", { type:"checkbox", class:"rnd-include", "data-key":cat.key });
     $chk.checked = true; // Default to included
 
-    const $chkLabel = el("label", { style:"display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--accent); font-size:11px; margin:0;" }, [
+    const $chkLabel = el("label", { class:"toggle-label" }, [
         $chk,
         document.createTextNode("Include")
     ]);
 
     // Label Row
     const $labelRow = el("div", { style:"display:flex; justify-content:space-between; align-items:center; margin-bottom:6px" }, [
-      el("span", { style:"font-size:12px; color:var(--muted); font-weight:600" }, [ document.createTextNode(cat.label) ]),
+      el("span", { style:"font-size:13px; color:var(--text); font-weight:700" }, [ document.createTextNode(cat.label) ]),
       $chkLabel
     ]);
 
@@ -347,7 +489,6 @@ function buildForm() {
       $select.appendChild(o);
     }
 
-    // Change listener
     $select.addEventListener("change", () => {
       state.selections[cat.key] = $select.value;
       renderAll();
@@ -358,15 +499,11 @@ function buildForm() {
     const $field = el("div", { class:"field" }, [ $labelRow, $select, $help ]);
     $form.appendChild($field);
   }
-
-  // Initial populate (if something is already in state, though typically empty on load)
-  for (const cat of CONFIG.categories) {
-    const sel = document.getElementById(`sel_${cat.key}`);
-    if (sel && state.selections[cat.key]) sel.value = state.selections[cat.key];
-  }
 }
 
-// 2. Render Outputs (Spec + Prompt)
+/**
+ * 2. RENDER OUTPUTS
+ */
 function renderAll() {
   const specLines = [];
   const promptParts = [];
@@ -381,8 +518,7 @@ function renderAll() {
         specLines.push(`${cat.label}: ${opt.label}`);
         specLines.push(`  → ${opt.description}`);
         
-        // Prompt format: usually just description or value. 
-        // Using description provides more flavor for image gen.
+        // Prompt format (Using description for maximum flavor)
         promptParts.push(opt.description);
         
         // Chips
@@ -392,7 +528,7 @@ function renderAll() {
   }
 
   if (state.extraNotes.trim()) {
-    specLines.push(`\nNotes: ${state.extraNotes}`);
+    specLines.push(`\n[Directives]: ${state.extraNotes}`);
     promptParts.push(state.extraNotes);
   }
 
@@ -410,26 +546,32 @@ function renderAll() {
   });
 }
 
-// 3. New Randomization Logic for "Random (N)"
+/**
+ * 3. NEW LOGIC: RANDOMIZE SUBSET + INCLUDE CHECK
+ * Allows randomizing N categories, but ONLY from the ones marked 'Include'.
+ */
 function randomizeSubset(count) {
-  // Reset all
-  state.selections = {};
-  
-  // Create a pool of all categories
-  const allCats = [...CONFIG.categories];
-  
-  // Shuffle the pool (Fisher-Yates)
-  for (let i = allCats.length - 1; i > 0; i--) {
+  state.selections = {}; // Clear previous selections
+
+  // A. Filter categories: Must be in CONFIG *and* checkbox must be checked
+  const eligibleCats = CONFIG.categories.filter(cat => {
+    const chk = document.querySelector(`.rnd-include[data-key="${cat.key}"]`);
+    return chk && chk.checked;
+  });
+
+  // B. Shuffle the eligible pool
+  const shuffled = [...eligibleCats];
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [allCats[i], allCats[j]] = [allCats[j], allCats[i]];
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  // Pick top N
-  const targetCats = allCats.slice(0, count);
+  // C. Pick top N (or fewer if we don't have enough included categories)
+  const targetCats = shuffled.slice(0, count);
 
-  // Assign random values to those N, clear others
+  // D. Assign values
   for (const cat of CONFIG.categories) {
-    // Is this category in our target list?
+    // Only assign if it was picked in our target list
     if (targetCats.includes(cat)) {
        const opt = randomPick(cat.options);
        state.selections[cat.key] = opt.value;
@@ -437,13 +579,15 @@ function randomizeSubset(count) {
        state.selections[cat.key] = "";
     }
     
-    // Update the dropdown UI
+    // Sync UI
     const sel = document.getElementById(`sel_${cat.key}`);
     if (sel) sel.value = state.selections[cat.key];
   }
 
   renderAll();
-  showToast(`Randomized ${count} categories.`);
+  
+  const msgCount = Math.min(count, eligibleCats.length);
+  showToast(`Manifested ${msgCount} attributes.`);
 }
 
 // ---- Event Listeners ----
@@ -461,22 +605,22 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     const sel = document.getElementById(`sel_${cat.key}`);
     if(sel) sel.value = "";
   }
-  
   renderAll();
-  showToast("Reset.");
+  showToast("Reality Reset.");
 });
 
-// RANDOMIZE (Standard - respects checkboxes)
+// 1) RANDOMIZE CHECKED
 document.getElementById("randomizeBtn").addEventListener("click", () => {
+  let count = 0;
   for (const cat of CONFIG.categories) {
     const chk = document.querySelector(`.rnd-include[data-key="${cat.key}"]`);
     
-    // Only pick if checkbox exists and is checked
+    // Only pick if checkbox is checked
     if (chk && chk.checked) {
       const opt = randomPick(cat.options);
       state.selections[cat.key] = opt?.value || "";
+      count++;
     } else {
-      // If unchecked, deselect it
       state.selections[cat.key] = "";
     }
 
@@ -484,31 +628,38 @@ document.getElementById("randomizeBtn").addEventListener("click", () => {
     if (sel) sel.value = state.selections[cat.key];
   }
   renderAll();
-  showToast("Randomized (Checked Only).");
+  showToast(`Randomized ${count} categories.`);
 });
 
-// RANDOM (N)
+// 2) RANDOM (N)
 document.getElementById("rndCountBtn").addEventListener("click", () => {
   const val = parseInt(document.getElementById("rndCountInput").value) || 3;
   randomizeSubset(val);
 });
 
-// RANDOM (4-7)
+// 3) RANDOM (4-7)
 document.getElementById("rndRangeBtn").addEventListener("click", () => {
   const min = 4;
   const max = 7;
-  // random integer between min and max (inclusive)
   const count = Math.floor(Math.random() * (max - min + 1)) + min;
   randomizeSubset(count);
 });
 
-// Copy Buttons
+// COPY Buttons
 document.getElementById("copyPromptBtn").addEventListener("click", () => {
-  copyText($promptOut.value);
+  if(!$promptOut.value) return;
+  navigator.clipboard.writeText($promptOut.value).then(() => showToast("Prompt Captured!"));
+});
+
+document.getElementById("copySpecBtn").addEventListener("click", () => {
+  if(!$specOut.value) return;
+  navigator.clipboard.writeText($specOut.value).then(() => showToast("Spec Sheet Captured!"));
 });
 
 document.getElementById("copyAllBtn").addEventListener("click", () => {
-  copyText($specOut.value + "\n\n---\n\n" + $promptOut.value);
+  if(!$specOut.value) return;
+  const fullText = $specOut.value + "\n\n---\n\n" + $promptOut.value;
+  navigator.clipboard.writeText(fullText).then(() => showToast("Full Reality Captured!"));
 });
 
 // Notes Listener
@@ -521,16 +672,10 @@ $extraNotes.addEventListener("input", () => {
 function showToast(msg) {
   $toast.textContent = msg;
   $toast.classList.add("show");
-  setTimeout(() => $toast.classList.remove("show"), 2000);
+  setTimeout(() => $toast.classList.remove("show"), 2500);
 }
 
-// Copy Helper
-function copyText(txt) {
-  if (!txt) return;
-  navigator.clipboard.writeText(txt).then(() => showToast("Copied to clipboard!"));
-}
-
-// ---- Init ----
+// Init
 buildForm();
 renderAll();
 
