@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Universe Builder | Pure Tags</title>
+  <title>Universe Builder | Flow</title>
   <style>
     /* 
        THEME: "Cosmic Creator" 
@@ -41,17 +41,15 @@
     }
 
     .wrap {
-      max-width: 1200px; margin: 0 auto;
-      display: grid; gap: 24px; grid-template-columns: 420px 1fr;
+      max-width: 800px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 24px;
       animation: fadeIn 0.8s ease-out;
     }
-    @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } }
 
     /* Header */
     header {
-      max-width: 1200px; margin: 0 auto 24px auto;
       text-align: center;
-      padding: 20px 0;
+      padding: 10px 0 20px 0;
     }
     h1 {
       margin: 0 0 8px 0; 
@@ -77,31 +75,35 @@
       backdrop-filter: blur(10px);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .card:hover {
-      box-shadow: 0 12px 40px rgba(0, 240, 255, 0.05); /* Subtle cyan  */
-      border-color: rgba(0, 240, 255, 0.3);
-    }
-
+    
     .hd {
       padding: 16px 20px;
       border-bottom: 1px solid var(--stroke);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      display: flex; flex-direction: column; gap: 16px;
       background: rgba(0,0,0,0.2);
+    }
+    .hd-top {
+        display: flex; justify-content: space-between; align-items: center; width: 100%;
     }
     .hd h2 {
       margin: 0; font-size: 15px; font-weight: 700; 
       color: var(--secondary); text-transform: uppercase; letter-spacing: 1px;
     }
 
-    /* Action Buttons */
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+    /* Action Buttons Area */
+    .actions { 
+        display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; 
+        width: 100%;
+        padding-top: 4px;
+    }
 
     button {
       appearance: none; border: 1px solid var(--stroke);
       background: var(--field); color: var(--text);
-      padding: 8px 12px; border-radius: 8px;
-      font-size: 12px; font-weight: 600; cursor: pointer;
+      padding: 10px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
       transition: all 0.2s;
+      flex-grow: 1; text-align: center;
     }
     button:hover {
       background: rgba(255,255,255,0.1);
@@ -172,28 +174,37 @@
     }
     .chip b { color: var(--tertiary); font-weight: 600; margin-left: 4px; }
 
-    /* Outputs */
+    /* Results Section (Now inside the flow) */
+    .results-area {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--stroke);
+    }
     .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 520px){ .split { grid-template-columns: 1fr; } }
+    @media (max-width: 600px){ .split { grid-template-columns: 1fr; } }
     .mono { 
       font-family: 'Menlo', 'Consolas', monospace; 
       font-size: 12px; line-height: 1.5; color: #d4d4d4; 
+      min-height: 150px;
     }
-    textarea[readonly] { background: rgba(0,0,0,0.3); border-color: transparent; }
+    textarea[readonly] { background: rgba(0,0,0,0.3); border-color: var(--stroke); }
 
     /* Controls Group (Number input + Btn) */
     .rnd-group {
-      display: inline-flex; gap: 4px; align-items: center; 
+      display: flex; gap: 0; align-items: stretch; 
       background: var(--field); border: 1px solid var(--stroke); 
-      border-radius: 8px; padding: 3px 4px 3px 8px;
+      border-radius: 8px; overflow: hidden;
+      flex-grow: 1;
     }
     .rnd-group input { 
-      border: none; background: transparent; width: 34px; padding: 0; 
+      border: none; background: transparent; width: 40px; padding: 0; 
       height: auto; text-align: center; color: var(--tertiary); font-weight: bold;
+      border-right: 1px solid var(--stroke);
     }
     .rnd-group button {
-      border: none; background: transparent; padding: 6px 8px; 
-      color: var(--text); font-size: 11px; margin: 0; box-shadow: none;
+      border: none; background: transparent; padding: 10px 12px; 
+      color: var(--text); font-size: 13px; margin: 0; box-shadow: none;
+      flex-grow: 1; border-radius: 0;
     }
     .rnd-group button:hover { background: rgba(255,255,255,0.1); color: #fff; transform: none; }
 
@@ -229,16 +240,22 @@
   <header>
     <h1>Universe Builder</h1>
     <p class="sub">
-      Welcome, Creator. You are the architect of this reality. <br>
-      Select your parameters below to generate something magnificent.
+      Select your parameters. Your prompt is copied automatically upon creation.
     </p>
   </header>
 
   <div class="wrap">
-    <!-- FILTER CARD -->
+    
+    <!-- MAIN CARD: Controls + Output -->
     <section class="card" id="builderCard">
+      
+      <!-- CONTROLS HEADER -->
       <div class="hd">
-        <h2>Parameters</h2>
+        <div class="hd-top">
+             <h2>Generators</h2>
+             <button id="resetBtn" style="width: auto; padding: 6px 12px; font-size: 11px; flex-grow: 0;">Reset</button>
+        </div>
+        
         <div class="actions">
           <!-- 1) Standard Randomize -->
           <button id="randomizeBtn" class="primary" title="Randomize only checked categories">Randomize Checked</button>
@@ -251,13 +268,35 @@
 
           <!-- 3) Random (4-7) Button -->
           <button id="rndRangeBtn" class="primary" title="Pick 4 to 7 random categories (only from checked)">Rand(4-7)</button>
-
-          <div style="width:1px; height:20px; background:var(--stroke); margin:0 4px;"></div>
-
-          <button id="resetBtn" title="Clear selections">Reset</button>
+        </div>
+        
+        <div style="text-align: center;">
+            <button id="copyAllBtn" class="good" style="width: 100%;" title="Copy everything manually">Copy All to Clipboard</button>
         </div>
       </div>
+
+      <!-- RESULTS AREA (MOVED UP) -->
+      <div class="bd" style="background: rgba(0,0,0,0.2); padding-bottom: 10px;">
+        <div class="split">
+          <div class="field">
+            <label>
+                <span>Spec Sheet</span>
+            </label>
+            <textarea id="specOut" class="mono" readonly placeholder="Output will appear here..."></textarea>
+          </div>
+          <div class="field">
+            <label>
+                <span>Condensed Prompt</span>
+            </label>
+            <textarea id="promptOut" class="mono" readonly placeholder="Prompt will appear here..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM PARAMETERS -->
       <div class="bd">
+        <h3 style="margin-top:0; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;">Detailed Settings</h3>
+        
         <div class="grid" id="form"></div>
 
         <div class="field" style="margin-top:24px; border-top:1px solid var(--stroke); padding-top:16px;">
@@ -272,33 +311,6 @@
       </div>
     </section>
 
-    <!-- OUTPUT CARD -->
-    <section class="card">
-      <div class="hd">
-        <h2>Reality Output</h2>
-        <div class="actions">
-           <button id="copyAllBtn" class="good" title="Copy everything">Copy All</button>
-        </div>
-      </div>
-      <div class="bd">
-        <div class="split">
-          <div class="field">
-            <label>
-                <span>Spec Sheet</span>
-                <button id="copySpecBtn" style="padding:2px 8px; font-size:10px; margin-left:auto">Copy Spec</button>
-            </label>
-            <textarea id="specOut" class="mono" readonly></textarea>
-          </div>
-          <div class="field">
-            <label>
-                <span>Condensed Prompt</span>
-                <button id="copyPromptBtn" style="padding:2px 8px; font-size:10px; margin-left:auto">Copy Prompt</button>
-            </label>
-            <textarea id="promptOut" class="mono" readonly></textarea>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
 
   <div class="toast" id="toast">Captured! The universe awaits.</div>
@@ -311,7 +323,7 @@
  * -----------------------------------------------------------
  */
 const CONFIG = {
-  version: "2.1 NoDesc",
+  version: "3.0 AutoCopy",
   generator_name: "Universe Builder",
   categories: [
     {
@@ -634,7 +646,7 @@ const CONFIG = {
         { value:"commercial_hand_on_hip", label:"Commercial model pose", description:"Hand on hip; weight shifted." },
         { value:"woo_girl_stride", label:"Celebration mid-stride", description:"Arms raised; 'woo-girl' energy." },
         { value:"fx_showcase_frontal", label:"Frontal showcase", description:"Static to show costume details." }
-     ]
+    ]
     }
   ]
 };
@@ -663,6 +675,8 @@ const el = (tag, props={}, children=[]) => {
 
 const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+// ---- LOGIC ----
+
 /**
  * 1. BUILD FORM
  * Creates dropdowns + "Include" checkboxes.
@@ -676,6 +690,16 @@ function buildForm() {
     // CHECKBOX: "Include" toggle
     const $chk = el("input", { type:"checkbox", class:"rnd-include", "data-key":cat.key });
     $chk.checked = true; // Default to included
+
+    // EVENT: Unchecking immediately clears the result for this category
+    $chk.addEventListener("change", () => {
+        if(!$chk.checked) {
+            state.selections[cat.key] = ""; // Clear selection
+            const sel = document.getElementById(`sel_${cat.key}`);
+            if(sel) sel.value = "";
+            renderAll(); // Update prompt immediately
+        }
+    });
 
     const $chkLabel = el("label", { class:"toggle-label" }, [
         $chk,
@@ -710,7 +734,7 @@ function buildForm() {
 
 /**
  * 2. RENDER OUTPUTS
- * UPDATED: Removes all "description" text from the final output boxes.
+ * Removing descriptions from final output as requested previously.
  */
 function renderAll() {
   const specLines = [];
@@ -719,13 +743,18 @@ function renderAll() {
 
   for (const cat of CONFIG.categories) {
     const val = state.selections[cat.key];
-    if (val) {
+    
+    // Only process if selected AND if the checkbox is checked (double safety)
+    const chk = document.querySelector(`.rnd-include[data-key="${cat.key}"]`);
+    const isIncluded = chk ? chk.checked : true;
+
+    if (val && isIncluded) {
       const opt = cat.options.find(o => o.value === val);
       if (opt) {
-        // Spec format: Category: Selected Item Name (No description)
+        // Spec format: Category: Selected Item Name
         specLines.push(`${cat.label}: ${opt.label}`);
         
-        // Prompt format: Selected Item Name (No description)
+        // Prompt format: Selected Item Name only
         promptParts.push(opt.label);
         
         // Chips
@@ -754,31 +783,29 @@ function renderAll() {
 }
 
 /**
- * 3. NEW LOGIC: RANDOMIZE SUBSET + INCLUDE CHECK
- * Allows randomizing N categories, but ONLY from the ones marked 'Include'.
+ * 3. RANDOMIZE SUBSET + AUTO COPY
  */
 function randomizeSubset(count) {
   state.selections = {}; // Clear previous selections
 
-  // A. Filter categories: Must be in CONFIG *and* checkbox must be checked
+  // A. Filter categories
   const eligibleCats = CONFIG.categories.filter(cat => {
     const chk = document.querySelector(`.rnd-include[data-key="${cat.key}"]`);
     return chk && chk.checked;
   });
 
-  // B. Shuffle the eligible pool
+  // B. Shuffle
   const shuffled = [...eligibleCats];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  // C. Pick top N (or fewer if we don't have enough included categories)
+  // C. Pick top N
   const targetCats = shuffled.slice(0, count);
 
   // D. Assign values
   for (const cat of CONFIG.categories) {
-    // Only assign if it was picked in our target list
     if (targetCats.includes(cat)) {
        const opt = randomPick(cat.options);
        state.selections[cat.key] = opt.value;
@@ -793,8 +820,17 @@ function randomizeSubset(count) {
 
   renderAll();
   
+  // AUTO COPY PROMPT
+  autoCopyPrompt();
+  
   const msgCount = Math.min(count, eligibleCats.length);
-  showToast(`Manifested ${msgCount} attributes.`);
+  showToast(`Manifested & Copied (${msgCount} items)`);
+}
+
+function autoCopyPrompt() {
+    if($promptOut.value) {
+        navigator.clipboard.writeText($promptOut.value);
+    }
 }
 
 // ---- Event Listeners ----
@@ -804,10 +840,8 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   state.selections = {};
   state.extraNotes = "";
   $extraNotes.value = "";
-  // Reset checkboxes to checked
   document.querySelectorAll(".rnd-include").forEach(c => c.checked = true);
   
-  // Clear dropdowns
   for (const cat of CONFIG.categories) {
     const sel = document.getElementById(`sel_${cat.key}`);
     if(sel) sel.value = "";
@@ -816,13 +850,12 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   showToast("Reality Reset.");
 });
 
-// 1) RANDOMIZE CHECKED
+// 1) RANDOMIZE CHECKED + AUTO COPY
 document.getElementById("randomizeBtn").addEventListener("click", () => {
   let count = 0;
   for (const cat of CONFIG.categories) {
     const chk = document.querySelector(`.rnd-include[data-key="${cat.key}"]`);
     
-    // Only pick if checkbox is checked
     if (chk && chk.checked) {
       const opt = randomPick(cat.options);
       state.selections[cat.key] = opt?.value || "";
@@ -835,16 +868,17 @@ document.getElementById("randomizeBtn").addEventListener("click", () => {
     if (sel) sel.value = state.selections[cat.key];
   }
   renderAll();
-  showToast(`Randomized ${count} categories.`);
+  autoCopyPrompt();
+  showToast(`Randomized & Copied ${count} categories.`);
 });
 
-// 2) RANDOM (N)
+// 2) RANDOM (N) + AUTO COPY
 document.getElementById("rndCountBtn").addEventListener("click", () => {
   const val = parseInt(document.getElementById("rndCountInput").value) || 3;
   randomizeSubset(val);
 });
 
-// 3) RANDOM (4-7)
+// 3) RANDOM (4-7) + AUTO COPY
 document.getElementById("rndRangeBtn").addEventListener("click", () => {
   const min = 4;
   const max = 7;
@@ -852,19 +886,12 @@ document.getElementById("rndRangeBtn").addEventListener("click", () => {
   randomizeSubset(count);
 });
 
-// COPY Buttons
-document.getElementById("copyPromptBtn").addEventListener("click", () => {
-  if(!$promptOut.value) return;
-  navigator.clipboard.writeText($promptOut.value).then(() => showToast("Prompt Captured!"));
-});
-
-document.getElementById("copySpecBtn").addEventListener("click", () => {
-  if(!$specOut.value) return;
-  navigator.clipboard.writeText($specOut.value).then(() => showToast("Spec Sheet Captured!"));
-});
-
+// MANUAL COPY
 document.getElementById("copyAllBtn").addEventListener("click", () => {
   if(!$specOut.value) return;
+  // Copying just the Prompt string to be safe, or you can copy full text
+  // The user asked for "Prompt results" when creation button clicked.
+  // For this button, we copy everything.
   const fullText = $specOut.value + "\n\n---\n\n" + $promptOut.value;
   navigator.clipboard.writeText(fullText).then(() => showToast("Full Reality Captured!"));
 });
@@ -886,9 +913,6 @@ function showToast(msg) {
 buildForm();
 renderAll();
 
-</script>
-</body>
-</html>
 </script>
 </body>
 </html>
