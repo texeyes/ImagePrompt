@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Character-Only Prompt Builder</title>
+  <style>
+    :root{
+      --bg:#050712;
+      --panel:#0f1220;
+      --panel-soft:#151a2b;
+      --accent1:#ffcc33;
+      --accent2:#34d3ff;
+      --accent3:#ff6ad5;
+      --text:#f9fafb;
+      --muted:#9ca3af;
+      --border:#1f2937;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%,#000 100%);
+      color:var(--text);
+      min-height:100vh;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .app{width:100%;max-width:1180px;display:flex;flex-direction:column;gap:16px}
+    .header{text-align:center;padding:12px 16px 4px}
+    .header h1{
+      font-size:1.6rem;letter-spacing:.04em;text-transform:uppercase;
+      background:linear-gradient(90deg,#f97316,#facc15,#22d3ee,#a855f7,#f97316);
+      -webkit-background-clip:text;color:transparent;margin-bottom:4px
+    }
+    .header p{font-size:.85rem;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:radial-gradient(circle at top left,#1e293b 0,#020617 55%);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 14px 10px;
+      box-shadow:0 18px 45px rgba(15,23,42,.75);
+    }
+    .card h2{
+      font-size:.95rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+      margin-bottom:10px;display:flex;justify-content:space-between;align-items:center
+    }
+    .pill{padding:2px 8px;border-radius:999px;font-size:.7rem;background:rgba(55,65,81,.7);color:var(--muted)}
+    .filters{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow:auto;padding-right:4px}
+    .filter-row{
+      border-radius:10px;padding:8px 9px 7px;
+      background:linear-gradient(135deg,rgba(15,23,42,.9),rgba(15,23,42,.4));
+      border:1px solid rgba(55,65,81,.9);
+      display:grid;grid-template-columns:auto minmax(0,1.6fr) minmax(0,1.6fr);
+      gap:8px;align-items:center
+    }
+    .filter-main{display:flex;flex-direction:column;gap:1px}
+    .filter-label{font-size:.8rem;font-weight:600}
+    .filter-desc{font-size:.7rem;color:var(--muted)}
+    .filter-actions{display:flex;flex-direction:column;gap:5px}
+    .select{
+      width:100%;
+      background:rgba(15,23,42,.9);
+      border-radius:999px;
+      border:1px solid rgba(55,65,81,.9);
+      padding:4px 8px;
+      color:var(--text);
+      font-size:.78rem;
+    }
+    .include-toggle{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted)}
+    .include-toggle input{accent-color:var(--accent2)}
+    .buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .btn{
+      border-radius:999px;border:1px solid rgba(226,232,240,.25);
+      background:radial-gradient(circle at top,#1f2937 0,#020617 60%);
+      color:var(--text);font-size:.78rem;padding:6px 11px;
+      display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+      transition:transform .08s ease, box-shadow .08s ease, border-color .08s ease;
+    }
+    .btn-primary{
+      border-color:rgba(250,204,21,.7);
+      background:linear-gradient(135deg,#facc15,#22d3ee);
+      color:#020617;font-weight:700;
+      box-shadow:0 10px 35px rgba(56,189,248,.55);
+    }
+    .btn-ghost{
+      background:radial-gradient(circle at top,#020617 0,#020617 60%);
+      border-style:dashed;border-color:rgba(148,163,184,.7);
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(15,23,42,.9);border-color:rgba(148,163,184,1)}
+    .outputs{display:flex;flex-direction:column;gap:10px}
+    .output-box{
+      background:radial-gradient(circle at top left,#1e293b 0,#020617 55%);
+      border-radius:10px;border:1px solid rgba(55,65,81,.9);
+      padding:8px 9px 7px;display:flex;flex-direction:column;gap:4px
+    }
+    .output-box h3{
+      font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+      display:flex;justify-content:space-between;align-items:center
+    }
+    .output-body{
+      font-family:system-ui,sans-serif;font-size:.8rem;line-height:1.4;color:#e5e7eb;
+      white-space:pre-wrap;max-height:260px;overflow:auto
+    }
+    .toast{
+      position:fixed;bottom:18px;left:50%;
+      transform:translateX(-50%);
+      background:rgba(15,23,42,.96);
+      padding:7px 14px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      font-size:.78rem;color:var(--text);
+      opacity:0;pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;z-index:40
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+    /* NEW: Texas Art Exhibitions panel */
+    .exhibitions{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-height:70vh;
+      overflow:auto;
+      padding-right:4px;
+    }
+    .ex-row{
+      border-radius:10px;
+      padding:10px 10px 9px;
+      background:linear-gradient(135deg,rgba(15,23,42,.9),rgba(15,23,42,.4));
+      border:1px solid rgba(55,65,81,.9);
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+    .ex-top{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:baseline;
+      justify-content:space-between;
+    }
+    .ex-title{font-weight:700;font-size:.9rem}
+    .ex-meta{color:var(--muted);font-size:.78rem}
+    .ex-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .mini{
+      padding:3px 8px;
+      font-size:.72rem;
+    }
+    .field{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .input, .select2{
+      background:rgba(15,23,42,.9);
+      border-radius:999px;
+      border:1px solid rgba(55,65,81,.9);
+      padding:5px 10px;
+      color:var(--text);
+      font-size:.78rem;
+      outline:none;
+    }
+    .input{min-width:220px;flex:1}
+    .link{
+      color:#7dd3fc;
+      text-decoration:none;
+      border-bottom:1px dashed rgba(125,211,252,.4);
+    }
+    .link:hover{border-bottom-color:rgba(125,211,252,.9)}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Full‑Body Character Prompt Forge</h1>
+      <p>Character-only prompts + a Texas art exhibitions picker you can paste into the prompt as inspiration.</p>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Character Filters <span class="pill">All attributes loaded</span></h2>
+        <div class="filters" id="filters"></div>
+        <div class="buttons">
+          <button class="btn btn-primary" id="btnRandomChecked">🎲 Randomize Included</button>
+          <button class="btn" id="btnRandomAll">🌌 Full Shuffle</button>
+          <button class="btn btn-ghost" id="btnClear">♻️ Clear</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Prompt Output <span class="pill">Copy-ready</span></h2>
+        <div class="outputs">
+          <div class="output-box">
+            <h3>Spec (human‑readable)
+              <button class="btn btn-ghost mini" id="btnCopySpec">Copy</button>
+            </h3>
+            <div class="output-body" id="specOut"></div>
+          </div>
+          <div class="output-box">
+            <h3>Structured Prompt
+              <button class="btn btn-ghost mini" id="btnCopyPrompt">Copy</button>
+            </h3>
+            <div class="output-body" id="promptOut"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- NEW: Texas Art Exhibitions (filtered list) -->
+    <section class="card">
+      <h2>Texas Art Exhibitions <span class="pill">Filter + add to prompt</span></h2>
+
+      <div class="field" style="margin-bottom:10px">
+        <select class="select2" id="cityFilter" title="City filter">
+          <option value="all">All Texas</option>
+          <option value="Austin">Austin</option>
+          <option value="Dallas">Dallas</option>
+          <option value="Fort Worth">Fort Worth</option>
+          <option value="Houston">Houston</option>
+        </select>
+
+        <input class="input" id="textFilter" placeholder="Filter by museum, exhibition title, or keyword (e.g., 'Frida', 'Blanton')" />
+
+        <button class="btn btn-primary mini" id="btnAddRandomEx">🎟️ Add random exhibition to prompt</button>
+        <button class="btn btn-ghost mini" id="btnClearEx">🧹 Clear exhibition from prompt</button>
+      </div>
+
+      <div class="exhibitions" id="exhibitions"></div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    // ---------------------------
+    // Character Prompt Config
+    // ---------------------------
+    const CONFIG = [
+      { key:"archetype", label:"Archetype", description:"High-level role and vibe.", includeByDefault:true, options:[
+        "enigmatic minimalist runway walker",
+        "tropical indulgent adventurer",
+        "neon mech guardian",
+        "kawaii plush mascot spirit",
+        "mythic reptile rockstar idol",
+        "pop-art style icon"
+      ]},
+      { key:"species", label:"Species / Form", description:"Body type rendered head-to-toe.", includeByDefault:true, options:[
+        "stylized human figure",
+        "human wearing an oversized creature hood",
+        "anthropomorphic iguana humanoid",
+        "giant bipedal mech with humanlike proportions",
+        "soft plush toy character with stubby limbs"
+      ]},
+      { key:"headgear", label:"Head / Helmet", description:"Distinctive head silhouette and motif.", includeByDefault:true, options:[
+        "horned helmet with curved dark horns",
+        "full retro-futurist helmet with ridged plating and orange goggles",
+        "oversized iguana head hood resting on the shoulders",
+        "felted kawaii hood with tiny beads and friendly face window",
+        "reptile crest and dorsal spines running from head down the neck"
+      ]},
+      { key:"face_detail", label:"Face / Eye Motif", description:"Eyes, visor, and face style.", includeByDefault:true, options:[
+        "tinted circular goggles with warm amber lenses",
+        "soft cute embroidered eyes and rosy cheeks",
+        "sharp reptilian eye with glowing highlight",
+        "clean hidden face behind a smooth helmet mask",
+        "comic-style halftone facial shading"
+      ]},
+      { key:"body_silhouette", label:"Body Silhouette", description:"Full-body proportions and stance.", includeByDefault:true, options:[
+        "tall runway proportions, long legs, relaxed stride",
+        "heroic athletic build, confident posture",
+        "compact plush proportions, short limbs, cute stance",
+        "heavy mech frame, broad shoulders, powerful legs",
+        "reptilian humanoid stance, slightly crouched, agile"
+      ]},
+      { key:"outfit", label:"Outfit & Coverage", description:"Primary clothing style.", includeByDefault:true, options:[
+        "seamless white latex bodysuit with matching boots",
+        "mosaic chest armor with glowing turquoise tiles",
+        "ornate fantasy armor with filigree and gemstones",
+        "soft felt onesie with stitched geometric patches",
+        "hard-surface mech plating with exposed joints"
+      ]},
+      { key:"materials", label:"Materials & Surface", description:"Key textures defining the character.", includeByDefault:true, options:[
+        "glossy latex and polished metal",
+        "felted wool plush with visible fibers",
+        "stained-glass inlays and smooth ceramic",
+        "brushed alloy panels with subtle wear and edge highlights",
+        "gem-studded armor with turquoise stones and gold trim"
+      ]},
+      { key:"palette", label:"Color Palette", description:"Global color story.", includeByDefault:true, options:[
+        "primary color-block cyan, yellow, deep blue",
+        "neon synthwave magenta, purple, orange sunset gradients",
+        "tropical teal, hot pink, lush green",
+        "regal jewel tones turquoise, gold, deep burgundy",
+        "soft kawaii neutrals cream, warm gray, peach blush"
+      ]},
+      { key:"art_style", label:"Art / Render Style", description:"How the character is rendered.", includeByDefault:true, options:[
+        "minimalist 3D render with clean lighting",
+        "bold comic illustration with crisp ink lines and halftone shading",
+        "high-detail fantasy concept art with cinematic rim light",
+        "vaporwave poster art with neon gradients",
+        "toy photography look with soft focus and gentle grain"
+      ]},
+      { key:"props", label:"Signature Prop", description:"Defining object.", includeByDefault:true, options:[
+        "electric guitar held like a stage weapon",
+        "shell dish overflowing with pearls and gemstones",
+        "mech arms braced against a rocky slope",
+        "small plush hands clasped innocently",
+        "half-eaten pastry held casually near the face"
+      ]},
+      { key:"setting", label:"Optional Setting Wrap", description:"Short background hint (toggle off for character-only).", includeByDefault:false, options:[
+        "minimalist color-block wall of flat yellow and blue rectangles",
+        "sun-drenched tropical garden with hibiscus blooms and dense foliage",
+        "neon sunset over jagged mountains, vaporwave sky",
+        "studio portrait lighting with patterned wallpaper",
+        "vintage comic-panel frame with speech bubbles"
+      ]},
+      { key:"energy", label:"Energy / Mood", description:"Pose and emotional read.", includeByDefault:true, options:[
+        "calm deliberate stride, runway confidence",
+        "carefree indulgent joy, mid-snack humor",
+        "rock-god confidence in swirling fog",
+        "serene comforting presence, cute mascot energy",
+        "heroic determination, looming against the horizon"
+      ]}
+    ];
+
+    const state = { include:{}, values:{}, exhibition: null };
+
+    const $filters = document.getElementById("filters");
+    const $specOut = document.getElementById("specOut");
+    const $promptOut = document.getElementById("promptOut");
+    const $toast = document.getElementById("toast");
+
+    // ---------------------------
+    // Texas Exhibitions (Texas-only)
+    // ---------------------------
+    const TEXAS_EXHIBITIONS = [
+      {
+        title: "Spirit & Splendor: El Greco, Velázquez, and the Hispanic Baroque",
+        venue: "Blanton Museum of Art",
+        city: "Austin",
+        dates: "Through Jan 31, 2026",
+        url: "https://austin.culturemap.com/news/arts/museums-galleries-january-2026/",
+        tags: ["baroque","old masters","museum"]
+      },
+      {
+        title: "The Canvas Can Do Miracles",
+        venue: "The Contemporary Austin",
+        city: "Austin",
+        dates: "Through Jan 11, 2026",
+        url: "https://austin.culturemap.com/news/arts/museums-galleries-january-2026/",
+        tags: ["contemporary","abstraction","mixed media"]
+      },
+      {
+        title: "Reuse On the Runway: The Exhibit",
+        venue: "Austin Creative Reuse / Julia C. Butridge Gallery",
+        city: "Austin",
+        dates: "Jan 17 – Feb 28, 2026",
+        url: "https://austin.culturemap.com/news/arts/museums-galleries-january-2026/",
+        tags: ["fashion","upcycled","wearable art","sustainability"]
+      },
+      {
+        title: "magic mirrors (Jamie Ho)",
+        venue: "Art League Houston",
+        city: "Houston",
+        dates: "Jan 16 – Apr 19, 2026",
+        url: "https://www.artleaguehouston.org/upcoming-exhibitions",
+        tags: ["new media","installation","identity","projection"]
+      },
+      {
+        title: "Return to Infinity: Yayoi Kusama",
+        venue: "Dallas Museum of Art (DMA)",
+        city: "Dallas",
+        dates: "Through Jan 18, 2026",
+        url: "https://www.dallasartfair.com/dalpass/january/",
+        tags: ["contemporary","installation","museum"]
+      },
+      {
+        title: "Myth and Marble: Ancient Roman Sculpture from the Torlonia Collection",
+        venue: "Kimbell Art Museum",
+        city: "Fort Worth",
+        dates: "Through Jan 25, 2026",
+        url: "https://www.dallasartfair.com/dalpass/january/",
+        tags: ["ancient","sculpture","museum"]
+      },
+      {
+        title: "Jenny Saville: The Anatomy of Painting",
+        venue: "Modern Art Museum of Fort Worth",
+        city: "Fort Worth",
+        dates: "Through Jan 18, 2026",
+        url: "https://www.dallasartfair.com/dalpass/january/",
+        tags: ["painting","contemporary","museum"]
+      }
+    ];
+
+    // ---------------------------
+    // UI Builders
+    // ---------------------------
+    function buildForm(){
+      CONFIG.forEach(cat=>{
+        state.include[cat.key]=cat.includeByDefault;
+        state.values[cat.key]=cat.options[0];
+
+        const row=document.createElement("div");
+        row.className="filter-row";
+        row.dataset.key=cat.key;
+
+        const main=document.createElement("div");
+        main.className="filter-main";
+        main.innerHTML=`<div class="filter-label">${cat.label}</div><div class="filter-desc">${cat.description}</div>`;
+
+        const actions=document.createElement("div");
+        actions.className="filter-actions";
+
+        const sel=document.createElement("select");
+        sel.className="select";
+        cat.options.forEach(opt=>{
+          const o=document.createElement("option");
+          o.value=opt;o.textContent=opt;
+          sel.appendChild(o);
+        });
+        sel.addEventListener("change",()=>{state.values[cat.key]=sel.value;renderAll();});
+
+        const inc=document.createElement("label");
+        inc.className="include-toggle";
+        const cb=document.createElement("input");
+        cb.type="checkbox"; cb.checked=cat.includeByDefault;
+        cb.addEventListener("change",()=>{state.include[cat.key]=cb.checked;renderAll();});
+        inc.appendChild(cb);
+        inc.appendChild(document.createElement("span")).textContent="Include in prompt";
+
+        actions.appendChild(sel);
+        actions.appendChild(inc);
+
+        row.appendChild(main);
+        row.appendChild(actions);
+        $filters.appendChild(row);
+      });
+    }
+
+    const $exhibitions = document.getElementById("exhibitions");
+    const $cityFilter = document.getElementById("cityFilter");
+    const $textFilter = document.getElementById("textFilter");
+
+    function buildExhibitions(){
+      $exhibitions.innerHTML = "";
+      const list = getFilteredExhibitions();
+
+      list.forEach((ex, idx)=>{
+        const row = document.createElement("div");
+        row.className = "ex-row";
+
+        const top = document.createElement("div");
+        top.className = "ex-top";
+
+        const title = document.createElement("div");
+        title.className = "ex-title";
+        title.textContent = ex.title;
+
+        const meta = document.createElement("div");
+        meta.className = "ex-meta";
+        meta.textContent = `${ex.venue} · ${ex.city} · ${ex.dates}`;
+
+        top.appendChild(title);
+        top.appendChild(meta);
+
+        const actions = document.createElement("div");
+        actions.className = "ex-actions";
+
+        const btnUse = document.createElement("button");
+        btnUse.className = "btn btn-primary mini";
+        btnUse.textContent = "Use in prompt";
+        btnUse.addEventListener("click", ()=>{
+          state.exhibition = ex;
+          renderAll();
+          toast("Exhibition added!");
+        });
+
+        const a = document.createElement("a");
+        a.className = "link";
+        a.href = ex.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = "Source";
+
+        actions.appendChild(btnUse);
+        actions.appendChild(a);
+
+        row.appendChild(top);
+        row.appendChild(actions);
+        $exhibitions.appendChild(row);
+      });
+
+      if(list.length === 0){
+        const row = document.createElement("div");
+        row.className = "ex-row";
+        row.innerHTML = `<div class="ex-title">No matches</div><div class="ex-meta">Try a different city or keyword.</div>`;
+        $exhibitions.appendChild(row);
+      }
+    }
+
+    function getFilteredExhibitions(){
+      const city = $cityFilter.value;
+      const q = ($textFilter.value||"").trim().toLowerCase();
+      return TEXAS_EXHIBITIONS.filter(ex=>{
+        const cityOk = (city==="all") || (ex.city===city);
+        if(!cityOk) return false;
+        if(!q) return true;
+        const hay = (ex.title+" "+ex.venue+" "+ex.city+" "+ex.dates+" "+(ex.tags||[]).join(" ")).toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    // ---------------------------
+    // Prompt Builders
+    // ---------------------------
+    function g(k){ return state.include[k] ? state.values[k] : null; }
+
+    function exhibitionLine(){
+      if(!state.exhibition) return null;
+      const ex = state.exhibition;
+      // Keep it character-centric: "inspired by" not "scene description"
+      return `inspired by the Texas art exhibition "${ex.title}" at ${ex.venue} (${ex.city}, ${ex.dates})`;
+    }
+
+    function buildSpec(){
+      const parts=[];
+      parts.push(`A full-body ${g("species")||"character"} portrayed as ${g("archetype")||"a distinct archetype"}.`);
+      parts.push(`Head/face: ${[g("headgear"),g("face_detail")].filter(Boolean).join("; ")}.`);
+      parts.push(`Silhouette: ${g("body_silhouette")||"full-body, head-to-toe"}.`);
+      parts.push(`Outfit: ${[g("outfit"),g("materials")].filter(Boolean).join(" with ")}.`);
+      if(g("palette")) parts.push(`Palette: ${g("palette")}.`);
+      if(g("art_style")) parts.push(`Render style: ${g("art_style")}.`);
+      if(g("props")) parts.push(`Prop: ${g("props")}.`);
+      if(g("energy")) parts.push(`Mood: ${g("energy")}.`);
+      if(g("setting")) parts.push(`Optional setting wrap: ${g("setting")} (character remains the clear focus).`);
+      const exLine = exhibitionLine();
+      if(exLine) parts.push(`Inspiration: ${exLine}.`);
+      return parts.filter(Boolean).join(" ");
+    }
+
+    function buildPrompt(){
+      const tags=[];
+      tags.push("full-body character, single subject, head-to-toe in frame, clear silhouette, centered composition");
+      ["archetype","species","headgear","face_detail","body_silhouette","outfit","materials","palette","art_style","props","energy"].forEach(k=>{
+        if(state.include[k] && state.values[k]) tags.push(state.values[k]);
+      });
+
+      const exLine = exhibitionLine();
+      if(exLine) tags.push(exLine);
+
+      if(state.include.setting && state.values.setting){
+        tags.push("subtle background: "+state.values.setting);
+      } else {
+        tags.push("minimal unobtrusive background, no complex environment");
+      }
+      tags.push("sharp focus on the character");
+      return tags.join(", ");
+    }
+
+    function renderAll(){
+      $specOut.textContent=buildSpec();
+      $promptOut.textContent=buildPrompt();
+    }
+
+    // ---------------------------
+    // Randomize / Clear / Copy
+    // ---------------------------
+    function randomize(includeOnly){
+      CONFIG.forEach(cat=>{
+        if(includeOnly && !state.include[cat.key]) return;
+        const pick=cat.options[Math.floor(Math.random()*cat.options.length)];
+        state.values[cat.key]=pick;
+        const row=$filters.querySelector(`[data-key="${cat.key}"]`);
+        if(row) row.querySelector("select").value=pick;
+      });
+      renderAll();
+    }
+
+    function clearAll(){
+      CONFIG.forEach(cat=>{
+        state.include[cat.key]=cat.includeByDefault;
+        state.values[cat.key]=cat.options[0];
+        const row=$filters.querySelector(`[data-key="${cat.key}"]`);
+        if(row){
+          row.querySelector("select").value=cat.options[0];
+          row.querySelector("input[type='checkbox']").checked=cat.includeByDefault;
+        }
+      });
+      // keep exhibition selection unless you want it cleared too:
+      // state.exhibition = null;
+      renderAll();
+    }
+
+    function toast(msg){
+      $toast.textContent=msg;
+      $toast.classList.add("show");
+      setTimeout(()=> $toast.classList.remove("show"), 2000);
+    }
+    function copyText(txt,label){
+      if(!txt) return;
+      navigator.clipboard.writeText(txt).then(()=>toast(label+" copied!"));
+    }
+
+    document.getElementById("btnRandomChecked").addEventListener("click",()=>randomize(true));
+    document.getElementById("btnRandomAll").addEventListener("click",()=>randomize(false));
+    document.getElementById("btnClear").addEventListener("click",clearAll);
+    document.getElementById("btnCopySpec").addEventListener("click",()=>copyText($specOut.textContent,"Spec"));
+    document.getElementById("btnCopyPrompt").addEventListener("click",()=>copyText($promptOut.textContent,"Prompt"));
+
+    document.getElementById("btnAddRandomEx").addEventListener("click", ()=>{
+      const list = getFilteredExhibitions();
+      if(list.length === 0){
+        toast("No exhibitions match filters");
+        return;
+      }
+      state.exhibition = list[Math.floor(Math.random()*list.length)];
+      renderAll();
+      toast("Random exhibition added!");
+    });
+
+    document.getElementById("btnClearEx").addEventListener("click", ()=>{
+      state.exhibition = null;
+      renderAll();
+      toast("Exhibition cleared");
+    });
+
+    $cityFilter.addEventListener("change", buildExhibitions);
+    $textFilter.addEventListener("input", buildExhibitions);
+
+    // init
+    buildForm();
+    buildExhibitions();
+    renderAll();
+  </script>
+</body>
+</html>
