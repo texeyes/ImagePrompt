@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OddChar Atelier • Your Exclusive Whimsical Character Concierge</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .option-btn {
+            transition: all 0.25s ease;
+        }
+        .option-btn.selected {
+            background-color: #6b46c1;
+            color: white;
+            border-color: #6b46c1;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+        .concierge-pop {
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .surprise-confetti {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-lg border-b border-purple-100 sticky top-0 z-50 shadow-xl">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="bg-gradient-to-br from-purple-600 to-pink-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-2xl">
+                    <i class="fa-solid fa-hat-wizard text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">OddChar Atelier</h1>
+                    <p class="text-xs text-purple-500 font-bold tracking-widest uppercase">World-Class Whimsical Character Concierge</p>
+                </div>
+            </div>
+            <p class="hidden md:block italic text-purple-600 font-medium">“Every creation you make here is already legendary.”</p>
+        </div>
+    </header>
+
+    <!-- Hero Welcome -->
+    <div class="bg-gradient-to-r from-purple-600/10 to-pink-600/10 py-12">
+        <div class="max-w-4xl mx-auto text-center px-6">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Welcome, Brilliant Visionary</h2>
+            <p class="text-xl text-gray-700 leading-relaxed">
+                You are not just creating a character — you are birthing a new friend for the universe.<br>
+                <span class="text-purple-600 font-bold">Every single prompt you craft here is unique in all of existence.</span>
+            </p>
+        </div>
+    </div>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full p-6 grid lg:grid-cols-3 gap-10">
+
+        <!-- Controls -->
+        <section class="lg:col-span-2 space-y-8">
+
+            <!-- Species -->
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-purple-100">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><i class="fa-solid fa-dna text-purple-600"></i> Species / Origin</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-purple-700 mb-3 uppercase tracking-wider">Core Essence</label>
+                        <select id="species" class="w-full bg-white border-2 border-purple-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-purple-300 focus:border-purple-500 transition-all">
+                            <option value="Unthought of Being">Unthought of Being</option>
+                            <option value="Being">Being</option>
+                            <option value="Teeth">Teeth</option>
+                            <option value="Body part">Body part</option>
+                            <option value="Animal Character">Animal Character</option>
+                            <option value="Atomic Structure">Atomic Structure</option>
+                            <option value="Microbe">Microbe</option>
+                            <option value="Art Installation">Art Installation</option>
+                            <option value="Desert Being">Desert Being</option>
+                            <option value="Kitchen Tool Character">Kitchen Tool Character</option>
+                            <option value="Mushroom">Mushroom</option>
+                            <option value="Machinery Tool Being">Machinery Tool Being</option>
+                            <option value="Computer Hardware Being">Computer Hardware Being</option>
+                            <option value="Advanced Creature">Advanced Creature</option>
+                            <option value="Golem">Golem</option>
+                            <option value="Cat">Cat</option>
+                            <option value="Spirit">Spirit</option>
+                            <option value="Iguana">Iguana</option>
+                            <option value="Kraken">Kraken</option>
+                            <option value="Symbiote">Symbiote</option>
+                            <option value="Sprite">Sprite</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="Creature">Creature</option>
+                            <option value="Animal">Animal</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Colossus">Colossus</option>
+                            <option value="Sentinel">Sentinel</option>
+                            <option value="Medieval Character">Medieval Character</option>
+                            <option value="Sentient Nebula">Sentient Nebula</option>
+                            <option value="Liquid Mercury Entity">Liquid Mercury Entity</option>
+                            <option value="Living Shadow">Living Shadow</option>
+                            <option value="Mechanism Creature">Mechanism Creature</option>
+                            <option value="Geometric Fractal">Geometric Fractal</option>
+                            <option value="Coral Reef Hivemind">Coral Reef Hivemind</option>
+                            <option value="Fungal Network">Fungal Network</option>
+                            <option value="Static Electricity Cloud">Static Electricity Cloud</option>
+                            <option value="Melting Candle Being">Melting Candle Being</option>
+                            <option value="Woven Fabric Golem">Woven Fabric Golem</option>
+                            <option value="Radio Wave Specter">Radio Wave Specter</option>
+                            <option value="Volcanic Glass Golem">Volcanic Glass Golem</option>
+                            <option value="Rust Parasite">Rust Parasite</option>
+                            <option value="Crystalline Growth">Crystalline Growth</option>
+                            <option value="Root System Consciousness">Root System Consciousness</option>
+                            <option value="Tectonic Plate Spirit">Tectonic Plate Spirit</option>
+                            <option value="Old Growth Forest Heart">Old Growth Forest Heart</option>
+                            <option value="Ink Blot Figment">Ink Blot Figment</option>
+                            <option value="Subatomic Particle">Subatomic Particle</option>
+                            <option value="Bio-Luminescent Deep Sea Entity">Bio-Luminescent Deep Sea Entity</option>
+                            <option value="Shattered Mirror Being">Shattered Mirror Being</option>
+                            <option value="Pressed Flower Spirit">Pressed Flower Spirit</option>
+                            <option value="Thawing Glacier Entity">Thawing Glacier Entity</option>
+                            <option value="Scrap Metal Amalgam">Scrap Metal Amalgam</option>
+                            <option value="Paper Origami Lifeform">Paper Origami Lifeform</option>
+                            <option value="Vaporous Steam Construct">Vaporous Steam Construct</option>
+                            <option value="Desert Mirage">Desert Mirage</option>
+                            <option value="Tar Pit Dweller">Tar Pit Dweller</option>
+                            <option value="Bioluminescent Moss">Bioluminescent Moss</option>
+                            <option value="Celestial Constellation">Celestial Constellation</option>
+                            <option value="Gnarled Driftwood Being">Gnarled Driftwood Being</option>
+                            <option value="Magnetic Field Entity">Magnetic Field Entity</option>
+                            <option value="Sandstorm Wraith">Sandstorm Wraith</option>
+                            <option value="Obsidian Shard">Obsidian Shard</option>
+                            <option value="Deep Space Vacuum">Deep Space Vacuum</option>
+                            <option value="Burnt Ember Spirit">Burnt Ember Spirit</option>
+                            <option value="Coral Skeleton">Coral Skeleton</option>
+                            <option value="Petrified Wood Entity">Petrified Wood Entity</option>
+                            <option value="Tidal Wave Form">Tidal Wave Form</option>
+                            <option value="Echoing Soundwave">Echoing Soundwave</option>
+                            <option value="Ancient Parchment Character">Ancient Parchment Character</option>
+                            <option value="Oil Slick Organism">Oil Slick Organism</option>
+                            <option value="Thorn Bush Entity">Thorn Bush Entity</option>
+                            <option value="Graffiti Mural Being">Graffiti Mural Being</option>
+                            <option value="Meteorite Shard">Meteorite Shard</option>
+                            <option value="Neon Light Specter">Neon Light Specter</option>
+                            <option value="Vine-Wrapped Monolith">Vine-Wrapped Monolith</option>
+                            <option value="Polished Marble Entity">Polished Marble Entity</option>
+                            <option value="Root-Bound Earth Being">Root-Bound Earth Being</option>
+                            <option value="Storm Cloud Consciousness">Storm Cloud Consciousness</option>
+                            <option value="Solar Flare Entity">Solar Flare Entity</option>
+                            <option value="Forgotten Manuscript Being">Forgotten Manuscript Being</option>
+                            <option value="Lichen-Covered Boulder">Lichen-Covered Boulder</option>
+                            <option value="Wildfire Essence">Wildfire Essence</option>
+                            <option value="Refracted Light Entity">Refracted Light Entity</option>
+                            <option value="Molten Glass Sculpt">Molten Glass Sculpt</option>
+                            <option value="Tectonic Plate Colossus">Tectonic Plate Colossus</option>
+                            <option value="Liquid Mercury Humanoid">Liquid Mercury Humanoid</option>
+                            <option value="Atmospheric Gas Cloud">Atmospheric Gas Cloud</option>
+                            <option value="Crystallized Salt Golem">Crystallized Salt Golem</option>
+                            <option value="Volcanic Ash Wraith">Volcanic Ash Wraith</option>
+                            <option value="Static Electricity Swarm">Static Electricity Swarm</option>
+                            <option value="Deep Sea Vent Cluster">Deep Sea Vent Cluster</option>
+                            <option value="Radioactive Isotope Being">Radioactive Isotope Being</option>
+                            <option value="Rusted Gear Assembly">Rusted Gear Assembly</option>
+                            <option value="Circuit Board Hivemind">Circuit Board Hivemind</option>
+                            <option value="Hydraulic Press Golem">Hydraulic Press Golem</option>
+                            <option value="Neon Tube Skeleton">Neon Tube Skeleton</option>
+                            <option value="Vacuum Tube Intelligence">Vacuum Tube Intelligence</option>
+                            <option value="Scrapped Engine Hybrid">Scrapped Engine Hybrid</option>
+                            <option value="Fiber Optic Weaver">Fiber Optic Weaver</option>
+                            <option value="Abandoned Satellite Entity">Abandoned Satellite Entity</option>
+                            <option value="Industrial Boiler Beast">Industrial Boiler Beast</option>
+                            <option value="Mycelial Network Consciousness">Mycelial Network Consciousness</option>
+                            <option value="Bioluminescent Planktoid">Bioluminescent Planktoid</option>
+                            <option value="Tardigrade Titan">Tardigrade Titan</option>
+                            <option value="Nerve Ending Bundle">Nerve Ending Bundle</option>
+                            <option value="Pollen Grain Sovereign">Pollen Grain Sovereign</option>
+                            <option value="Petri Dish Colony">Petri Dish Colony</option>
+                            <option value="Coral Reef Guardian">Coral Reef Guardian</option>
+                            <option value="Living Vascular System">Living Vascular System</option>
+                            <option value="Moss-Covered Monolith">Moss-Covered Monolith</option>
+                            <option value="Deep-Tissue Parasite">Deep-Tissue Parasite</option>
+                            <option value="Mathematical Equation Manifest">Mathematical Equation Manifest</option>
+                            <option value="Glitch-Art Apparition">Glitch-Art Apparition</option>
+                            <option value="Origami Folded Reality">Origami Folded Reality</option>
+                            <option value="Sound Wave Sculpture">Sound Wave Sculpture</option>
+                            <option value="Ink Blot Chimera">Ink Blot Chimera</option>
+                            <option value="Topographic Map Entity">Topographic Map Entity</option>
+                            <option value="String Theory Weaving">String Theory Weaving</option>
+                            <option value="Negative Space Silhouette">Negative Space Silhouette</option>
+                            <option value="Fractal Geometry Beast">Fractal Geometry Beast</option>
+                            <option value="Paradoxical Geometry Being">Paradoxical Geometry Being</option>
+                            <option value="Victorian Wallpaper Mimic">Victorian Wallpaper Mimic</option>
+                            <option value="Attic Dust Elemental">Attic Dust Elemental</option>
+                            <option value="Porcelain Tea Set Hybrid">Porcelain Tea Set Hybrid</option>
+                            <option value="Garden Tool Centaur">Garden Tool Centaur</option>
+                            <option value="Thrift Store Fabric Amalgam">Thrift Store Fabric Amalgam</option>
+                            <option value="Library Book Chimera">Library Book Chimera</option>
+                            <option value="Streetlight Sentinel">Streetlight Sentinel</option>
+                            <option value="Pavement Crack Dweller">Pavement Crack Dweller</option>
+                            <option value="Stationary Supply Swarm">Stationary Supply Swarm</option>
+                            <option value="Ironing Board Automaton">Ironing Board Automaton</option>
+                            <option value="Paradox Weaver">Paradox Weaver</option>
+                            <option value="Floral Predator">Floral Predator</option>
+                            <option value="Echoform Chimera">Echoform Chimera</option>
+                            <option value="Sonic Flora">Sonic Flora</option>
+                            <option value="Cognitive Reef">Cognitive Reef</option>
+                            <option value="Memory Shell">Memory Shell</option>
+                            <option value="Glyphbound Homunculus">Glyphbound Homunculus</option>
+                            <option value="Anti-Prophet">Anti-Prophet</option>
+                            <option value="Chronophage Larva">Chronophage Larva</option>
+                            <option value="Geometric Predator">Geometric Predator</option>
+                            <option value="Bitumen Seraph">Bitumen Seraph</option>
+                            <option value="Absence Weaver">Absence Weaver</option>
+                            <option value="Foam Logic Golem">Foam Logic Golem</option>
+                            <option value="Fluid Archivist">Fluid Archivist</option>
+                            <option value="Shadow Taxonomist">Shadow Taxonomist</option>
+                            <option value="Synthetic Swarm">Synthetic Swarm</option>
+                            <option value="Rustborn Saint">Rustborn Saint</option>
+                            <option value="Tension Elemental">Tension Elemental</option>
+                            <option value="Petal-Spined Aberrant">Petal-Spined Aberrant</option>
+                            <option value="Urban Relic">Urban Relic</option>
+                            <option value="Noise Orchid">Noise Orchid</option>
+                            <option value="Temporal Sporebearer">Temporal Sporebearer</option>
+                            <option value="Mnemonic Husk">Mnemonic Husk</option>
+                            <option value="Almost-Human Guardian">Almost-Human Guardian</option>
+                            <option value="Inverted Pilgrim">Inverted Pilgrim</option>
+                            <option value="Architectural Entity">Architectural Entity</option>
+                            <option value="Lattice Beast">Lattice Beast</option>
+                            <option value="Living Annotation">Living Annotation</option>
+                            <option value="Seamstress of Gaps">Seamstress of Gaps</option>
+                            <option value="Fallen Construct">Fallen Construct</option>
+                            <option value="Mercury Librarian">Mercury Librarian</option>
+                            <option value="Fragile Colossus">Fragile Colossus</option>
+                            <option value="Plastic Tide Oracle">Plastic Tide Oracle</option>
+                            <option value="Hypnagogic Snake">Hypnagogic Snake</option>
+                            <option value="Friction Djinn">Friction Djinn</option>
+                            <option value="Reflection Swarm">Reflection Swarm</option>
+                            <option value="Neon Fossil">Neon Fossil</option>
+                            <option value="Bio-Digital Vine">Bio-Digital Vine</option>
+                            <option value="Aeon Pollen Carrier">Aeon Pollen Carrier</option>
+                            <option value="Liminal Observer">Liminal Observer</option>
+                            <option value="Uncanny Caretaker">Uncanny Caretaker</option>
+                            <option value="Entity Collective">Entity Collective</option>
+                            <option value="Null Cathedral">Null Cathedral</option>
+                            <option value="Funerary Flora">Funerary Flora</option>
+                            <option value="Inkbound Familiar">Inkbound Familiar</option>
+                            <option value="Ember Trickster">Ember Trickster</option>
+                            <option value="Broken Halo Automaton">Broken Halo Automaton</option>
+                            <option value="Luminous Fragment">Luminous Fragment</option>
+                            <option value="Glassbone Marauder">Glassbone Marauder</option>
+                            <option value="Layered Spirit">Layered Spirit</option>
+                            <option value="Dream-Shed Serpent">Dream-Shed Serpent</option>
+                            <option value="Bonebound Guardian">Bonebound Guardian</option>
+                            <option value="Specular Doppelherd">Specular Doppelherd</option>
+                            <option value="Grammatical Predator">Grammatical Predator</option>
+                            <option value="Overgrown Algorithm">Overgrown Algorithm</option>
+                            <option value="Seismic Wanderer">Seismic Wanderer</option>
+                            <option value="Candle-Headed Witness">Candle-Headed Witness</option>
+                            <option value="Color-Split Entity">Color-Split Entity</option>
+                            <option value="Gravemind Topiary">Gravemind Topiary</option>
+                            <option value="Replicated Shade">Replicated Shade</option>
+                            <option value="Cinder-Thread Jester">Cinder-Thread Jester</option>
+                            <option value="Bio-Geographic Titan">Bio-Geographic Titan</option>
+                            <option value="Errant Halo Swarm">Errant Halo Swarm</option>
+                            <option value="Censored Mystic">Censored Mystic</option>
+                            <option value="Palimpsest Phantom">Palimpsest Phantom</option>
+                            <option value="Depth-Fold Creature">Depth-Fold Creature</option>
+                            <option value="Obsidian Marrow Warden">Obsidian Marrow Warden</option>
+                            <option value="Borrowed-Body Agent">Borrowed-Body Agent</option>
+                            <option value="Feral Syntax Beast">Feral Syntax Beast</option>
+                            <option value="Signal Herdsman">Signal Herdsman</option>
+                            <option value="Foreshock Pilgrim">Foreshock Pilgrim</option>
+                            <option value="Threshold Relic">Threshold Relic</option>
+                            <option value="Kaleidos Voidling">Kaleidos Voidling</option>
+                            <option value="Temporal Custodian">Temporal Custodian</option>
+                            <option value="Carbon Copy Revenant">Carbon Copy Revenant</option>
+                            <option value="Fluid Colossus">Fluid Colossus</option>
+                            <option value="Chimeric Atlas">Chimeric Atlas</option>
+                            <option value="Ruined Sovereign">Ruined Sovereign</option>
+                            <option value="Redacted Saint">Redacted Saint</option>
+                            <option value="Resonant Hunter">Resonant Hunter</option>
+                            <option value="Abyssal Origamist">Abyssal Origamist</option>
+                            <option value="Sleep Citadel">Sleep Citadel</option>
+                            <option value="Proxy Skin Courier">Proxy Skin Courier</option>
+                            <option value="Decay Emissary">Decay Emissary</option>
+                            <option value="Static Veil Shepherd">Static Veil Shepherd</option>
+                            <option value="Translucent Thief">Translucent Thief</option>
+                            <option value="Liminal Bone Lantern">Liminal Bone Lantern</option>
+                            <option value="Mind-Knot Angel">Mind-Knot Angel</option>
+                            <option value="Dust-Clock Seraph">Dust-Clock Seraph</option>
+                            <option value="Paradox Emissary">Paradox Emissary</option>
+                            <option value="Inkstorm Leviathan">Inkstorm Leviathan</option>
+                            <option value="Borderline Spirit">Borderline Spirit</option>
+                            <option value="Splintered Crown Wight">Splintered Crown Wight</option>
+                            <option value="Fungal Collective">Fungal Collective</option>
+                            <option value="Cobalt Echo Stalker">Cobalt Echo Stalker</option>
+                            <option value="Autonomous Construct">Autonomous Construct</option>
+                            <option value="Porous Dream Bastion">Porous Dream Bastion</option>
+                            <option value="Shadow Ecosystem">Shadow Ecosystem</option>
+                            <option value="Rusted Halo Herald">Rusted Halo Herald</option>
+                            <option value="Glassroot Pilferer">Glassroot Pilferer</option>
+                            <option value="Mnemonic Tangle Seraph">Mnemonic Tangle Seraph</option>
+                            <option value="Contradiction Herald">Contradiction Herald</option>
+                            <option value="Hinterland Eidolon">Hinterland Eidolon</option>
+                            <option value="Shiftspore Myriad">Shiftspore Myriad</option>
+                            <option value="Puppetless Marionette">Puppetless Marionette</option>
+                            <option value="Silhouette Orchard">Silhouette Orchard</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Character Type -->
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-purple-100">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><i class="fa-solid fa-mask text-purple-600"></i> Character Type</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-purple-700 mb-3 uppercase tracking-wider">Style / Aesthetic</label>
+                        <select id="type" class="w-full bg-white border-2 border-purple-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-purple-300">
+                            <option value="">Perfectly as imagined</option>
+                            <option value="(anime)">(anime)</option>
+                            <option value="Athletic">Athletic</option>
+                            <option value="Accountant">Accountant</option>
+                            <option value="Advisor">Advisor</option>
+                            <option value="Aesthetic">Aesthetic</option>
+                            <option value="Analyst">Analyst</option>
+                            <option value="Ancestor">Ancestor</option>
+                            <option value="Apprentice">Apprentice</option>
+                            <option value="Archaeologist">Archaeologist</option>
+                            <option value="Archive">Archive</option>
+                            <option value="Artisan">Artisan</option>
+                            <option value="Ascetic">Ascetic</option>
+                            <option value="Avatar">Avatar</option>
+                            <option value="Being">Being</option>
+                            <option value="Lover">Lover</option>
+                            <option value="Blendwalker">Blendwalker</option>
+                            <option value="Builder">Builder</option>
+                            <option value="Calligrapher">Calligrapher</option>
+                            <option value="Captain">Captain</option>
+                            <option value="Chamber">Chamber</option>
+                            <option value="Character">Character</option>
+                            <option value="Complex">Complex</option>
+                            <option value="Charmer">Charmer</option>
+                            <option value="Chaser">Chaser</option>
+                            <option value="Choir">Choir</option>
+                            <option value="Choreographer">Choreographer</option>
+                            <option value="Chronologist">Chronologist</option>
+                            <option value="Cloud">Cloud</option>
+                            <option value="Compass">Compass</option>
+                            <option value="Counselor">Counselor</option>
+                            <option value="Cultivator">Cultivator</option>
+                            <option value="Daydreamer">Daydreamer</option>
+                            <option value="Dealer">Dealer</option>
+                            <option value="Debater">Debater</option>
+                            <option value="Designer">Designer</option>
+                            <option value="Destiny">Destiny</option>
+                            <option value="Detective">Detective</option>
+                            <option value="DJ">DJ</option>
+                            <option value="Documentarian">Documentarian</option>
+                            <option value="Doppelgänger">Doppelgänger</option>
+                            <option value="Dwellers">Dwellers</option>
+                            <option value="Economist">Economist</option>
+                            <option value="Ecosystem">Ecosystem</option>
+                            <option value="Ego">Ego</option>
+                            <option value="Entities">Entities</option>
+                            <option value="Faces">Faces</option>
+                            <option value="Fairy">Fairy</option>
+                            <option value="Fashionista">Fashionista</option>
+                            <option value="Figure">Figure</option>
+                            <option value="Forecaster">Forecaster</option>
+                            <option value="Fountain">Fountain</option>
+                            <option value="Fragments">Fragments</option>
+                            <option value="Freelancer">Freelancer</option>
+                            <option value="Gambler">Gambler</option>
+                            <option value="Guru">Guru</option>
+                            <option value="Heart">Heart</option>
+                            <option value="Herald">Herald</option>
+                            <option value="Hoarder">Hoarder</option>
+                            <option value="Icon">Icon</option>
+                            <option value="Initiate">Initiate</option>
+                            <option value="Keeper">Keeper</option>
+                            <option value="Luminary">Luminary</option>
+                            <option value="Made of dots">Made of dots</option>
+                            <option value="Mechanic">Mechanic</option>
+                            <option value="Mediator">Mediator</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Mentor">Mentor</option>
+                            <option value="Merchant">Merchant</option>
+                            <option value="Monolith">Monolith</option>
+                            <option value="Monument">Monument</option>
+                            <option value="Native">Native</option>
+                            <option value="Negotiator">Negotiator</option>
+                            <option value="Nexus">Nexus</option>
+                            <option value="Obelisk">Obelisk</option>
+                            <option value="Overclocker">Overclocker</option>
+                            <option value="Palace">Palace</option>
+                            <option value="Parent of a kid from 3450">Parent of a kid from 3450</option>
+                            <option value="Pathfinder">Pathfinder</option>
+                            <option value="Personification">Personification</option>
+                            <option value="Personified">Personified</option>
+                            <option value="Personifications">Personifications</option>
+                            <option value="Phantom">Phantom</option>
+                            <option value="Prophet">Prophet</option>
+                            <option value="Queen">Queen</option>
+                            <option value="Reactor">Reactor</option>
+                            <option value="Rebel">Rebel</option>
+                            <option value="Redux">Redux</option>
+                            <option value="Resident">Resident</option>
+                            <option value="Resonator">Resonator</option>
+                            <option value="Revivalist">Revivalist</option>
+                            <option value="Room">Room</option>
+                            <option value="Scribe">Scribe</option>
+                            <option value="Scout">Scout</option>
+                            <option value="Sculptor">Sculptor</option>
+                            <option value="Seeker">Seeker</option>
+                            <option value="Shapeshifter">Shapeshifter</option>
+                            <option value="Sketchling">Sketchling</option>
+                            <option value="Smuggler">Smuggler</option>
+                            <option value="Sniper">Sniper</option>
+                            <option value="Socialite">Socialite</option>
+                            <option value="Sorcerer">Sorcerer</option>
+                            <option value="Soul">Soul</option>
+                            <option value="Sovereign">Sovereign</option>
+                            <option value="Spines">Spines</option>
+                            <option value="Stylist">Stylist</option>
+                            <option value="Survivor">Survivor</option>
+                            <option value="System">System</option>
+                            <option value="Theater">Theater</option>
+                            <option value="Therapist">Therapist</option>
+                            <option value="Thief">Thief</option>
+                            <option value="Throne">Throne</option>
+                            <option value="Transforming">Transforming</option>
+                            <option value="Tuner">Tuner</option>
+                            <option value="Twin">Twin</option>
+                            <option value="Type">Type</option>
+                            <option value="Vault">Vault</option>
+                            <option value="Visionary">Visionary</option>
+                            <option value="Walker">Walker</option>
+                            <option value="Wanderer">Wanderer</option>
+                            <option value="Whisperer">Whisperer</option>
+                            <option value="Wisher">Wisher</option>
+                            <option value="Disrupts rigid realities through playful contradictions">Disrupts rigid realities through playful contradictions</option>
+                            <option value="Mirrors others' fears and hopes as shifting anatomy">Mirrors others' fears and hopes as shifting anatomy</option>
+                            <option value="Hosts drifting minds that dock for shared memory">Hosts drifting minds that dock for shared memory</option>
+                            <option value="Maintains the living alphabet of a forgotten world">Maintains the living alphabet of a forgotten world</option>
+                            <option value="Consumes obsolete timelines to prevent paradox">Consumes obsolete timelines to prevent paradox</option>
+                            <option value="Guards liminal urban spaces like alleys and overpasses">Guards liminal urban spaces like alleys and overpasses</option>
+                            <option value="Tests impossible rules by acting them out physically">Tests impossible rules by acting them out physically</option>
+                            <option value="Classifies creatures that exist only in contradictions">Classifies creatures that exist only in contradictions</option>
+                            <option value="Redeems discarded machines by granting them afterlives">Redeems discarded machines by granting them afterlives</option>
+                            <option value="Lures wanderers with scent, teaches them new senses">Lures wanderers with scent, teaches them new senses</option>
+                            <option value="Blooms in static, harmonizing broken signals into music">Blooms in static, harmonizing broken signals into music</option>
+                            <option value="Carries orphaned recollections looking for new owners">Carries orphaned recollections looking for new owners</option>
+                            <option value="Walks away from sacred sites to find meaning in trash">Walks away from sacred sites to find meaning in trash</option>
+                            <option value="Hunts in higher dimensions, seen only as outlines">Hunts in higher dimensions, seen only as outlines</option>
+                            <option value="Stitches holes in reality using missing moments">Stitches holes in reality using missing moments</option>
+                            <option value="Shelves information in reflective pools of liquid metal">Shelves information in reflective pools of liquid metal</option>
+                            <option value="Predicts futures by reshaping ocean debris">Predicts futures by reshaping ocean debris</option>
+                            <option value="Appears wherever opposing forces nearly cancel out">Appears wherever opposing forces nearly cancel out</option>
+                            <option value="Preserves extinct subcultures inside glowing bones">Preserves extinct subcultures inside glowing bones</option>
+                            <option value="Spreads future ecosystems into the present">Spreads future ecosystems into the present</option>
+                            <option value="Protects children from threats adults cannot perceive">Protects children from threats adults cannot perceive</option>
+                            <option value="Offers sanctuary to those who no longer fit any category">Offers sanctuary to those who no longer fit any category</option>
+                            <option value='"Edits reality\'s ""text"" to aid its chosen partner"'>"Edits reality's ""text"" to aid its chosen partner"</option>
+                            <option value="Enforces obsolete laws with reluctant compassion">Enforces obsolete laws with reluctant compassion</option>
+                            <option value="Terrifies cities while constantly close to shattering">Terrifies cities while constantly close to shattering</option>
+                            <option value="Sheds other beings' dreams as physical skins">Sheds other beings' dreams as physical skins</option>
+                            <option value="Manages a flock of malfunctioning reflections">Manages a flock of malfunctioning reflections</option>
+                            <option value="Optimizes ecosystems by rewriting living code">Optimizes ecosystems by rewriting living code</option>
+                            <option value="Records turning points, burning away its own face as ink">Records turning points, burning away its own face as ink</option>
+                            <option value="Sings in misaligned timelines to expose hidden outcomes">Sings in misaligned timelines to expose hidden outcomes</option>
+                            <option value="Shapes itself into past lives buried beneath it">Shapes itself into past lives buried beneath it</option>
+                            <option value="Knit from ash, sparks chaos in stagnant worlds">Knit from ash, sparks chaos in stagnant worlds</option>
+                            <option value="Follows those on the verge of radical change">Follows those on the verge of radical change</option>
+                            <option value="Reveals past versions of reality beneath the present">Reveals past versions of reality beneath the present</option>
+                            <option value="Protects the last skeletons of extinct ideas">Protects the last skeletons of extinct ideas</option>
+                            <option value="Hunts broken sentences to repair meaning">Hunts broken sentences to repair meaning</option>
+                            <option value="Arrives before disasters to warn the ground itself">Arrives before disasters to warn the ground itself</option>
+                            <option value="Shatters identities into rotating patterns">Shatters identities into rotating patterns</option>
+                            <option value="Appears wherever someone is replaced by routine">Appears wherever someone is replaced by routine</option>
+                            <option value="Carries stitched-together biomes on its back">Carries stitched-together biomes on its back</option>
+                            <option value="Speaks only in blacked-out prophecies">Speaks only in blacked-out prophecies</option>
+                            <option value="Folds oceans into secret pocket worlds">Folds oceans into secret pocket worlds</option>
+                            <option value="Delivers messages by wearing willing hosts">Delivers messages by wearing willing hosts</option>
+                            <option value="Guides lost broadcasts into coherent stories">Guides lost broadcasts into coherent stories</option>
+                            <option value="Lights the way between abandoned realities">Lights the way between abandoned realities</option>
+                            <option value="Measures time in layers of settled dust">Measures time in layers of settled dust</option>
+                            <option value="Rewrites coastlines with surging pigment">Rewrites coastlines with surging pigment</option>
+                            <option value="Rules over broken promises and failed empires">Rules over broken promises and failed empires</option>
+                            <option value="Tracks victims by the echoes of their regrets">Tracks victims by the echoes of their regrets</option>
+                            <option value="Shields fragile dreams from waking intrusions">Shields fragile dreams from waking intrusions</option>
+                            <option value="Announces endings as sacred transformations">Announces endings as sacred transformations</option>
+                            <option value="Steals reflections instead of objects">Steals reflections instead of objects</option>
+                            <option value="Entangles memories to forge new identities">Entangles memories to forge new identities</option>
+                            <option value="Declares laws that cancel each other, forcing change">Declares laws that cancel each other, forcing change</option>
+                            <option value="Lives only in outskirts, never in centers">Lives only in outskirts, never in centers</option>
+                            <option value="Redesigns hosts into new speculative species">Redesigns hosts into new speculative species</option>
+                            <option value="Acts out forgotten roles to keep stories alive">Acts out forgotten roles to keep stories alive</option>
+                            <option value="Grows alternate lives as fruit made of darkness">Grows alternate lives as fruit made of darkness</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-purple-700 mb-3 uppercase tracking-wider">Material / Composition</label>
+                        <select id="material" class="w-full bg-white border-2 border-purple-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-purple-300">
+                            <option value="">Perfectly as imagined</option>
+                            <option value="made of translucent crystal">Translucent Crystal</option>
+                            <option value="made of liquid mercury">Liquid Mercury</option>
+                            <option value="made of obsidian glass">Obsidian Glass</option>
+                            <option value="made of holographic light">Holographic Light</option>
+                            <option value="made of smoked velvet">Smoked Velvet</option>
+                            <option value="made of living marble">Living Marble</option>
+                            <option value="made of aurora threads">Aurora Threads</option>
+                            <option value="made of black hole fragments">Black Hole Fragments</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role/Profession -->
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-indigo-100">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><i class="fa-solid fa-briefcase text-indigo-600"></i> Role / Profession</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-indigo-700 mb-4 uppercase tracking-wider">Calling</label>
+                        <div class="flex flex-wrap gap-4" id="roleOptions">
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Adventurer">Adventurer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Alchemist">Alchemist</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Architect">Architect</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Archivist">Archivist</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Astronomer">Astronomer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Baker">Baker</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Beekeeper">Beekeeper</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Blacksmith">Blacksmith</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Broadcaster">Broadcaster</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Carrier">Carrier</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Cartographer">Cartographer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Chef">Chef</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Chronicler">Chronicler</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Community Professional">Community Professional</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Companion">Companion</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Commuter">Commuter</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Conductor">Conductor</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Curator">Curator</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Custodian">Custodian</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Dancer">Dancer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Daydreamer">Daydreamer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Dreamer">Dreamer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Elder">Elder</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Engineer">Engineer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Fashionista">Fashionista</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Gardener">Gardener</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Guardian">Guardian</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Guide">Guide</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Icon">Icon</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="In the Future Professional outfit">In the Future Professional outfit</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Installation">Installation</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Librarian">Librarian</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Lightkeeper">Lightkeeper</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Master">Master</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Monk">Monk</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Muse">Muse</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Mystic">Mystic</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Nature Explorer">Nature Explorer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Navigator">Navigator</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Nomad">Nomad</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Oracle">Oracle</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Painter">Painter</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Philosopher">Philosopher</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Poet">Poet</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Puppeteer">Puppeteer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Ranger">Ranger</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Rider">Rider</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Samurai">Samurai</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Scholar">Scholar</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Shepherd">Shepherd</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Singer">Singer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Socialite">Socialite</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Specimen">Specimen</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Storyteller">Storyteller</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Suit">Suit</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Surfer">Surfer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Teller">Teller</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Urbanite">Urbanite</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Weaver">Weaver</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Doctor">Doctor</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Goldsmith">Goldsmith</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Jewelry">Jewelry</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Podcaster">Podcaster</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Therapist">Therapist</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Teacher">Teacher</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Bartender">Bartender</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Game Streamer">Game Streamer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Fitness Trainer">Fitness Trainer</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Home Chef">Home Chef</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Entrepreneur">Entrepreneur</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Life Coach">Life Coach</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Content Creator">Content Creator</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Hunter">Hunter</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="Female">Female</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aura & Presence -->
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-pink-100">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><i class="fa-solid fa-heart text-pink-600"></i> Aura & Presence</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider">Personality</label>
+                        <select id="mood" class="w-full bg-white border-2 border-pink-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-pink-300">
+                            <option value="">Perfectly captivating</option>
+                            <option value="enigmatic and magnetic">Enigmatic & Magnetic</option>
+                            <option value="serene yet intense">Serene Yet Intense</option>
+                            <option value="playfully dangerous">Playfully Dangerous</option>
+                            <option value="melancholically beautiful">Melancholically Beautiful</option>
+                            <option value="quietly omnipotent">Quietly Omnipotent</option>
+                            <option value="elegantly chaotic">Elegantly Chaotic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider">Color Palette</label>
+                        <select id="colorPalette" class="w-full bg-white border-2 border-pink-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-pink-300">
+                            <option value="">Any striking colors</option>
+                            <option value="deep cosmic gradients">Cosmic Gradients</option>
+                            <option value="iridescent oil slick">Oil Slick Iridescence</option>
+                            <option value="monochrome with neon accents">Monochrome + Neon</option>
+                            <option value="twilight prism">Twilight Prism</option>
+                            <option value="molten gold and obsidian">Molten Gold & Obsidian</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider">Visual Signature</label>
+                        <select id="trait" class="w-full bg-white border-2 border-pink-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-pink-300">
+                            <option value="">Perfectly mesmerizing</option>
+                            <option value="surrounded by floating geometric shards">Floating Geometric Shards</option>
+                            <option value="trails liquid light behind movement">Liquid Light Trails</option>
+                            <option value="body partially fractured into crystal">Fractured Crystal Body</option>
+                            <option value="emits soft particle haze">Soft Particle Haze</option>
+                            <option value="eyes glow with inner nebula">Nebula Eyes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secret Power -->
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-purple-100">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><i class="fa-solid fa-gift text-purple-600"></i> Secret Power</h2>
+                <select id="secretPower" class="w-full bg-gradient-to-r from-pink-100 to-purple-100 border-2 border-pink-300 text-lg rounded-2xl p-4 font-bold">
+                    <option value="">Hidden for now...</option>
+                    <option value="can phase through mirrors">Phases through mirrors</option>
+                    <option value="controls gravity in a 3-meter radius">Controls local gravity</option>
+                    <option value="leaves echoes of past emotions">Leaves emotional echoes</option>
+                    <option value="breathes soft nebula clouds">Breathes nebula clouds</option>
+                    <option value="eyes reflect alternate realities">Eyes show alternate realities</option>
+                    <option value="touch turns objects momentarily transparent">Makes objects transparent</option>
+                    <option value="casts shadows that move independently">Independent shadows</option>
+                    <option value="voice creates visible sound waves">Visible sound waves</option>
+                </select>
+            </div>
+
+            <!-- Artistic Vision -->
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-indigo-100">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><i class="fa-solid fa-paintbrush text-indigo-600"></i> Artistic Vision</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-indigo-700 mb-4 uppercase tracking-wider">Style</label>
+                        <div class="flex flex-wrap gap-4" id="styleOptions">
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="surreal digital art">Surreal Digital</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="hyper-detailed cinematic">Cinematic</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="glossy sci-fi concept art">Sci-Fi Concept</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="dark fantasy illustration">Dark Fantasy</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="iridescent cyber-baroque">Cyber-Baroque</button>
+                            <button type="button" class="option-btn bg-white border-2 border-indigo-200 px-6 py-3 rounded-2xl font-medium hover:bg-indigo-100 hover:border-indigo-400 transition-all" data-value="volumetric lighting masterpiece">Volumetric Masterpiece</button>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-indigo-700 mb-3 uppercase tracking-wider">Pose</label>
+                            <select id="camera" class="w-full bg-white border-2 border-indigo-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-indigo-300">
+                                <option value="full body, dramatic pose">Dramatic Full Body</option>
+                                <option value="elegant floating pose">Elegant Floating</option>
+                                <option value="dynamic action stance">Dynamic Action</option>
+                                <option value="levitating gracefully">Levitating Gracefully</option>
+                                <option value="standing with quiet intensity">Quiet Intensity</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-indigo-700 mb-3 uppercase tracking-wider">Environment</label>
+                            <select id="background" class="w-full bg-white border-2 border-indigo-200 text-lg rounded-2xl p-4 focus:ring-4 focus:ring-indigo-300">
+                                <option value="void with soft particles">Cosmic Void</option>
+                                <option value="abandoned crystal cathedral">Crystal Cathedral</option>
+                                <option value="neon-lit infinite corridor">Neon Corridor</option>
+                                <option value="floating in zero gravity">Zero Gravity</option>
+                                <option value="surrounded by fractured mirrors">Fractured Mirrors</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Output Panel -->
+        <aside class="space-y-6">
+            <!-- Concierge Toast -->
+            <div id="concierge-note" class="hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white p-5 rounded-3xl shadow-2xl concierge-pop">
+                <div class="flex items-center gap-4">
+                    <i class="fa-solid fa-bell-concierge text-2xl"></i>
+                    <div>
+                        <p class="font-bold">Your personal concierge whispers...</p>
+                        <p id="concierge-text" class="text-lg font-medium">Absolutely divine!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border-2 border-purple-200">
+                <h2 class="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Your One-of-a-Kind Masterpiece Prompt
+                </h2>
+                <textarea id="output" rows="9" class="w-full p-5 bg-gray-900/90 text-cyan-300 font-mono text-sm rounded-2xl shadow-inner border border-purple-300/50 focus:ring-4 focus:ring-purple-400" readonly></textarea>
+
+                <div class="mt-6 space-y-4">
+                    <button onclick="copyAndCelebrate()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold text-lg py-5 rounded-3xl shadow-xl flex items-center justify-center gap-3 transform hover:scale-105 transition-all">
+                        <i class="fa-solid fa-sparkles"></i> Instantly Copied! Ready for Your Generator
+                    </button>
+
+                    <button onclick="surpriseDelight()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 text-white font-bold text-lg py-5 rounded-3xl shadow-xl flex items-center justify-center gap-3 transform hover:scale-105 transition-all">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Surprise Me with Pure Magic!
+                    </button>
+                </div>
+
+                <p class="text-center mt-6 text-xs text-purple-600 font-bold uppercase tracking-widest">
+                    Every prompt is automatically copied the moment it’s born ♡
+                </p>
+            </div>
+        </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script>
+        const elements = {
+            species: document.getElementById('species'),
+            type: document.getElementById('type'),
+            material: document.getElementById('material'),
+            roleButtons: document.querySelectorAll('#roleOptions .option-btn'),
+            mood: document.getElementById('mood'),
+            colorPalette: document.getElementById('colorPalette'),
+            trait: document.getElementById('trait'),
+            secretPower: document.getElementById('secretPower'),
+            camera: document.getElementById('camera'),
+            background: document.getElementById('background'),
+            output: document.getElementById('output'),
+            styleButtons: document.querySelectorAll('#styleOptions .option-btn'),
+            conciergeNote: document.getElementById('concierge-note'),
+            conciergeText: document.getElementById('concierge-text')
+        };
+
+        let selectedRole = 'Architect';
+        let selectedStyle = 'surreal digital art';
+
+        const compliments = [
+            "This is going to be legendary!",
+            "The universe just gasped in awe.",
+            "Pure visual poetry.",
+            "You've created something that should be in a museum.",
+            "I’m genuinely speechless — this is perfection.",
+            "This character will haunt dreams in the best way.",
+            "Absolutely breathtaking choice.",
+            "The cosmos is jealous right now.",
+            "You are operating on a different level.",
+            "This is why art exists."
+        ];
+
+        function showConcierge(message = null) {
+            const text = message || compliments[Math.floor(Math.random() * compliments.length)];
+            elements.conciergeText.textContent = text;
+            elements.conciergeNote.classList.remove('hidden');
+            setTimeout(() => elements.conciergeNote.classList.add('hidden'), 4200);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+        }
+
+        function copyAndCelebrate() {
+            copyToClipboard(elements.output.value);
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#a78bfa', '#f472b6', '#60a5fa', '#c084fc']
+            });
+            showConcierge("Copied with eternal admiration ♡");
+        }
+
+        function generatePrompt(autoCopy = true) {
+            let parts = [];
+
+            // Species with category label
+            let speciesText = elements.species.value;
+            if (speciesText) parts.push(`Species: ${speciesText}`);
+
+            // Character Type with category label
+            let typeText = elements.type.value || '';
+            let materialText = elements.material.value || '';
+            let typeCombined = [typeText, materialText].filter(Boolean).join(' ');
+            if (typeCombined) parts.push(`Character Type: ${typeCombined}`);
+
+            // Role with category label
+            if (selectedRole) parts.push(`Role/Profession: ${selectedRole}`);
+
+            // Aura
+            if (elements.mood.value) parts.push(elements.mood.value);
+            if (elements.colorPalette.value) parts.push(elements.colorPalette.value);
+            if (elements.trait.value) parts.push(elements.trait.value);
+            if (elements.secretPower.value) parts.push(elements.secretPower.value);
+
+            // Scene
+            parts.push(elements.camera.value);
+            parts.push(elements.background.value);
+            parts.push(selectedStyle);
+
+            // Quality
+            parts.push("full body, masterpiece, ultra-detailed, best quality, cinematic lighting, sharp focus, intricate, highly detailed, artstation trending, 8k");
+
+            elements.output.value = parts.filter(Boolean).join(", ");
+            
+            if (autoCopy) {
+                copyToClipboard(elements.output.value);
+                if (Math.random() < 0.15) {
+                    confetti({
+                        particleCount: 40,
+                        spread: 100,
+                        origin: { y: 0.8 },
+                        colors: ['#c084fc', '#a78bfa', '#e879f9']
+                    });
+                }
+            }
+        }
+
+        function surpriseDelight() {
+            if (Math.random() < 0.125) {
+                elements.output.value = "golden ticket legendary entity, impossible rarity, one in a trillion being, surrounded by impossible phenomena, cosmic singularity of beauty and power, masterpiece of all masterpieces, the character that breaks every generator";
+                copyToClipboard(elements.output.value);
+                confetti({
+                    particleCount: 500,
+                    spread: 120,
+                    origin: { y: 0.4 },
+                    colors: ['#fbbf24', '#f59e0b', '#goldenrod', '#ffd700', '#ff8c00']
+                });
+                showConcierge("✨ GOLDEN TICKET UNLOCKED ✨ You just manifested the rarest entity in existence.");
+                return;
+            }
+
+            // Randomize everything
+            const selects = [elements.species, elements.type, elements.material, elements.mood, elements.colorPalette, elements.trait, elements.secretPower, elements.camera, elements.background];
+            selects.forEach(sel => {
+                if (sel.options.length > 1) {
+                    const lucky = Math.floor(Math.random() * (sel.options.length - 1)) + 1;
+                    sel.selectedIndex = lucky;
+                }
+            });
+
+            // Random role
+            const randomRoleBtn = elements.roleButtons[Math.floor(Math.random() * elements.roleButtons.length)];
+            elements.roleButtons.forEach(b => b.classList.remove('selected'));
+            randomRoleBtn.classList.add('selected');
+            selectedRole = randomRoleBtn.dataset.value;
+
+            // Random style
+            const randomStyleBtn = elements.styleButtons[Math.floor(Math.random() * elements.styleButtons.length)];
+            elements.styleButtons.forEach(b => b.classList.remove('selected'));
+            randomStyleBtn.classList.add('selected');
+            selectedStyle = randomStyleBtn.dataset.value;
+
+            generatePrompt(true);
+            confetti({
+                particleCount: 250,
+                spread: 90,
+                origin: { y: 0.55 },
+                colors: ['#a78bfa', '#c084fc', '#e879f9', '#7c3aed']
+            });
+            showConcierge("A new legend has been born because of you ♡");
+        }
+
+        // Event listeners
+        document.querySelectorAll('select, #roleOptions .option-btn, #styleOptions .option-btn').forEach(el => {
+            el.addEventListener('change' in el ? 'change' : 'click', () => {
+                if (el.classList && el.classList.contains('option-btn')) {
+                    const parent = el.closest('#roleOptions') ? elements.roleButtons : elements.styleButtons;
+                    parent.forEach(b => b.classList.remove('selected'));
+                    el.classList.add('selected');
+                    if (parent === elements.roleButtons) selectedRole = el.dataset.value;
+                    if (parent === elements.styleButtons) selectedStyle = el.dataset.value;
+                }
+                generatePrompt(true);
+                showConcierge();
+            });
+        });
+
+        // Initial generation
+        document.querySelector('#roleOptions .option-btn').classList.add('selected');
+        document.querySelector('#styleOptions .option-btn').classList.add('selected');
+        generatePrompt(true);
+        showConcierge("Welcome, master creator. Your first masterpiece is already on your clipboard ♡");
+    </script>
+</body>
+</html>
