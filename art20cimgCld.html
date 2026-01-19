@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OddChar Atelier | Sora 2 Character Prompt Studio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        .dark-glass {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+            padding: 2px;
+            border-radius: 1.5rem;
+        }
+        
+        .gradient-border-inner {
+            background: white;
+            border-radius: calc(1.5rem - 2px);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5rem;
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.5); }
+        }
+        
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .concept-tag {
+            transition: all 0.3s ease;
+        }
+        
+        .concept-tag:hover {
+            transform: scale(1.05);
+        }
+        
+        .toast {
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white min-h-screen">
+
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl float"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl float" style="animation-delay: -3s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-3xl float" style="animation-delay: -1.5s;"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast fixed top-6 right-6 z-50 dark-glass rounded-2xl p-4 border border-white/10 max-w-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-sparkles text-white"></i>
+            </div>
+            <p id="toast-text" class="text-sm text-slate-200"></p>
+        </div>
+    </div>
+
+    <div class="relative z-10 min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="p-6 border-b border-white/5">
+            <div class="max-w-6xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 flex items-center justify-center pulse-glow">
+                        <i class="fa-solid fa-atom text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight">OddChar <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-fuchsia-400">Atelier</span></h1>
+                        <p class="text-xs text-slate-400 tracking-widest uppercase">Sora 2 Character Studio</p>
+                    </div>
+                </div>
+                <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400">
+                    <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">Conceptual Blending</span>
+                    <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">Ontological Play</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-6">
+            <div class="max-w-6xl mx-auto">
+                
+                <!-- Intro -->
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-3">Craft Impossible Entities</h2>
+                    <p class="text-slate-400 max-w-2xl mx-auto">
+                        Break the human-centric bias. Blend concepts that shouldn't exist together. 
+                        Create characters that defamiliarize reality and captivate through creative friction.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-6">
+                    
+                    <!-- Left Column: Core Identity -->
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- The Entity Section -->
+                        <div class="glass rounded-3xl p-6 text-slate-800">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white">
+                                    <i class="fa-solid fa-dna"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">The Entity</h3>
+                                    <p class="text-xs text-slate-500">Speculative Biology + Post-Human Forms</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Species</label>
+                                    <select id="species" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Character Type</label>
+                                    <select id="charType" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Role / Purpose</label>
+                                    <select id="role" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Conceptual Friction Section -->
+                        <div class="glass rounded-3xl p-6 text-slate-800">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Creative Friction</h3>
+                                    <p class="text-xs text-slate-500">Incongruity + High-Contrast Dynamics</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Ontological State</label>
+                                    <select id="ontology" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Motion / Action</label>
+                                    <select id="motion" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Defamiliarization Section -->
+                        <div class="glass rounded-3xl p-6 text-slate-800">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white">
+                                    <i class="fa-solid fa-eye"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Defamiliarization</h3>
+                                    <p class="text-xs text-slate-500">Making the Familiar Strange</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Environment</label>
+                                    <select id="environment" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Visual Style</label>
+                                    <select id="style" class="w-full bg-slate-50 border-0 text-slate-700 rounded-xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column: Output -->
+                    <div class="space-y-6">
+                        
+                        <!-- Active Concepts -->
+                        <div class="glass rounded-3xl p-5 text-slate-800">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Active Concepts</h4>
+                            <div id="concept-tags" class="flex flex-wrap gap-2">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Prompt Output -->
+                        <div class="gradient-border">
+                            <div class="gradient-border-inner p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-bold text-slate-800">Your Prompt</h3>
+                                    <button onclick="refreshPrompt()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1 transition-colors">
+                                        <i class="fa-solid fa-shuffle"></i> Remix
+                                    </button>
+                                </div>
+                                
+                                <textarea id="output" rows="8" readonly class="w-full p-4 bg-slate-900 text-emerald-400 mono text-sm rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none border-0"></textarea>
+                                
+                                <div class="space-y-3">
+                                    <button onclick="triggerSurprise()" class="w-full bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 hover:from-indigo-500 hover:via-violet-500 hover:to-fuchsia-500 text-white font-bold py-4 px-6 rounded-xl transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/25 flex items-center justify-center gap-3">
+                                        <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                                        <span>Generate Random Entity</span>
+                                    </button>
+                                    
+                                    <button onclick="copyToClipboard()" id="copyBtn" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span>Copy Prompt</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tips -->
+                        <div class="glass rounded-3xl p-5 text-slate-700">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Sora 2 Tips</h4>
+                            <ul class="text-xs space-y-2 text-slate-600">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                                    <span>Describe motion and transformation</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                                    <span>Include environmental interaction</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-0.5"></i>
+                                    <span>Embrace the impossible</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-6 border-t border-white/5 text-center">
+            <p class="text-sm text-slate-500">OddChar Atelier — Where impossible entities come to life</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // === DATA ===
+        const speciesList = [
+            "Unthought of Being","Being","Teeth","Body part","Animal Character","Atomic Structure","Microbe","Art Installation",
+            "Desert Being","Kitchen Tool Character","Mushroom","Machinery Tool Being","Computer Hardware Being","Advanced Creature",
+            "Golem","Cat","Spirit","Iguana","Kraken","Symbiote","Sprite","Hybrid","Creature","Animal","Dog","Colossus",
+            "Sentinel","Medieval Character","Sentient Nebula","Liquid Mercury Entity","Living Shadow","Mechanism Creature",
+            "Geometric Fractal","Coral Reef Hivemind","Fungal Network","Static Electricity Cloud","Melting Candle Being",
+            "Woven Fabric Golem","Radio Wave Specter","Volcanic Glass Golem","Rust Parasite","Crystalline Growth",
+            "Root System Consciousness","Tectonic Plate Spirit","Old Growth Forest Heart","Ink Blot Figment","Subatomic Particle",
+            "Bio-Luminescent Deep Sea Entity","Shattered Mirror Being","Pressed Flower Spirit","Thawing Glacier Entity",
+            "Scrap Metal Amalgam","Paper Origami Lifeform","Vaporous Steam Construct","Desert Mirage","Tar Pit Dweller",
+            "Bioluminescent Moss","Celestial Constellation","Gnarled Driftwood Being","Magnetic Field Entity","Sandstorm Wraith",
+            "Obsidian Shard","Deep Space Vacuum","Burnt Ember Spirit","Coral Skeleton","Petrified Wood Entity","Tidal Wave Form",
+            "Echoing Soundwave","Ancient Parchment Character","Oil Slick Organism","Thorn Bush Entity","Graffiti Mural Being",
+            "Meteorite Shard","Neon Light Specter","Vine-Wrapped Monolith","Polished Marble Entity","Root-Bound Earth Being",
+            "Storm Cloud Consciousness","Solar Flare Entity","Forgotten Manuscript Being","Lichen-Covered Boulder",
+            "Wildfire Essence","Refracted Light Entity","Molten Glass Sculpt","Tectonic Plate Colossus","Liquid Mercury Humanoid",
+            "Atmospheric Gas Cloud","Crystallized Salt Golem","Volcanic Ash Wraith","Static Electricity Swarm","Deep Sea Vent Cluster",
+            "Radioactive Isotope Being","Rusted Gear Assembly","Circuit Board Hivemind","Hydraulic Press Golem","Neon Tube Skeleton",
+            "Vacuum Tube Intelligence","Scrapped Engine Hybrid","Fiber Optic Weaver","Abandoned Satellite Entity","Industrial Boiler Beast",
+            "Mycelial Network Consciousness","Bioluminescent Planktoid","Tardigrade Titan","Nerve Ending Bundle","Pollen Grain Sovereign",
+            "Petri Dish Colony","Coral Reef Guardian","Living Vascular System","Moss-Covered Monolith","Deep-Tissue Parasite",
+            "Mathematical Equation Manifest","Glitch-Art Apparition","Origami Folded Reality","Sound Wave Sculpture","Ink Blot Chimera",
+            "Topographic Map Entity","String Theory Weaving","Negative Space Silhouette","Fractal Geometry Beast","Paradoxical Geometry Being",
+            "Victorian Wallpaper Mimic","Attic Dust Elemental","Porcelain Tea Set Hybrid","Garden Tool Centaur","Thrift Store Fabric Amalgam",
+            "Library Book Chimera","Streetlight Sentinel","Pavement Crack Dweller","Stationary Supply Swarm","Ironing Board Automaton",
+            "Paradox Weaver","Echoform Chimera","Cognitive Reef","Glyphbound Homunculus","Chronophage Larva",
+            "Bitumen Seraph","Foam Logic Golem","Shadow Taxonomist","Rustborn Saint","Petal-Spined Aberrant",
+            "Noise Orchid","Mnemonic Husk","Inverted Pilgrim","Lattice Beast","Seamstress of Gaps",
+            "Mercury Librarian","Plastic Tide Oracle","Friction Djinn","Neon Fossil","Aeon Pollen Carrier",
+            "Uncanny Caretaker","Null Cathedral","Inkbound Familiar","Broken Halo Automaton","Glassbone Marauder",
+            "Dream-Shed Serpent","Specular Doppelherd","Overgrown Algorithm","Candle-Headed Witness","Gravemind Topiary",
+            "Cinder-Thread Jester","Errant Halo Swarm","Palimpsest Phantom","Obsidian Marrow Warden","Feral Syntax Beast",
+            "Foreshock Pilgrim","Kaleidos Voidling","Carbon Copy Revenant","Chimeric Atlas","Redacted Saint",
+            "Abyssal Origamist","Proxy Skin Courier","Static Veil Shepherd","Liminal Bone Lantern","Dust-Clock Seraph",
+            "Inkstorm Leviathan","Splintered Crown Wight","Cobalt Echo Stalker","Porous Dream Bastion","Rusted Halo Herald",
+            "Glassroot Pilferer","Mnemonic Tangle Seraph","Contradiction Herald","Hinterland Eidolon","Shiftspore Myriad",
+            "Puppetless Marionette","Silhouette Orchard"
+        ];
+
+        const characterTypeList = [
+            "(anime)","Athletic","Accountant","Advisor","Aesthetic","Analyst","Ancestor","Apprentice","Archaeologist","Archive","Artisan",
+            "Ascetic","Avatar","Being","Lover","Blendwalker","Builder","Calligrapher","Captain","Chamber","Character",
+            "Complex","Charmer","Chaser","Choir","Choreographer","Chronologist","Cloud","Compass","Counselor","Cultivator",
+            "Daydreamer","Dealer","Debater","Designer","Destiny","Detective","DJ","Hunter","Documentarian","Doppelgänger",
+            "Dwellers","Economist","Ecosystem","Ego","Engine","Entities","Faces","Fairy","Fashionista","Figure","Forecaster",
+            "Fountain","Fragments","Freelancer","Gambler","Guru","Heart","Herald","Hoarder","Icon","Initiate","Keeper",
+            "Luminary","Made of dots","Mechanic","Mediator","Medium","Mentor","Merchant","Monolith","Monument","Native",
+            "Negotiator","Nexus","Obelisk","Overclocker","Palace","Parent of a kid from 3450","Pathfinder","Personification",
+            "Personified","Personifications","Phantom","Prophet","Queen","Reactor","Rebel","Redux","Resident","Resonator",
+            "Revivalist","Room","Scribe","Scout","Sculptor","Seeker","Shapeshifter","Sketchling","Smuggler","Sniper",
+            "Socialite","Sorcerer","Soul","Sovereign","Spines","Stylist","Survivor","System","Theater","Therapist",
+            "Thief","Throne","Transforming","Tuner","Twin","Type","Vault","Visionary","Walker","Wanderer","Whisperer","Wisher",
+            "Liminal Trickster","Composite Entity","Distributed Organism","Semiotic Construct","Temporal Parasite","Asphalt Angel",
+            "Abstract Embodiment","Ontological Archivist","Corroded Mystic","Floral Predator","Sonic Flora","Memory Shell",
+            "Anti-Prophet","Geometric Predator","Absence Weaver","Fluid Archivist","Synthetic Swarm","Tension Elemental",
+            "Urban Relic","Temporal Sporebearer","Almost-Human Guardian","Architectural Entity","Living Annotation","Fallen Construct",
+            "Fragile Colossus","Hypnagogic Snake","Reflection Swarm","Bio-Digital Vine","Liminal Observer","Entity Collective",
+            "Funerary Flora","Ember Trickster","Luminous Fragment","Layered Spirit","Bonebound Guardian","Grammatical Predator",
+            "Seismic Wanderer","Color-Split Entity","Replicated Shade","Bio-Geographic Titan","Censored Mystic","Depth-Fold Creature",
+            "Borrowed-Body Agent","Signal Herdsman","Threshold Relic","Temporal Custodian","Fluid Colossus","Ruined Sovereign",
+            "Resonant Hunter","Sleep Citadel","Decay Emissary","Translucent Thief","Mind-Knot Angel","Paradox Emissary",
+            "Borderline Spirit","Fungal Collective","Autonomous Construct","Shadow Ecosystem"
+        ];
+
+        const roleList = [
+            "Adventurer","Alchemist","Architect","Archivist","Astronomer","Baker","Beekeeper","Blacksmith","Broadcaster",
+            "Carrier","Cartographer","Chef","Chronicler","Community Professional","Companion","Commuter","Conductor",
+            "Curator","Custodian","Dancer","Daydreamer","Dreamer","Elder","Engineer","Fashionista","Gardener","Guardian",
+            "Guide","Icon","In the Future Professional outfit","Installation","Librarian","Lightkeeper","Master","Monk",
+            "Muse","Mystic","Nature Explorer","Navigator","Nomad","Oracle","Painter","Philosopher","Poet","Puppeteer",
+            "Ranger","Rider","Samurai","Scholar","Shepherd","Singer","Socialite","Specimen","Storyteller","Suit",
+            "Surfer","Teller","Urbanite","Weaver","Female","Doctor","Goldsmith","Jewelry","Podcaster","Therapist","Teacher",
+            "Bartender","Game Streamer","Fitness Trainer","Home Chef","Entrepreneur","Life Coach","Content Creator",
+            "Disrupts rigid realities through playful contradictions","Mirrors others' fears and hopes as shifting anatomy",
+            "Hosts drifting minds that dock for shared memory","Maintains the living alphabet of a forgotten world",
+            "Consumes obsolete timelines to prevent paradox","Guards liminal urban spaces like alleys and overpasses",
+            "Tests impossible rules by acting them out physically","Classifies creatures that exist only in contradictions",
+            "Redeems discarded machines by granting them afterlives","Lures wanderers with scent, teaches them new senses",
+            "Blooms in static, harmonizing broken signals into music","Carries orphaned recollections looking for new owners",
+            "Walks away from sacred sites to find meaning in trash","Hunts in higher dimensions, seen only as outlines",
+            "Stitches holes in reality using missing moments","Shelves information in reflective pools of liquid metal",
+            "Predicts futures by reshaping ocean debris","Appears wherever opposing forces nearly cancel out",
+            "Preserves extinct subcultures inside glowing bones","Spreads future ecosystems into the present",
+            "Protects children from threats adults cannot perceive","Offers sanctuary to those who no longer fit any category",
+            "Edits reality's text to aid its chosen partner","Enforces obsolete laws with reluctant compassion",
+            "Terrifies cities while constantly close to shattering","Sheds other beings' dreams as physical skins",
+            "Manages a flock of malfunctioning reflections","Optimizes ecosystems by rewriting living code",
+            "Records turning points, burning away its own face as ink","Sings in misaligned timelines to expose hidden outcomes",
+            "Shapes itself into past lives buried beneath it","Knit from ash, sparks chaos in stagnant worlds",
+            "Follows those on the verge of radical change","Reveals past versions of reality beneath the present",
+            "Protects the last skeletons of extinct ideas","Hunts broken sentences to repair meaning",
+            "Arrives before disasters to warn the ground itself","Shatters identities into rotating patterns",
+            "Appears wherever someone is replaced by routine","Carries stitched-together biomes on its back",
+            "Speaks only in blacked-out prophecies","Folds oceans into secret pocket worlds",
+            "Delivers messages by wearing willing hosts","Guides lost broadcasts into coherent stories",
+            "Lights the way between abandoned realities","Measures time in layers of settled dust",
+            "Rewrites coastlines with surging pigment","Rules over broken promises and failed empires",
+            "Tracks victims by the echoes of their regrets","Shields fragile dreams from waking intrusions",
+            "Announces endings as sacred transformations","Steals reflections instead of objects",
+            "Entangles memories to forge new identities","Declares laws that cancel each other, forcing change",
+            "Lives only in outskirts, never in centers","Redesigns hosts into new speculative species",
+            "Acts out forgotten roles to keep stories alive","Grows alternate lives as fruit made of darkness"
+        ];
+
+        const ontologyList = [
+            "exists between moments",
+            "simultaneously solid and vapor",
+            "perpetually forming and dissolving",
+            "visible only in peripheral vision",
+            "made of compressed memories",
+            "exists as a living contradiction",
+            "frozen mid-transformation",
+            "phasing between dimensions",
+            "constructed from ambient emotions",
+            "held together by forgotten promises",
+            "existing in multiple timescales at once",
+            "composed of crystallized sound",
+            "bleeding into adjacent realities",
+            "neither alive nor inanimate",
+            "made of folded spacetime",
+            "assembled from discarded futures"
+        ];
+
+        const motionList = [
+            "slowly rotating in place",
+            "drifting through the scene",
+            "particles continuously shedding and reforming",
+            "pulsing with inner light",
+            "fragments orbiting the core",
+            "gracefully unraveling at the edges",
+            "emerging from the ground",
+            "casting impossible shadows",
+            "leaving trails of afterimages",
+            "breathing visible energy",
+            "flickering between states",
+            "attracting floating debris",
+            "reflecting surroundings incorrectly",
+            "generating ripples in the air",
+            "slowly ascending",
+            "collecting light around itself"
+        ];
+
+        const environmentList = [
+            "abandoned shopping mall at dusk",
+            "endless white void with floating debris",
+            "underwater cathedral ruins",
+            "inside a massive clock mechanism",
+            "forest of crystalline trees",
+            "rooftop during a meteor shower",
+            "library where books float freely",
+            "train station between worlds",
+            "garden growing from circuit boards",
+            "museum after closing time",
+            "canyon made of stacked paper",
+            "city street flooded with clouds",
+            "inside a kaleidoscope",
+            "desert of black sand and white sky",
+            "greenhouse full of glowing plants",
+            "infinite staircase going nowhere"
+        ];
+
+        const styleList = [
+            "cinematic volumetric lighting",
+            "dreamlike surrealism",
+            "high contrast noir aesthetic",
+            "bioluminescent color palette",
+            "soft painterly atmosphere",
+            "hyper-detailed macro perspective",
+            "ethereal double exposure",
+            "brutalist architectural framing",
+            "warm golden hour glow",
+            "cold clinical precision",
+            "organic flowing forms",
+            "geometric abstraction",
+            "vintage film grain texture",
+            "liquid chrome reflections",
+            "muted earth tones with neon accents",
+            "stark minimalist composition"
+        ];
+
+        const concepts = [
+            { name: "Conceptual Blending", color: "bg-indigo-100 text-indigo-700" },
+            { name: "Ontological Play", color: "bg-violet-100 text-violet-700" },
+            { name: "Creative Friction", color: "bg-amber-100 text-amber-700" },
+            { name: "Speculative Biology", color: "bg-emerald-100 text-emerald-700" },
+            { name: "Post-Human", color: "bg-rose-100 text-rose-700" },
+            { name: "Defamiliarization", color: "bg-teal-100 text-teal-700" },
+            { name: "Incongruity", color: "bg-orange-100 text-orange-700" },
+            { name: "Anthropomorphism", color: "bg-sky-100 text-sky-700" }
+        ];
+
+        const toastMessages = [
+            "Reality just bent to your will.",
+            "The impossible is now possible.",
+            "A truly unique entity emerges.",
+            "You've created something new.",
+            "The universe takes note.",
+            "Boundaries successfully broken.",
+            "Concepts beautifully blended.",
+            "An original vision captured."
+        ];
+
+        // Sort lists
+        speciesList.sort();
+        characterTypeList.sort();
+        roleList.sort();
+
+        // DOM Elements
+        const els = {
+            species: document.getElementById('species'),
+            charType: document.getElementById('charType'),
+            role: document.getElementById('role'),
+            ontology: document.getElementById('ontology'),
+            motion: document.getElementById('motion'),
+            environment: document.getElementById('environment'),
+            style: document.getElementById('style'),
+            output: document.getElementById('output'),
+            toast: document.getElementById('toast'),
+            toastText: document.getElementById('toast-text'),
+            copyBtn: document.getElementById('copyBtn'),
+            conceptTags: document.getElementById('concept-tags')
+        };
+
+        // Populate select
+        function populateSelect(el, items) {
+            el.innerHTML = '';
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                el.appendChild(opt);
+            });
+        }
+
+        // Initialize selects
+        populateSelect(els.species, speciesList);
+        populateSelect(els.charType, characterTypeList);
+        populateSelect(els.role, roleList);
+        populateSelect(els.ontology, ontologyList);
+        populateSelect(els.motion, motionList);
+        populateSelect(els.environment, environmentList);
+        populateSelect(els.style, styleList);
+
+        // Add listeners
+        document.querySelectorAll('select').forEach(sel => {
+            sel.addEventListener('change', () => {
+                generatePrompt();
+                showToast();
+            });
+        });
+
+        // Update concept tags
+        function updateConceptTags() {
+            const shuffled = [...concepts].sort(() => Math.random() - 0.5).slice(0, 4);
+            els.conceptTags.innerHTML = shuffled.map(c => 
+                `<span class="concept-tag px-3 py-1.5 rounded-full text-xs font-medium ${c.color}">${c.name}</span>`
+            ).join('');
+        }
+
+        // Show toast
+        function showToast(msg) {
+            const message = msg || toastMessages[Math.floor(Math.random() * toastMessages.length)];
+            els.toastText.textContent = message;
+            els.toast.classList.add('show');
+            setTimeout(() => els.toast.classList.remove('show'), 3000);
+        }
+
+        // Generate prompt
+        function generatePrompt() {
+            const species = els.species.value;
+            const charType = els.charType.value;
+            const role = els.role.value;
+            const ontology = els.ontology.value;
+            const motion = els.motion.value;
+            const environment = els.environment.value;
+            const style = els.style.value;
+
+            const prompt = `Species: ${species}, Character Type: ${charType}, Role/Profession: ${role}. The entity ${ontology}, ${motion}. Set in ${environment}. Rendered in ${style}.`;
+
+            els.output.value = prompt;
+            updateConceptTags();
+            autoCopy();
+        }
+
+        // Auto copy
+        async function autoCopy() {
+            try {
+                await navigator.clipboard.writeText(els.output.value);
+            } catch (err) {
+                console.error('Auto-copy failed', err);
+            }
+        }
+
+        // Manual copy
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(els.output.value);
+                const btn = els.copyBtn;
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                btn.classList.remove('bg-slate-100', 'text-slate-700');
+                btn.classList.add('bg-emerald-100', 'text-emerald-700');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.add('bg-slate-100', 'text-slate-700');
+                    btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+                }, 2000);
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+        }
+
+        // Randomize
+        function randomizeAll() {
+            const randomize = (el) => {
+                el.selectedIndex = Math.floor(Math.random() * el.options.length);
+            };
+            randomize(els.species);
+            randomize(els.charType);
+            randomize(els.role);
+            randomize(els.ontology);
+            randomize(els.motion);
+            randomize(els.environment);
+            randomize(els.style);
+        }
+
+        // Refresh
+        function refreshPrompt() {
+            randomizeAll();
+            generatePrompt();
+            showToast("Fresh combinations unlocked.");
+        }
+
+        // Surprise
+        function triggerSurprise() {
+            randomizeAll();
+            generatePrompt();
+
+            // Confetti
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#6366f1', '#8b5cf6', '#d946ef'] });
+                confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#6366f1', '#8b5cf6', '#d946ef'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+
+            // Golden ticket 1 in 8
+            if (Math.random() < 0.125) {
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#FFD700', '#FFA500', '#FFEC8B'] });
+                showToast("GOLDEN ENTITY — One in a million!");
+            } else {
+                showToast("A unique entity has been born.");
+            }
+        }
+
+        // Initialize
+        randomizeAll();
+        generatePrompt();
+        updateConceptTags();
+    </script>
+</body>
+</html>
