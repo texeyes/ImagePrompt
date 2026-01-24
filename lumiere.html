@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LUMIÈRE — Digital Atelier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at top, #111 0%, #000 60%);
+      color: #eaeaea;
+    }
+    h1, h2, h3 {
+      font-family: 'Bodoni Moda', serif;
+      letter-spacing: 0.05em;
+    }
+    .glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .fade-in {
+      animation: fade 0.8s ease forwards;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<header class="p-8 text-center">
+  <h1 class="text-5xl tracking-widest">LUMIÈRE</h1>
+  <p class="mt-3 text-sm opacity-70 uppercase">A Digital Fashion House</p>
+</header>
+
+<!-- APP -->
+<main id="app" class="max-w-6xl mx-auto p-6 space-y-12"></main>
+
+<script>
+/* ======================
+   GLOBAL STATE MACHINE
+====================== */
+const STATE = {
+  step: 'INIT',
+  inspirationImage: null,
+  aestheticText: '',
+  collections: {
+    men: [],
+    women: []
+  },
+  selectedCollection: null,
+  cart: [],
+  userPhoto: null,
+  selectedItem: null,
+  email: ''
+};
+
+const PRICE = 10000;
+
+/* ======================
+   RENDER ENGINE
+====================== */
+const app = document.getElementById('app');
+
+function render() {
+  app.innerHTML = '';
+  switch (STATE.step) {
+    case 'INIT': renderInspirationUpload(); break;
+    case 'ANALYSIS': renderAnalysis(); break;
+    case 'COLLECTIONS': renderCollections(); break;
+    case 'TRYON': renderTryOn(); break;
+    case 'SHOP': renderShop(); break;
+    case 'CHECKOUT': renderCheckout(); break;
+    case 'COMPLETE': renderComplete(); break;
+  }
+}
+
+/* ======================
+   STEP 1 — INSPIRATION
+====================== */
+function renderInspirationUpload() {
+  app.innerHTML = `
+    <section class="glass p-10 text-center fade-in">
+      <h2 class="text-3xl mb-6">Begin with Inspiration</h2>
+      <input type="file" accept="image/*" class="mx-auto mb-6" id="inspirationInput"/>
+      <button class="mt-4 px-8 py-3 bg-white text-black uppercase tracking-widest"
+        onclick="analyzeInspiration()">Analyze Aesthetic</button>
+    </section>
+  `;
+}
+
+async function analyzeInspiration() {
+  STATE.step = 'ANALYSIS';
+  STATE.aestheticText = `
+A chiaroscuro dialogue of shadow and restraint — obsidian tones softened by muted silver.
+Textures feel architectural, deliberate, almost ceremonial.
+The mood is quiet power: Paris at dusk, precision without excess.
+  `;
+  render();
+}
+
+/* ======================
+   STEP 2 — ANALYSIS
+====================== */
+function renderAnalysis() {
+  app.innerHTML = `
+    <section class="glass p-10 fade-in">
+      <h2 class="text-3xl mb-6">Aesthetic Essence</h2>
+      <p class="leading-relaxed opacity-90 whitespace-pre-line">
+        ${STATE.aestheticText}
+      </p>
+      <button class="mt-8 px-8 py-3 bg-white text-black uppercase tracking-widest"
+        onclick="generateCollections()">Generate Collections</button>
+    </section>
+  `;
+}
+
+function generateCollections() {
+  STATE.collections.men = generateMockItems('Men', 8);
+  STATE.collections.women = generateMockItems('Women', 9);
+  STATE.step = 'COLLECTIONS';
+  render();
+}
+
+/* ======================
+   STEP 3 — COLLECTIONS
+====================== */
+function renderCollections() {
+  app.innerHTML = `
+    <section class="fade-in">
+      <h2 class="text-3xl mb-6 text-center">The Collections</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        ${renderCollectionCard('Men', STATE.collections.men)}
+        ${renderCollectionCard('Women', STATE.collections.women)}
+      </div>
+    </section>
+  `;
+}
+
+function renderCollectionCard(label, items) {
+  return `
+    <div class="glass p-6">
+      <h3 class="text-2xl mb-4">${label}'s Collection</h3>
+      <p class="text-sm opacity-70 mb-4">${items.length} pieces</p>
+      <button class="px-6 py-2 bg-white text-black uppercase tracking-widest"
+        onclick="selectCollection('${label.toLowerCase()}')">
+        View Collection
+      </button>
+    </div>
+  `;
+}
+
+function selectCollection(type) {
+  STATE.selectedCollection = type;
+  STATE.step = 'TRYON';
+  render();
+}
+
+/* ======================
+   STEP 4 — TRY ON
+====================== */
+function renderTryOn() {
+  app.innerHTML = `
+    <section class="glass p-10 text-center fade-in">
+      <h2 class="text-3xl mb-6">Virtual Fitting Room</h2>
+      <p class="mb-6 opacity-80">Upload a photo to preview styled looks</p>
+      <input type="file" accept="image/*" class="mx-auto mb-6"/>
+      <div class="space-y-4">
+        <p class="italic opacity-70">Look 01 — Minimalist Precision</p>
+        <p class="italic opacity-70">Look 02 — Editorial Layering</p>
+        <p class="italic opacity-70">Look 03 — Evening Statement</p>
+      </div>
+      <button class="mt-8 px-8 py-3 bg-white text-black uppercase tracking-widest"
+        onclick="STATE.step='SHOP'; render();">
+        Proceed to Shop
+      </button>
+    </section>
+  `;
+}
+
+/* ======================
+   STEP 5 — SHOP
+====================== */
+function renderShop() {
+  const items = STATE.collections[STATE.selectedCollection];
+  app.innerHTML = `
+    <section class="fade-in">
+      <h2 class="text-3xl mb-6 text-center">Select Your Piece</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        ${items.map(item => `
+          <div class="glass p-5">
+            <h3 class="text-xl mb-2">${item.name}</h3>
+            <p class="text-sm opacity-70 mb-3">${item.description}</p>
+            <p class="mb-3">$10,000</p>
+            <button class="px-4 py-2 bg-white text-black"
+              onclick="selectItem('${item.id}')">
+              Purchase
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function selectItem(id) {
+  STATE.selectedItem = id;
+  STATE.step = 'CHECKOUT';
+  render();
+}
+
+/* ======================
+   STEP 6 — CHECKOUT
+====================== */
+function renderCheckout() {
+  app.innerHTML = `
+    <section class="glass p-10 text-center fade-in">
+      <h2 class="text-3xl mb-6">Private Checkout</h2>
+      <p class="mb-4">Item Price: $10,000</p>
+      <input type="email" placeholder="Your Email" class="p-3 text-black w-full max-w-md mb-6"
+        onchange="STATE.email=this.value"/>
+      <button class="px-8 py-3 bg-white text-black uppercase tracking-widest"
+        onclick="completePurchase()">
+        Confirm Purchase
+      </button>
+    </section>
+  `;
+}
+
+function completePurchase() {
+  // TODO: EmailJS / Mail API
+  console.log('Send email to austincarrots@gmail.com', STATE.email, STATE.selectedItem);
+  STATE.step = 'COMPLETE';
+  render();
+}
+
+/* ======================
+   COMPLETE
+====================== */
+function renderComplete() {
+  app.innerHTML = `
+    <section class="glass p-12 text-center fade-in">
+      <h2 class="text-3xl mb-6">Thank You</h2>
+      <p class="opacity-80">Someone will be in contact with you shortly.</p>
+    </section>
+  `;
+}
+
+/* ======================
+   MOCK DATA
+====================== */
+function generateMockItems(label, count) {
+  return Array.from({ length: count }).map((_, i) => ({
+    id: `${label}-${i}`,
+    name: `${label} Piece ${i + 1}`,
+    description: `Architectural silhouette in matte wool and silk blend.`
+  }));
+}
+
+render();
+</script>
+
+</body>
+</html>
