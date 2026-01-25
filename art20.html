@@ -3,54 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Character Prompt Engine v2.0</title>
+    <title>AI Character Engine v3.0</title>
     <style>
         :root { --bg: #0b0f19; --card-bg: #161b2c; --accent: #00f2ff; --text: #e2e8f0; --btn-hover: #00c4cc; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
         
-        /* Top Control Panel */
-        header { position: sticky; top: 0; background: #0b0f19e6; backdrop-filter: blur(10px); padding: 25px; border-bottom: 2px solid var(--accent); z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        .control-container { max-width: 900px; margin: 0 auto; text-align: center; }
-        #prompt-output { width: 100%; height: 100px; background: #000; color: var(--accent); border: 1px solid #334155; padding: 15px; font-family: 'Courier New', monospace; border-radius: 8px; margin-bottom: 15px; font-size: 1.1em; resize: none; box-shadow: inset 0 2px 10px rgba(0,242,255,0.1); }
+        header { position: sticky; top: 0; background: #0b0f19f2; backdrop-filter: blur(10px); padding: 20px; border-bottom: 2px solid var(--accent); z-index: 1000; }
+        .control-container { max-width: 1000px; margin: 0 auto; text-align: center; }
         
-        .btn-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        button { padding: 12px 24px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-rand { background: var(--accent); color: #000; }
-        .btn-rand:hover { background: var(--btn-hover); transform: translateY(-2px); }
-        .btn-reset { background: #475569; color: white; }
-        .btn-copy { background: #10b981; color: white; }
+        #prompt-output { width: 100%; height: 120px; background: #000; color: var(--accent); border: 1px solid #334155; padding: 15px; font-family: monospace; border-radius: 8px; margin-bottom: 15px; font-size: 1em; resize: none; }
+        
+        .category-toggles { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 10px; background: #1e293b; border-radius: 8px; }
+        .toggle-item { display: flex; align-items: center; gap: 5px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
+        .toggle-item input { accent-color: var(--accent); }
 
-        /* Gallery Grid */
+        .btn-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        button { padding: 10px 20px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-rand { background: var(--accent); color: #000; }
+        .btn-copy-all { background: #10b981; color: white; }
+        
         main { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .card { background: var(--card-bg); border: 1px solid #2d3748; padding: 20px; border-radius: 12px; transition: transform 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
-        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.3em; border-bottom: 1px solid #2d3748; padding-bottom: 5px; }
-        .trait { font-size: 0.9em; margin: 4px 0; color: #94a3b8; }
+        .card { background: var(--card-bg); border: 1px solid #2d3748; padding: 20px; border-radius: 12px; position: relative; }
+        .card:hover { border-color: var(--accent); }
+        .card h3 { margin: 0 0 10px 0; color: var(--accent); }
+        .trait { font-size: 0.85em; margin: 4px 0; color: #94a3b8; }
         .trait b { color: #cbd5e1; }
-        .tags { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag { background: #1e293b; color: var(--accent); font-size: 0.75em; padding: 4px 10px; border-radius: 100px; border: 1px solid #334155; }
+        
+        .btn-card-copy { margin-top: 15px; width: 100%; background: #334155; color: white; padding: 8px; font-size: 0.8em; }
+        .btn-card-copy:hover { background: #475569; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="control-container">
-        <h1 style="margin: 0 0 15px 0; font-size: 1.5em; letter-spacing: 2px;">PROMPT SLOT MACHINE</h1>
-        <textarea id="prompt-output" readonly placeholder="Click Randomize to build a character prompt..."></textarea>
+        <textarea id="prompt-output" readonly placeholder="Select categories and click Randomize..."></textarea>
+        
+        <div class="category-toggles" id="toggles">
+            <!-- Toggles generated by JS -->
+        </div>
+
         <div class="btn-group">
-            <button class="btn-rand" onclick="randomizeEverything()">🎲 Randomize Everything</button>
-            <button class="btn-copy" onclick="copyPrompt()">📋 Copy Prompt</button>
-            <button class="btn-reset" onclick="resetGallery()">🔄 Reset Gallery</button>
+            <button class="btn-rand" onclick="randomize()">🎲 Randomize Selected</button>
+            <button class="btn-copy-all" onclick="copyAll()">📋 Copy Main Prompt</button>
+            <button class="btn-reset" onclick="renderGallery(false)" style="background:#64748b; color:white;">🔄 Shuffle Cards</button>
         </div>
     </div>
 </header>
 
-<main>
-    <div id="gallery" class="grid"></div>
-</main>
+<main><div id="gallery" class="grid"></div></main>
 
 <script>
+const categories = ["Species", "Aesthetic", "Facial", "Action", "Prop", "Environment", "Style", "Texture"];
 const data = [
     ["Alien Goat", "Anthropomorphic Green Goat", "1970s Psychedelic", "Orange shades, goatee, horns", "Playing instrument", "Pink/Gold electric bass", "Indoor atrium, vines", "3D Digital Illustration", "Textured fur, glossy metal"],
     ["Pink Blob", "Slime-based creature", "Underground Hip-Hop", "Glossy eyes, frown", "Rapping", "Handheld mic, star chain", "Dimly lit stage, bokeh", "3D Digital Sculpt", "Wet, viscous, translucent"],
@@ -96,66 +101,67 @@ const data = [
     ["Gold Sentinel", "Human (Masked)", "Urban Futurism", "Skull gold mask", "Walking sidewalk", "Golden skeletal mask", "Industrial green tile", "Street Photography", "Reflective gold spandex"]
 ];
 
-const characters = data.map(row => ({
-    id: row[0], species: row[1], aesthetic: row[2], facial: row[3], 
-    action: row[4], prop: row[5], env: row[6], style: row[7], tex: row[8]
+const characters = data.map(r => ({
+    id: r[0], Species: r[1], Aesthetic: r[2], Facial: r[3], Action: r[4], 
+    Prop: r[5], Environment: r[6], Style: r[7], Texture: r[8]
 }));
 
-const getRandVal = (key) => {
-    const vals = characters.map(c => c[key]);
-    return vals[Math.floor(Math.random() * vals.length)];
-};
+// Init Toggles
+const toggleContainer = document.getElementById('toggles');
+categories.forEach(cat => {
+    const label = document.createElement('label');
+    label.className = 'toggle-item';
+    label.innerHTML = `<input type="checkbox" checked id="chk-${cat}"> ${cat}`;
+    toggleContainer.appendChild(label);
+});
 
-function randomizeEverything() {
-    const p = `${getRandVal('species')}, ${getRandVal('aesthetic')} theme, ${getRandVal('facial')}, ${getRandVal('action')}, holding ${getRandVal('prop')}, ${getRandVal('env')}, ${getRandVal('style')} art style, ${getRandVal('tex')} texture.`;
-    document.getElementById('prompt-output').value = p;
-    copyPrompt();
-    renderGallery(true);
+function randomize() {
+    let parts = [];
+    categories.forEach(cat => {
+        if(document.getElementById(`chk-${cat}`).checked) {
+            const vals = characters.map(c => c[cat]);
+            const val = vals[Math.floor(Math.random() * vals.length)];
+            parts.push(`${cat}: ${val}`);
+        }
+    });
+    document.getElementById('prompt-output').value = parts.join(", ");
+    copyAll();
 }
 
-function copyPrompt() {
+function copyAll() {
     const text = document.getElementById('prompt-output').value;
     if(!text) return;
     navigator.clipboard.writeText(text);
-    const btn = document.querySelector('.btn-copy');
-    btn.innerText = "✅ COPIED!";
-    setTimeout(() => btn.innerText = "📋 Copy Prompt", 1500);
+    const btn = document.querySelector('.btn-copy-all');
+    btn.innerText = "✅ COPIED ALL";
+    setTimeout(() => btn.innerText = "📋 Copy Main Prompt", 1500);
+}
+
+function copyCard(idx) {
+    const c = characters[idx];
+    const text = categories.map(cat => `${cat}: ${c[cat]}`).join(", ");
+    navigator.clipboard.writeText(text);
+    alert(`Prompt for ${c.id} copied!`);
 }
 
 function renderGallery(shuffle = false) {
     const gallery = document.getElementById('gallery');
     gallery.innerHTML = '';
-    let list = [...characters];
+    let list = characters.map((c, i) => ({...c, originalIdx: i}));
     if(shuffle) list.sort(() => Math.random() - 0.5);
     
     list.forEach(c => {
         const div = document.createElement('div');
         div.className = 'card';
         div.innerHTML = `
-            <div>
-                <h3>${c.id}</h3>
-                <div class="trait"><b>Type:</b> ${c.species}</div>
-                <div class="trait"><b>Face:</b> ${c.facial}</div>
-                <div class="trait"><b>Action:</b> ${c.action}</div>
-                <div class="trait"><b>Prop:</b> ${c.prop}</div>
-                <div class="trait"><b>Scene:</b> ${c.env}</div>
-            </div>
-            <div class="tags">
-                <span class="tag">${c.aesthetic}</span>
-                <span class="tag">${c.style}</span>
-                <span class="tag">${c.tex}</span>
-            </div>
+            <h3>${c.id}</h3>
+            ${categories.map(cat => `<div class="trait"><b>${cat}:</b> ${c[cat]}</div>`).join('')}
+            <button class="btn-card-copy" onclick="copyCard(${c.originalIdx})">📋 Copy This Profile</button>
         `;
         gallery.appendChild(div);
     });
 }
 
-function resetGallery() {
-    document.getElementById('prompt-output').value = '';
-    renderGallery(false);
-}
-
-// Initial Load
 renderGallery();
 </script>
 </body>
