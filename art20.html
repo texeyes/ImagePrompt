@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Character Prompt Engine v2.0</title>
+    <style>
+        :root { --bg: #0b0f19; --card-bg: #161b2c; --accent: #00f2ff; --text: #e2e8f0; --btn-hover: #00c4cc; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        
+        /* Top Control Panel */
+        header { position: sticky; top: 0; background: #0b0f19e6; backdrop-filter: blur(10px); padding: 25px; border-bottom: 2px solid var(--accent); z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .control-container { max-width: 900px; margin: 0 auto; text-align: center; }
+        #prompt-output { width: 100%; height: 100px; background: #000; color: var(--accent); border: 1px solid #334155; padding: 15px; font-family: 'Courier New', monospace; border-radius: 8px; margin-bottom: 15px; font-size: 1.1em; resize: none; box-shadow: inset 0 2px 10px rgba(0,242,255,0.1); }
+        
+        .btn-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        button { padding: 12px 24px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-rand { background: var(--accent); color: #000; }
+        .btn-rand:hover { background: var(--btn-hover); transform: translateY(-2px); }
+        .btn-reset { background: #475569; color: white; }
+        .btn-copy { background: #10b981; color: white; }
+
+        /* Gallery Grid */
+        main { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: var(--card-bg); border: 1px solid #2d3748; padding: 20px; border-radius: 12px; transition: transform 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.3em; border-bottom: 1px solid #2d3748; padding-bottom: 5px; }
+        .trait { font-size: 0.9em; margin: 4px 0; color: #94a3b8; }
+        .trait b { color: #cbd5e1; }
+        .tags { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #1e293b; color: var(--accent); font-size: 0.75em; padding: 4px 10px; border-radius: 100px; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="control-container">
+        <h1 style="margin: 0 0 15px 0; font-size: 1.5em; letter-spacing: 2px;">PROMPT SLOT MACHINE</h1>
+        <textarea id="prompt-output" readonly placeholder="Click Randomize to build a character prompt..."></textarea>
+        <div class="btn-group">
+            <button class="btn-rand" onclick="randomizeEverything()">🎲 Randomize Everything</button>
+            <button class="btn-copy" onclick="copyPrompt()">📋 Copy Prompt</button>
+            <button class="btn-reset" onclick="resetGallery()">🔄 Reset Gallery</button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div id="gallery" class="grid"></div>
+</main>
+
+<script>
+const data = [
+    ["Alien Goat", "Anthropomorphic Green Goat", "1970s Psychedelic", "Orange shades, goatee, horns", "Playing instrument", "Pink/Gold electric bass", "Indoor atrium, vines", "3D Digital Illustration", "Textured fur, glossy metal"],
+    ["Pink Blob", "Slime-based creature", "Underground Hip-Hop", "Glossy eyes, frown", "Rapping", "Handheld mic, star chain", "Dimly lit stage, bokeh", "3D Digital Sculpt", "Wet, viscous, translucent"],
+    ["Electric Rodent", "Pikachu-inspired mammal", "Cyberpunk Neon", "Glowing cheeks", "Standing on platform", "Glowing orb pendant", "High-tech club, lasers", "3D Cinematic Render", "Soft fur, plasma arcs"],
+    ["Anime Driver", "Human (Anime)", "Summer Coastline", "Star-highlighted eyes", "Driving car", "Star-shaped hair clip", "Coastal road, bubbles", "2D Modern Anime", "Smooth cel-shaded skin"],
+    ["Peach Dress", "Human (Photoreal)", "Retro Summer Soul", "Glam makeup, hoops", "Walking to camera", "Triple-layer gold chain", "Outdoor festival, neon", "Hyper-realistic Photo", "Satin fabric, peach print"],
+    ["Lobster Model", "Human (Editorial)", "Avant-Garde Fashion", "Natural makeup", "Runway power pose", "Giant lobster bodysuit", "Dark runway, spotlight", "High-Fashion Photo", "Hard chitin shell vs skin"],
+    ["Raincoat Cat", "Domestic Kitten", "Cozy Rainy Day", "Large expressive eyes", "Standing still", "Yellow raincoat, umbrella", "Rainy evening exterior", "3D Cinematic Render", "Wet fur, matte plastic"],
+    ["Warrior Girl", "Human (Anime)", "Post-Apocalyptic", "Sharp eyes, markings", "Crouching by fire", "Bone skull necklace", "Cave with handprint art", "3D Digital Animation", "Fur pelts, rough stone"],
+    ["Starry Chibi", "Human (Chibi)", "Kawaii Sparkly", "Over-sized star eyes", "Holding bottle", "Yellow bear hoodie", "Blurred retail shop", "2D Vector Illustration", "Flat colors, sparkles"],
+    ["Formal Clone", "Human (Photoreal)", "Luxury Nightlife", "Elegant makeup", "Standing clasped hands", "Black slit dress", "Rooftop terrace, night", "Hyper-realistic Photo", "Silk fabric, beading"],
+    ["Desk Potato", "Anthropomorphic Potato", "Lo-Fi WFH", "Minimalist smiley", "Typing at computer", "Laptop with glow logo", "Home studio, foam panels", "3D Stylized Render", "Starchy skin, 'eyes'"],
+    ["Neon Cyborg", "Human (Cyber)", "Sci-Fi Cyberpunk", "Glowing implants", "Looking up cheering", "Brass goggles, neck armor", "Purple nebula atmosphere", "Cinematic VFX", "Polished chrome, fur"],
+    ["Grey Parrot", "African Grey Parrot", "Naturalistic Wildlife", "Yellow iris, black beak", "Close-up portrait", "N/A (Feather patterns)", "Blurred desert background", "Realistic Digital Painting", "Layered feather textures"],
+    ["Sauce Pin-ups", "Human (Pin-up)", "1950s Americana", "Retro glam makeup", "Holding condiments", "Heinz ketchup/mayo bottles", "Red/Cream split backdrop", "Stylized Digital Painting", "High-gloss vinyl/latex"],
+    ["Impressionist", "Human (Classic)", "19th-C. French", "Blurry/Indistinct", "Standing on hill", "Green parasol", "Wildflower field, wind", "Impressionist Oil", "Thick impasto brushstrokes"],
+    ["Sketchbook", "Doodled monsters", "Underground Weird Art", "Bulging eyes, teeth", "Singing", "N/A (Hand-drawn)", "Dotted paper", "Raw Marker/Pen Sketch", "Thick black ink outlines"],
+    ["Card Collage", "Crows/Birds", "Surrealist Journal", "N/A", "Perching on blocks", "4 of Hearts playing card", "Wood table, wave art", "Mixed Media Collage", "Paper ephemera, grain"],
+    ["Fish Pin-up", "Human/Fish Hybrid", "Vintage Hollywood", "Red lips, curls", "Leaning on column", "Gold ornate pillar", "Sky-blue backdrop", "Retro Magazine Collage", "Halftone print, aged paper"],
+    ["Foil Alien", "Alien Creature", "Glitch Industrial", "Glowing single eye", "Portrait view", "N/A (Organic mask)", "Snowy mountain peaks", "3D Abstract Render", "Crinkled metallic foil"],
+    ["Star Kittens", "Plush Kittens", "Kawaii Nursery", "Glossy doll eyes", "Dancing", "Star gold collars", "Pink pastel sweet shop", "3D High-Gloss Render", "Fluffy fur, shiny plastic"],
+    ["Unicycle Ape", "Anthropomorphic Ape", "Circus Street", "Neutral expression", "Riding unicycle", "Champagne flute", "Waterfront pier, sunset", "Low-Res Video Still", "Pink tulle, rough denim"],
+    ["Fungal Titan", "Stone-giant/Mushroom", "Dark Fantasy", "Long braided beard", "Standing guard", "Giant mushroom hat", "Glowing mushroom forest", "High-Fantasy Digital", "Carved stone, gill-ribs"],
+    ["Space Pilot", "Human (Anime)", "Retro Sci-Fi", "Soft grey eyes", "Official portrait", "Space uniform, insignia", "Dark starry background", "Clean 2D Anime", "Polished fabric, trim"],
+    ["Leopard Art", "Leopard/Big Cat", "Tribal Modernism", "Grumpy eyes, fangs", "Portrait in frame", "Yellow ornate frame", "Interior with plants", "Acrylic Painting", "Flat matte, bold spots"],
+    ["Green Gorilla", "Anthropomorphic Ape", "Playful Animated", "Wide yellow eyes", "Shushing gesture", "N/A (Indoor plant)", "Blurred living room", "3D Stylized Render", "Wavy fur, dark nails"],
+    ["Dragon Rider", "Human/Dragon", "Epic Fantasy", "Glowing blue eyes", "Riding dragon head", "Flaming broadsword", "Snowy moonlit peaks", "Cinematic Hyper-realism", "Dragon scales, fire"],
+    ["Cyber Vixen", "Human (Cyber)", "Dark Electro Club", "Heavy dark makeup", "Looking through blinds", "Red horizontal blinds", "Moody blue interior", "Cinematic Film Photo", "High-gloss lips, skin"],
+    ["Gold Deity", "Human (Mystical)", "Ancient Futurism", "Gold-painted face", "Dynamic standing", "Gold neck rings", "Dark cloudy sky", "Digital Concept Art", "Draped cloth, gold metal"],
+    ["Pop Art Cowboy", "Human (Iconic)", "Retro Pop Art", "Rugged features", "Holding revolver", "Cowboy hat, neck scarf", "N/A (Poster frame)", "Warhol Screenprint", "Flat color blocks"],
+    ["Butterfly Dog", "Vizsla Dog", "Peaceful Nature", "Calm eyes", "Sitting still", "Monarch butterfly", "Grass field, pine trees", "Naturalistic Photo", "Short copper coat"],
+    ["Jagged Beast", "Stylized Beast", "Contemporary Pop", "Angry red eyes", "Portrait view", "Layered wood cutout", "Tropical exterior", "Contemporary Pop Art", "Matte painted wood"],
+    ["Constructivist", "Human (Abstract)", "Constructivism", "Abstract silhouette", "Playing horn", "Red circular graphic", "Graphic design layout", "Constructivist Poster", "Distressed newsprint"],
+    ["He-Man Parody", "Human (Muscular)", "1980s Retro Cartoon", "Square jaw, grimace", "Looking sideways", "Blue headband, fur collar", "Simple blue background", "2D Flat Animation", "Smooth cel-shaded skin"],
+    ["Odd Deity Cat", "Tabby Cat", "Minimalist Odd", "Grumpy expression", "Playing guitar", "Black electric guitar", "Teal room, yoga mats", "3D Stylized Render", "Matte plastic, metallic"],
+    ["Circuit Face", "Cyber Humanoid", "Bio-Digital Cosmic", "Circuit-etched skin", "Serene upward tilt", "Crystal shards", "Deep space, nebulae", "High-End Digital VFX", "Translucent nebula skin"],
+    ["Antique Collage", "Human (Multicultural)", "Vintage Scrapbook", "Various subjects", "Posing formal", "Suitcase, pocket watch", "Sepia landmarks", "Mixed Media Collage", "Sepia ink, aged paper"],
+    ["Palm Spacesuit", "Human/Camel Hybrid", "Vaporwave Surreal", "Visor-covered faces", "Waving to camel", "Retro teal sports car", "Pink/Purple sunset", "3D Surrealist Render", "Palm-patterned fabric"],
+    ["Banjo Bot", "Rusty Robot", "Desert Sci-Fi", "Red mechanical eye", "Playing banjo", "Banjo, satellite head", "Desert, purple galaxy", "3D Cinematic Render", "Weathered copper/brass"],
+    ["Clown Mutant", "Alien/Clown Hybrid", "Dark Circus", "Tiny tusks, pink lips", "Portrait view", "Ruffled Victorian collar", "Carnival interior", "3D Practical Effects", "Pebbled skin, ruffles"],
+    ["Noir City", "Human (Stylized)", "Retro-Noir", "Shadowed profile", "Leaning on car", "Black luxury sedan", "Urban blue buildings", "High-Contrast Comic", "Flat ink-blot shadows"],
+    ["Suburban Group", "Human (Uncanny)", "1970s Domestic", "Vacant gazes", "Sitting at table", "Round wooden table", "70s-style kitchen", "Low-Res Analog Film", "Grainy tape-fuzz, cotton"],
+    ["Gold Sentinel", "Human (Masked)", "Urban Futurism", "Skull gold mask", "Walking sidewalk", "Golden skeletal mask", "Industrial green tile", "Street Photography", "Reflective gold spandex"]
+];
+
+const characters = data.map(row => ({
+    id: row[0], species: row[1], aesthetic: row[2], facial: row[3], 
+    action: row[4], prop: row[5], env: row[6], style: row[7], tex: row[8]
+}));
+
+const getRandVal = (key) => {
+    const vals = characters.map(c => c[key]);
+    return vals[Math.floor(Math.random() * vals.length)];
+};
+
+function randomizeEverything() {
+    const p = `${getRandVal('species')}, ${getRandVal('aesthetic')} theme, ${getRandVal('facial')}, ${getRandVal('action')}, holding ${getRandVal('prop')}, ${getRandVal('env')}, ${getRandVal('style')} art style, ${getRandVal('tex')} texture.`;
+    document.getElementById('prompt-output').value = p;
+    copyPrompt();
+    renderGallery(true);
+}
+
+function copyPrompt() {
+    const text = document.getElementById('prompt-output').value;
+    if(!text) return;
+    navigator.clipboard.writeText(text);
+    const btn = document.querySelector('.btn-copy');
+    btn.innerText = "✅ COPIED!";
+    setTimeout(() => btn.innerText = "📋 Copy Prompt", 1500);
+}
+
+function renderGallery(shuffle = false) {
+    const gallery = document.getElementById('gallery');
+    gallery.innerHTML = '';
+    let list = [...characters];
+    if(shuffle) list.sort(() => Math.random() - 0.5);
+    
+    list.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+            <div>
+                <h3>${c.id}</h3>
+                <div class="trait"><b>Type:</b> ${c.species}</div>
+                <div class="trait"><b>Face:</b> ${c.facial}</div>
+                <div class="trait"><b>Action:</b> ${c.action}</div>
+                <div class="trait"><b>Prop:</b> ${c.prop}</div>
+                <div class="trait"><b>Scene:</b> ${c.env}</div>
+            </div>
+            <div class="tags">
+                <span class="tag">${c.aesthetic}</span>
+                <span class="tag">${c.style}</span>
+                <span class="tag">${c.tex}</span>
+            </div>
+        `;
+        gallery.appendChild(div);
+    });
+}
+
+function resetGallery() {
+    document.getElementById('prompt-output').value = '';
+    renderGallery(false);
+}
+
+// Initial Load
+renderGallery();
+</script>
+</body>
+</html>
