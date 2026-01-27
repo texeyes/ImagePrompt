@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model ID Prompt Engine</title>
+    <style>
+        :root { --bg: #0b0f19; --card-bg: #161b2c; --accent: #f472b6; --text: #e2e8f0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        
+        header { position: sticky; top: 0; background: #0b0f19f2; backdrop-filter: blur(10px); padding: 20px; border-bottom: 2px solid var(--accent); z-index: 1000; }
+        .control-container { max-width: 1000px; margin: 0 auto; text-align: center; }
+        
+        #prompt-output { width: 100%; height: 100px; background: #000; color: var(--accent); border: 1px solid #334155; padding: 15px; font-family: monospace; border-radius: 8px; margin-bottom: 15px; font-size: 1em; resize: none; }
+        
+        .btn-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        button { padding: 12px 20px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 0.8em; }
+        .btn-model { background: var(--accent); color: #000; }
+        .btn-chaos { background: #ffffff; color: #000; }
+        .btn-copy { background: #10b981; color: white; }
+
+        main { max-width: 1200px; margin: 30px auto; padding: 20px; }
+        .model-section { margin-bottom: 40px; }
+        .model-header { border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 20px; color: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); padding: 15px; border-radius: 10px; border: 1px solid #2d3748; font-size: 0.85em; }
+        .card b { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="control-container">
+        <textarea id="prompt-output" readonly placeholder="Click a Model button to generate..."></textarea>
+        <div class="btn-group">
+            <button class="btn-model" onclick="randByModel('MODEL1')">🎲 MODEL 1 (Psychedelia)</button>
+            <button class="btn-model" onclick="randByModel('MODEL2')" style="background:#38bdf8;">🎲 MODEL 2 (Cyberpunk)</button>
+            <button class="btn-model" onclick="randByModel('MODEL3')" style="background:#a78bfa;">🎲 MODEL 3 (Kawaii)</button>
+            <button class="btn-chaos" onclick="randChaos()">🌪️ GLOBAL CHAOS</button>
+            <button class="btn-copy" onclick="copyPrompt()">📋 COPY</button>
+        </div>
+    </div>
+</header>
+
+<main id="main-content"></main>
+
+<script>
+const cats = ["Species", "Aesthetic", "Facial", "Action", "Prop", "Environment", "Style", "Texture"];
+const rawData = [
+    ["MODEL1", "Alien Goat", "1970s Psychedelic", "Orange shades", "Playing instrument", "Pink Bass", "Atrium", "3D Illustration", "Textured fur"],
+    ["MODEL1", "Groovy Ape", "Vintage Disco", "Afro", "Dancing", "Mirror ball", "Disco floor", "Retro Poster", "Velvet"],
+    ["MODEL1", "Neon Sloth", "Acid Dream", "Swirly eyes", "Floating", "Lava lamp", "Rainbow nebula", "Airbrush", "Iridescent"],
+    ["MODEL2", "Electric Rodent", "Cyberpunk", "Implants", "Running", "Data shard", "Neon alley", "Cinematic Render", "Chrome"],
+    ["MODEL2", "Cyborg Vixen", "Dark Electro", "Mechanical jaw", "Hacking", "Neural link", "Server room", "Concept Art", "Carbon fiber"],
+    ["MODEL2", "Rusty Bot", "Desert Sci-Fi", "Ocular sensor", "Repairing", "Wrench", "Scrap yard", "Weathered 3D", "Rusted iron"],
+    ["MODEL3", "Starry Chibi", "Kawaii", "Star eyes", "Giggling", "Magic wand", "Candy clouds", "Vector Art", "Glitter"],
+    ["MODEL3", "Pastel Dragon", "Whimsical", "Floral horns", "Flying", "Crystal egg", "Crystal cave", "Watercolour", "Scales"],
+    ["MODEL3", "Plush Kitten", "Nursery", "Button eyes", "Napping", "Ball of yarn", "Moonlight room", "Soft 3D Sculpt", "Fleece"]
+];
+
+const items = rawData.map(r => ({
+    mid: r[0], Species: r[1], Aesthetic: r[2], Facial: r[3], Action: r[4], 
+    Prop: r[5], Environment: r[6], Style: r[7], Texture: r[8]
+}));
+
+function randByModel(modelId) {
+    const filtered = items.filter(i => i.mid === modelId);
+    let promptParts = [`Model ID: ${modelId}`];
+    cats.forEach(cat => {
+        const vals = filtered.map(f => f[cat]);
+        promptParts.push(`${cat}: ${vals[Math.floor(Math.random() * vals.length)]}`);
+    });
+    setPrompt(promptParts.join(", "));
+}
+
+function randChaos() {
+    let promptParts = [`Model ID: MIXED`];
+    cats.forEach(cat => {
+        const vals = items.map(i => i[cat]);
+        promptParts.push(`${cat}: ${vals[Math.floor(Math.random() * vals.length)]}`);
+    });
+    setPrompt(promptParts.join(", "));
+}
+
+function setPrompt(txt) {
+    document.getElementById('prompt-output').value = txt;
+    copyPrompt();
+}
+
+function copyPrompt() {
+    const box = document.getElementById('prompt-output');
+    if(!box.value) return;
+    navigator.clipboard.writeText(box.value);
+}
+
+function render() {
+    const main = document.getElementById('main-content');
+    const models = [...new Set(items.map(i => i.mid))];
+    models.forEach(m => {
+        const sec = document.createElement('div');
+        sec.className = 'model-section';
+        sec.innerHTML = `<h2 class="model-header">${m} Group</h2><div class="grid" id="grid-${m}"></div>`;
+        main.appendChild(sec);
+        items.filter(i => i.mid === m).forEach(i => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<b>${i.Species}</b><br>${i.Aesthetic}<br>${i.Style}`;
+            document.getElementById(`grid-${m}`).appendChild(card);
+        });
+    });
+}
+
+render();
+</script>
+</body>
+</html>
