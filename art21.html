@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Command Center v4.0</title>
+    <title>Prompt Command Center v4.1</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --bg: #030712; --panel: #111827; --m1: #f472b6; --m2: #38bdf8; --m3: #a78bfa; --m4: #fbbf24; --text: #f3f4f6; }
@@ -12,7 +12,6 @@
         
         header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #374151; padding-bottom: 20px; }
         
-        /* Category Filters */
         .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; background: #1f2937; padding: 15px; border-radius: 8px; }
         .filter-item { display: flex; align-items: center; gap: 6px; font-size: 0.85em; cursor: pointer; }
         .filter-item input { accent-color: var(--m2); }
@@ -22,7 +21,6 @@
         .btn-gen { background: #f3f4f6; color: #000; }
         .btn-chaos { background: var(--m4); color: #000; }
 
-        /* Streams */
         .streams { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 25px; }
         .prompt-box { background: var(--panel); border-radius: 10px; padding: 18px; position: relative; border-left: 5px solid #4b5563; }
         .box-m1 { border-color: var(--m1); }
@@ -30,19 +28,22 @@
         .box-m3 { border-color: var(--m3); }
         .box-m4 { border-color: var(--m4); }
 
-        .label { position: absolute; top: -10px; left: 15px; background: var(--bg); padding: 2px 8px; font-size: 0.7em; font-weight: bold; text-transform: uppercase; }
-        textarea { width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 0.9em; resize: none; outline: none; margin-top: 5px; }
-        .copy-tag { font-size: 0.7em; color: #9ca3af; text-align: right; margin-top: 4px; font-weight: bold; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; position: absolute; top: -12px; left: 15px; right: 15px; }
+        .label { background: var(--bg); padding: 2px 8px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
+        
+        .btn-mini-copy { background: #374151; color: white; border: none; padding: 2px 8px; font-size: 0.65em; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-mini-copy:hover { background: #4b5563; color: var(--accent); }
+
+        textarea { width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 0.9em; resize: none; outline: none; margin-top: 10px; }
+        .copy-tag { font-size: 0.7em; color: #9ca3af; text-align: right; margin-top: 4px; font-weight: bold; min-height: 1em; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>COMMAND CENTER v4.0</h1>
-        
+        <h1>COMMAND CENTER v4.1</h1>
         <div class="filters" id="cat-filters"></div>
-
         <div class="btn-group">
             <button class="btn btn-gen" onclick="generate(false)">🎲 Generate Streams</button>
             <button class="btn btn-chaos" onclick="generate(true)">🌪️ Global Chaos</button>
@@ -50,10 +51,34 @@
     </header>
 
     <div class="streams">
-        <div class="prompt-box box-m1"><span class="label" style="color:var(--m1)">Stream 01 (M1)</span><textarea id="out-MODEL1" readonly></textarea><div class="copy-tag" id="tag-MODEL1"></div></div>
-        <div class="prompt-box box-m2"><span class="label" style="color:var(--m2)">Stream 02 (M2)</span><textarea id="out-MODEL2" readonly></textarea><div class="copy-tag" id="tag-MODEL2"></div></div>
-        <div class="prompt-box box-m3"><span class="label" style="color:var(--m3)">Stream 03 (M3)</span><textarea id="out-MODEL3" readonly></textarea><div class="copy-tag" id="tag-MODEL3"></div></div>
-        <div class="prompt-box box-m4"><span class="label" style="color:var(--m4)">Stream 04 (Chaos)</span><textarea id="out-CHAOS" readonly></textarea><div class="copy-tag" id="tag-CHAOS"></div></div>
+        <div class="prompt-box box-m1">
+            <div class="label-row">
+                <span class="label" style="color:var(--m1)">Stream 01 (M1)</span>
+                <button class="btn-mini-copy" onclick="manualCopy('MODEL1')">📋 COPY M1</button>
+            </div>
+            <textarea id="out-MODEL1" readonly></textarea><div class="copy-tag" id="tag-MODEL1"></div>
+        </div>
+        <div class="prompt-box box-m2">
+            <div class="label-row">
+                <span class="label" style="color:var(--m2)">Stream 02 (M2)</span>
+                <button class="btn-mini-copy" onclick="manualCopy('MODEL2')">📋 COPY M2</button>
+            </div>
+            <textarea id="out-MODEL2" readonly></textarea><div class="copy-tag" id="tag-MODEL2"></div>
+        </div>
+        <div class="prompt-box box-m3">
+            <div class="label-row">
+                <span class="label" style="color:var(--m3)">Stream 03 (M3)</span>
+                <button class="btn-mini-copy" onclick="manualCopy('MODEL3')">📋 COPY M3</button>
+            </div>
+            <textarea id="out-MODEL3" readonly></textarea><div class="copy-tag" id="tag-MODEL3"></div>
+        </div>
+        <div class="prompt-box box-m4">
+            <div class="label-row">
+                <span class="label" style="color:var(--m4)">Stream 04 (Chaos)</span>
+                <button class="btn-mini-copy" onclick="manualCopy('CHAOS')">📋 COPY CHAOS</button>
+            </div>
+            <textarea id="out-CHAOS" readonly></textarea><div class="copy-tag" id="tag-CHAOS"></div>
+        </div>
     </div>
 </div>
 
@@ -73,7 +98,6 @@ const data = [
 
 const items = data.map(r => ({ mid: r[0], Species: r[1], Aesthetic: r[2], Facial: r[3], Action: r[4], Prop: r[5], Environment: r[6], Style: r[7], Texture: r[8] }));
 
-// Init Filters
 const filterContainer = document.getElementById('cat-filters');
 cats.forEach(c => {
     const el = document.createElement('label');
@@ -83,24 +107,17 @@ cats.forEach(c => {
 });
 
 function generate(isChaos) {
-    const models = ["MODEL1", "MODEL2", "MODEL3"];
+    const ids = ["MODEL1", "MODEL2", "MODEL3", "CHAOS"];
     let allGenerated = [];
 
-    // Standard Streams
-    models.forEach(mId => {
-        const filteredData = items.filter(i => i.mid === mId);
-        const p = buildPrompt(filteredData);
-        document.getElementById(`out-${mId}`).value = p;
-        allGenerated.push({id: mId, val: p});
+    ids.forEach(id => {
+        const source = id === 'CHAOS' ? items : items.filter(i => i.mid === id);
+        const p = buildPrompt(source);
+        document.getElementById(`out-${id}`).value = p;
+        allGenerated.push({id, val: p});
+        document.getElementById(`tag-${id}`).innerText = "";
     });
 
-    // Chaos Stream
-    const chaosPrompt = buildPrompt(items);
-    document.getElementById('out-CHAOS').value = chaosPrompt;
-    allGenerated.push({id: 'CHAOS', val: chaosPrompt});
-
-    // Reset tags and copy random
-    ["MODEL1", "MODEL2", "MODEL3", "CHAOS"].forEach(id => document.getElementById(`tag-${id}`).innerText = "");
     const lucky = allGenerated[Math.floor(Math.random() * allGenerated.length)];
     if(lucky.val) {
         navigator.clipboard.writeText(lucky.val);
@@ -108,6 +125,15 @@ function generate(isChaos) {
     }
 
     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#f472b6', '#38bdf8', '#a78bfa', '#fbbf24'] });
+}
+
+function manualCopy(id) {
+    const text = document.getElementById(`out-${id}`).value;
+    if(!text) return;
+    navigator.clipboard.writeText(text);
+    const tag = document.getElementById(`tag-${id}`);
+    tag.innerText = "✅ COPIED MANUALLY!";
+    setTimeout(() => tag.innerText = "", 2000);
 }
 
 function buildPrompt(source) {
