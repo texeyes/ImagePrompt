@@ -9,31 +9,24 @@
         :root { --bg: #030712; --panel: #111827; --m1: #f472b6; --m2: #38bdf8; --m3: #a78bfa; --m4: #fbbf24; --text: #f3f4f6; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: 0 auto; }
-        
         header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #374151; padding-bottom: 20px; }
-        
         .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; background: #1f2937; padding: 15px; border-radius: 8px; }
         .filter-item { display: flex; align-items: center; gap: 6px; font-size: 0.85em; cursor: pointer; }
         .filter-item input { accent-color: var(--m2); }
-
         .btn-group { display: flex; justify-content: center; gap: 15px; }
         .btn { padding: 12px 25px; font-weight: 800; border-radius: 6px; border: none; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-gen { background: #f3f4f6; color: #000; }
         .btn-chaos { background: var(--m4); color: #000; }
-
         .streams { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 25px; }
         .prompt-box { background: var(--panel); border-radius: 10px; padding: 18px; position: relative; border-left: 5px solid #4b5563; }
         .box-m1 { border-color: var(--m1); }
         .box-m2 { border-color: var(--m2); }
         .box-m3 { border-color: var(--m3); }
         .box-m4 { border-color: var(--m4); }
-
         .label-row { display: flex; justify-content: space-between; align-items: center; position: absolute; top: -12px; left: 15px; right: 15px; }
         .label { background: var(--bg); padding: 2px 8px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
-        
         .btn-mini-copy { background: #374151; color: white; border: none; padding: 2px 8px; font-size: 0.65em; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .btn-mini-copy:hover { background: #4b5563; color: var(--accent); }
-
         textarea { width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 0.9em; resize: none; outline: none; margin-top: 10px; }
         .copy-tag { font-size: 0.7em; color: #9ca3af; text-align: right; margin-top: 4px; font-weight: bold; min-height: 1em; }
     </style>
@@ -88,71 +81,69 @@ const data = [
     ["MODEL1", "Alien Goat", "1970s Psychedelic", "Orange shades", "Playing instrument", "Pink Bass", "Atrium", "3D Illustration", "Textured fur"],
     ["MODEL1", "Groovy Ape", "Vintage Disco", "Afro", "Dancing", "Mirror ball", "Disco floor", "Retro Poster", "Velvet"],
     ["MODEL1", "Neon Sloth", "Acid Dream", "Swirly eyes", "Floating", "Lava lamp", "Rainbow nebula", "Airbrush", "Iridescent"],
-    
     ["MODEL1", "Alien Goat", "Anthropomorphic Animal", "1970s Psychedelic", "Orange shades, goatee, horns", "Playing instrument", "Pink/Gold electric bass", "Indoor atrium, vines", "3D Digital Illustration", "Textured fur, glossy metal"],
-["MODEL1", "Pink Blob", "Slime-based creature", "Underground Music", "Glossy eyes, frown", "joking", "Handheld mic, star chain", "Dimly lit stage, bokeh", "3D Digital Sculpt", "Wet, viscous, translucent"],
-["MODEL1", "Electric Rodent", "Pikachu-inspired mammal", "Cyberpunk Neon", "Glowing cheeks", "Standing on platform", "Glowing orb pendant", "High-tech club, lasers", "3D Cinematic Render", "Soft fur, plasma arcs"],
-["MODEL1", "Anime Driver", "Anime Teen", "Summer Coastline", "Star-highlighted eyes", "running", "Star-shaped hair clip", "Coastal road, bubbles", "2D Modern Anime", "Smooth cel-shaded skin"],
-["MODEL1", "Peach Dress", "Photoreal Fantasy Female", "Retro Summer Soul", "Glam makeup, hoops", "Walking to camera", "Triple-layer gold chain", "Outdoor festival, neon", "Cultural Specific Art Form", "Satin fabric, peach print"],
-["MODEL1", "Lobster Model", "Female Human (Editorial)", "Avant-Garde Fashion", "Natural makeup", "Runway power pose", "Giant lobster bodysuit", "Dark runway, spotlight", "High-Fashion Photo", "Hard chitin shell vs skin"],
-["MODEL1", "Raincoat Cat", "Domestic Creature", "Cozy Rainy Day", "Large expressive eyes", "counting gold", "umbrella", "cheery evening exterior", "3D Cinematic Render", "Wet fur, matte plastic"],
-["MODEL1", "Warrior Girl", "Anime Unique Beast", "Post-Apocalyptic", "Sharp eyes, markings", "Crouching by fire", "ornamental necklace", "Cave with handprint art", "3D Digital Animation", "Fur pelts, rough stone"],
-["MODEL1", "Starry Chibi", "Chibi Character", "Kawaii Sparkly", "heavy eye shadow and lashes", "Holding bottle", "advertisment hoodie", "Blurred retail shop", "2D Vector Illustration", "Flat colors, sparkles"],
-["MODEL1", "Formal Clone", "Photoreal Kids Drawn Monster", "Luxury Nightlife", "Elegant makeup", "full body pose", "cartoon clothes", "Rooftop terrace, night", "Hyper-realistic Photo", "Silk fabric, beading"],
-["MODEL1", "Desk Potato", "Anthropomorphic Food Character", "Lo-Fi WFH", "Minimalist smiley", "putting legos together", "glowing floresent item", "Home studio, foam panels", "3D Stylized Render", "Starchy skin, 'eyes'"],
-["MODEL1", "Neon Cyborg", "Cyber Household Character", "Sci-Fi Cyberpunk", "Glowing implants", "Looking up cheering", "Brass goggles, neck armor", "Purple nebula atmosphere", "Cinematic VFX", "Polished chrome, fur"],
-["MODEL1", "Grey Parrot", "friendly Bird character", "Naturalistic Wildlife", "Yellow iris, black beak", "Close-up portrait", "Feather patterns", "Blurred desert background", "Realistic Digital Painting", "Layered feather textures"],
-["MODEL1", "Sauce Pin-ups", "Human (Pin-up)", "1950s Americana", "Retro glam makeup", "Holding condiments", "unknown futuristic object", "interesting backdrop", "Stylized Digital Painting", "High-gloss vinyl/latex"],
-["MODEL1", "Impressionist", "Classic Mythical Character", "19th-C. French", "Blurry/Indistinct", "Standing on hill", "Green parasol", "Wildflower field, wind", "Impressionist Oil", "Thick impasto brushstrokes"],
-["MODEL1", "Sketchbook", "Doodled monsters", "Underground Weird Art", "Bulging eyes, teeth", "selling lemonaid", " ", "lots of love", "Pen Sketch", "Thick black ink outlines"],
-["MODEL1", "Card Collage", "Predator Birds", "Surrealist Journal", "N/A", "Perching on blocks", "4 of Hearts playing card", "wave art", "Mixed Media Collage", "Paper ephemera, grain"],
-["MODEL1", "Fish Pin-up", "Fish Hybrid", "Vintage Hollywood", "Red lips, curls", "Leaning on column", "Gold ornate pillar", "Sky-blue backdrop", "Retro Magazine Collage", "Halftone print, aged paper"],
-["MODEL1", "Foil Alien", "Alien Creature", "Glitch Industrial", "Glowing single eye", "Portrait view", "Organic mask", "Snowy mountain peaks", "3D Abstract Render", "Crinkled metallic foil"],
-["MODEL1", "Star Kittens", "Plush Baby Animal", "Kawaii Nursery", "Glossy doll eyes", "Dancing", "gold", "Pink pastel sweet shop", "3D High-Gloss Render", "Fluffy fur, shiny plastic"],
-["MODEL1", "Unicycle Ape", "Anthropomorphic Fern", "300BC living room", "Neutral expression", "Riding unicycle", "a king's treasure object", "Waterfront pier, sunset", "Low-Res Video Still", "Pink tulle, rough denim"],
-["MODEL1", "Fungal Titan", "Giant Mushroom Human", "Bright Odd Fantasy", "Long braided beard", "Standing guard", "Giant mushroom hat", "Glowing mushroom forest", "High-Fantasy Digital", "Carved stone, gill-ribs"],
-["MODEL1", "Space Pilot", "Anime Creature", "Retro Sci-Fi", "Soft green eyes", "Official portrait", "Space uniform, insignia", "color coordinated starry background", "Clean 2D Anime", "Polished fabric, trim"],
-["MODEL1", "Leopard Art", "Big Wild Cat", "Tribal Modernism", "excited eyes, fangs", "Portrait in frame", "Yellow ornate frame", "Interior with plants", "Post-Modern Art Form", "Flat matte, bold spots"],
-["MODEL1", "Green Gorilla", "Anthropomorphic Beast", "Playful Animated", "Wide bright eyes", "Shushing gesture", "Indoor plant", "Blurred living room", "3D Stylized Render", "Wavy fur, dark nails"],
-["MODEL1", "Dragon Rider", "Dragon", "Epic Fantasy", "Glowing blue eyes", "Riding dragon head", "Flaming broadsword", "Snowy moonlit peaks", "Cinematic Hyper-realism", "Dragon scales, fire"],
-["MODEL1", "Cyber Vixen", "Human (Cyber)", "Dark Electro Club", "Heavy dark makeup", "in the year 202010", "Red horizontal blinds", "bright modern interior", "Cinematic Film Photo", "High-gloss lips"],
-["MODEL1", "Gold Deity", "Mystical Being", "Ancient Futurism", "Gold-painted face", "Dynamic standing", "pink neck rings", "exciting summer sky", "Digital Concept Art", "Draped cloth, gold metal"],
-["MODEL1", "Pop Art Cowboy", "Human (Iconic)", "Retro Pop Art", "Rugged features", "Holding profession's tool", "Cowboy hat, neck scarf", "Poster frame", "Warhol Screenprint", "primary color blocks"],
-["MODEL1", "Butterfly Dog", "a species of Dog", "Peaceful Nature", "Calm eyes", "Sitting still", "Monarch butterfly", "Grass field, pine trees", "Naturalistic Photo", "Short copper coat"],
-["MODEL1", "Jagged Beast", "Stylized Beast", "Contemporary Pop", "happy blue eyes", "Portrait view", "Layered wood cutout", "Tropical exterior", "Contemporary Pop Art", "Matte painted wood"],
-["MODEL1", "Constructivist", "Abstract Cartoon Character", "Constructivism", "Abstract silhouette", "Playing instrument", "Red circular graphic", "Graphic design layout", "Constructivist Poster", "Distressed newsprint"],
-["MODEL1", "He-Man Parody", "80s Muscular Comic Toy", "1980s Retro Cartoon", "Square jaw, grimace", "Looking sideways", "artistic headband, fur collar", "Simple blue background", "2D Flat Animation", "Smooth cel-shaded skin"],
-["MODEL1", "Odd Deity Cat", "Cat", "Minimalist Odd", "Grumpy expression", "Playing guitar", "Black electric guitar", "Teal room, surfboards", "3D Stylized Render", "Matte plastic, metallic"],
-["MODEL1", "Circuit Face", "Cyber Humanoid", "Bio-Digital Cosmic", "Circuit-etched skin", "Serene upward tilt", "nostalgic", "Deep space, nebulae", "High-End Digital VFX", "Translucent nebula skin"],
-["MODEL1", "Antique Collage", "Star Wars creature", "Vintage Scrapbook", "Various subjects", "Posing formal", "Suitcase", "famous landmark", "Mixed Media Collage", "aged paper"],
-["MODEL1", "Palm Spacesuit", "Camel Hybrid", "Vaporwave Surreal", "Visor-covered faces", "Waving to family", "Retro teal sports car", "Pink/Purple sunset", "3D Surrealist Render", "Palm-patterned fabric"],
-["MODEL1", "Banjo Bot", "Basic Pedestrian Robot", "Desert Sci-Fi", "mechanical body part", "Playing banjo", "Banjo, satellite head", "Desert, purple galaxy", "3D Cinematic Render", "Weathered copper/brass"],
-["MODEL1", "Clown Mutant", "Alien Hybrid", "Dark Circus", "Tiny tusks, pink lips", "Portrait view", "Ruffled Victorian collar", "facinating interior", "3D Practical Effects", "Pebbled skin, ruffles"],
-["MODEL1", "Noir City", "Female (Stylized)", "Retro-Noir", "Shadowed profile", "Leaning on car", "Black luxury car", "Urban primary color buildings", "High-Contrast Comic", "Flat ink-blot shadows"],
-["MODEL1", "Suburban Group", "hybrid (Uncanny)", "1970s Domestic", "Vacant gazes", "Sitting at table", "Round wooden table", "70s-style kitchen", "Low-Res Analog Film", "Grainy tape-fuzz, cotton"],
-["MODEL1", "Gold Sentinel", "Bird Hybrid", "Urban Futurism", "elegant gold mask with horns", "Walking sidewalk", "Golden object", "Industrial green tile", "Street Photography", "Reflective gold spandex"],
-["MODEL1", "Alien Goat", "Anthropomorphic Animal", "1970s Psychedelic", "Orange shades, goatee, horns", "Playing instrument", "Pink/Gold electric bass", "Indoor atrium, vines", "3D Digital Illustration", "Textured fur, glossy metal"],
-["MODEL1", "Kidcore Art", "Unexpected Object Character", "Playful Kidcore", "item to disgusting to eat", "suprised and happy", "Flashlight, Oreo-themed items", "Cluttered colorful tabletop", "2D Pop Illustration", "Matte plastic, flat color"],
-["MODEL1", "Island Woman", "Space Island Cheerleader", "Tropical Summer", "Sun-kissed skin, green eyes", "Wading in water", "Gold ornate shell earring", "Exotic beach with palm trees", "Cinematic Photography", "Wet skin, glistening water"],
-["MODEL1", "Beach Suit", "Humanoid Lizard", "Business Casual / Tropical", "Red glowing eyes, black face markings", "Profile portrait", "Black business suit and tie", "Serene ocean coastline", "3D Stylized Render", "teal scales, smooth fabric"],
-["MODEL1", "Pink Oreo", "Surreal Food Related Branding Package", "Surreal Food Branding", "N/A", "N/A", "unimaginable thing to eat-flavored Oreos", "Vibrant pink background", "Product Photography", "Crisp cookie texture, creamy filling"],
-["MODEL1", "Ghost Screamer", "Apparition", "Cartoon Horror but sweet", "wide pupils, jagged teeth, wide mouth", "Mid-scream gesture", "Glowing aura", "vibrant colorful screenprint", "2D Flat Animation", "Glowing green mist, smooth cel-shading"],
-["MODEL1", "Yellow Gaper", "Humanoid (Abstract)", "Minimalist Surreal", "Oversized open mouth, closed eyes", "Vocalizin", "Yellow cowl", "suprising backdrop", "Graphic Digital Art", "Grainy paper-like texture"],
-["MODEL1", "Gold Circuit Alien", "Cyborg Alien", "Ancient Astronaut / Sci-fi", "kids style drawing of an animal", "Stoic portrait", "Gold wireframe neck ruff", "Splattered gold/ochre backdrop", "Ink and Watercolor Hybrid", "Metallic gold leaf, rough ink"],
-["MODEL1", "Neon Skeleton", "Bioluminescent Skeleton", "Cyber-Goth", "glustered but friendly", "interesting and happy", "glowing object", "Monochrome desert dunes", "Art on Postal Stamp", "Vibrant neon tubes, matte black sand"],
-["MODEL2", "Electric Rodent", "Cyberpunk", "Implants", "Running", "Data shard", "Neon alley", "Cinematic Render", "Chrome"],
-["MODEL2", "Cyborg Vixen", "Dark Electro", "Mechanical jaw", "Hacking", "Neural link", "Server room", "Concept Art", "Carbon fiber"],
-["MODEL2", "Rusty Bot", "Desert Sci-Fi", "Ocular sensor", "Repairing", "Wrench", "Scrap yard", "Weathered 3D", "Rusted iron"],
-[“MODEL2”, “Axolotl Plushies”, “Kawaii Arcade”, “small smiles”, “Cheering and reaching up”, “Arcade claw, joystick and buttons”, “Claw machine with colored balls”, “Rubber Hose animation style”, “Soft plush texture, grainy lines”],
-[“MODEL2”, “Buff Fish(specific fish type)”, “Odd Fitness Hybrid”, “small toothy mouth”, “Flexing arms, power pose”, “Muscle-defined chest and abs”, “White studio tropical backdrop”, “Surrealism”, “Soft felt, stuffed plush”],
-[“MODEL2”, “Type of Bird taking a Bath”, “Cozy Domestic”, “extremely curious”, “Floating in bathwater”, “Wooden bath tray, green tiles”, “brightly colored tiled bathroom with plants”, “Lofi 2D Illustration”, “Water ripples, smooth ceramic tiles”],
-[“MODEL2”, “specific type of animal Varieties”, “Scientific Botanical”, “N/A”, “N/A”, “Collection of diverse crab species”, “Flat two-tone gradient background”, “Scientific Illustration”, “Hard shells, varied patterns and colors”],
-[“MODEL2”, “Type of Snack Cut Animal”, “Surreal Dessert”, “Closed peaceful eyes”, “Snuggling between a snack”, “Graham crackers, chocolate and marshmallow”, “unique background”, “Chiaroscuro”, “Toasted marshmallow fur, crunchy cracker”],
-[“MODEL2”, “Fruit Cute Baby Animal”, “Fruit Aesthetic”, “Winking and blushing”, “Snuggling with fruit”, “Large sliced fruit”, “colorful fruit pattern”, “Hieroglyph”, “Soft white fur, juicy fruit texture”],
-[“MODEL2”, “Sleeping cute animal”, “Lazy Urban”, “dream state”, “Sleeping on pavement”, “White chalk road icon”, “Asphalt street with curb and leaves”, “Real Photography”, “Coarse brown fur, rough asphalt”],
-["MODEL3", "Starry Chibi", "Kawaii", "Star eyes", "Giggling", "Magic wand", "Candy clouds", "Vector Art", "Glitter"],
-["MODEL3", "Pastel Dragon", "Whimsical", "Floral horns", "Flying", "Crystal egg", "Crystal cave", "Watercolour", "Scales"],
-["MODEL3", "Plush Kitten", "Nursery", "Button eyes", "Napping", "Ball of yarn", "Moonlight room", "Soft 3D Sculpt", "Fleece"]
+    ["MODEL1", "Pink Blob", "Slime-based creature", "Underground Music", "Glossy eyes, frown", "joking", "Handheld mic, star chain", "Dimly lit stage, bokeh", "3D Digital Sculpt", "Wet, viscous, translucent"],
+    ["MODEL1", "Electric Rodent", "Pikachu-inspired mammal", "Cyberpunk Neon", "Glowing cheeks", "Standing on platform", "Glowing orb pendant", "High-tech club, lasers", "3D Cinematic Render", "Soft fur, plasma arcs"],
+    ["MODEL1", "Anime Driver", "Anime Teen", "Summer Coastline", "Star-highlighted eyes", "running", "Star-shaped hair clip", "Coastal road, bubbles", "2D Modern Anime", "Smooth cel-shaded skin"],
+    ["MODEL1", "Peach Dress", "Photoreal Fantasy Female", "Retro Summer Soul", "Glam makeup, hoops", "Walking to camera", "Triple-layer gold chain", "Outdoor festival, neon", "Cultural Specific Art Form", "Satin fabric, peach print"],
+    ["MODEL1", "Lobster Model", "Female Human (Editorial)", "Avant-Garde Fashion", "Natural makeup", "Runway power pose", "Giant lobster bodysuit", "Dark runway, spotlight", "High-Fashion Photo", "Hard chitin shell vs skin"],
+    ["MODEL1", "Raincoat Cat", "Domestic Creature", "Cozy Rainy Day", "Large expressive eyes", "counting gold", "umbrella", "cheery evening exterior", "3D Cinematic Render", "Wet fur, matte plastic"],
+    ["MODEL1", "Warrior Girl", "Anime Unique Beast", "Post-Apocalyptic", "Sharp eyes, markings", "Crouching by fire", "ornamental necklace", "Cave with handprint art", "3D Digital Animation", "Fur pelts, rough stone"],
+    ["MODEL1", "Starry Chibi", "Chibi Character", "Kawaii Sparkly", "heavy eye shadow and lashes", "Holding bottle", "advertisment hoodie", "Blurred retail shop", "2D Vector Illustration", "Flat colors, sparkles"],
+    ["MODEL1", "Formal Clone", "Photoreal Kids Drawn Monster", "Luxury Nightlife", "Elegant makeup", "full body pose", "cartoon clothes", "Rooftop terrace, night", "Hyper-realistic Photo", "Silk fabric, beading"],
+    ["MODEL1", "Desk Potato", "Anthropomorphic Food Character", "Lo-Fi WFH", "Minimalist smiley", "putting legos together", "glowing floresent item", "Home studio, foam panels", "3D Stylized Render", "Starchy skin, 'eyes'"],
+    ["MODEL1", "Neon Cyborg", "Cyber Household Character", "Sci-Fi Cyberpunk", "Glowing implants", "Looking up cheering", "Brass goggles, neck armor", "Purple nebula atmosphere", "Cinematic VFX", "Polished chrome, fur"],
+    ["MODEL1", "Grey Parrot", "friendly Bird character", "Naturalistic Wildlife", "Yellow iris, black beak", "Close-up portrait", "Feather patterns", "Blurred desert background", "Realistic Digital Painting", "Layered feather textures"],
+    ["MODEL1", "Sauce Pin-ups", "Human (Pin-up)", "1950s Americana", "Retro glam makeup", "Holding condiments", "unknown futuristic object", "interesting backdrop", "Stylized Digital Painting", "High-gloss vinyl/latex"],
+    ["MODEL1", "Impressionist", "Classic Mythical Character", "19th-C. French", "Blurry/Indistinct", "Standing on hill", "Green parasol", "Wildflower field, wind", "Impressionist Oil", "Thick impasto brushstrokes"],
+    ["MODEL1", "Sketchbook", "Doodled monsters", "Underground Weird Art", "Bulging eyes, teeth", "selling lemonaid", " ", "lots of love", "Pen Sketch", "Thick black ink outlines"],
+    ["MODEL1", "Card Collage", "Predator Birds", "Surrealist Journal", "N/A", "Perching on blocks", "4 of Hearts playing card", "wave art", "Mixed Media Collage", "Paper ephemera, grain"],
+    ["MODEL1", "Fish Pin-up", "Fish Hybrid", "Vintage Hollywood", "Red lips, curls", "Leaning on column", "Gold ornate pillar", "Sky-blue backdrop", "Retro Magazine Collage", "Halftone print, aged paper"],
+    ["MODEL1", "Foil Alien", "Alien Creature", "Glitch Industrial", "Glowing single eye", "Portrait view", "Organic mask", "Snowy mountain peaks", "3D Abstract Render", "Crinkled metallic foil"],
+    ["MODEL1", "Star Kittens", "Plush Baby Animal", "Kawaii Nursery", "Glossy doll eyes", "Dancing", "gold", "Pink pastel sweet shop", "3D High-Gloss Render", "Fluffy fur, shiny plastic"],
+    ["MODEL1", "Unicycle Ape", "Anthropomorphic Fern", "300BC living room", "Neutral expression", "Riding unicycle", "a king's treasure object", "Waterfront pier, sunset", "Low-Res Video Still", "Pink tulle, rough denim"],
+    ["MODEL1", "Fungal Titan", "Giant Mushroom Human", "Bright Odd Fantasy", "Long braided beard", "Standing guard", "Giant mushroom hat", "Glowing mushroom forest", "High-Fantasy Digital", "Carved stone, gill-ribs"],
+    ["MODEL1", "Space Pilot", "Anime Creature", "Retro Sci-Fi", "Soft green eyes", "Official portrait", "Space uniform, insignia", "color coordinated starry background", "Clean 2D Anime", "Polished fabric, trim"],
+    ["MODEL1", "Leopard Art", "Big Wild Cat", "Tribal Modernism", "excited eyes, fangs", "Portrait in frame", "Yellow ornate frame", "Interior with plants", "Post-Modern Art Form", "Flat matte, bold spots"],
+    ["MODEL1", "Green Gorilla", "Anthropomorphic Beast", "Playful Animated", "Wide bright eyes", "Shushing gesture", "Indoor plant", "Blurred living room", "3D Stylized Render", "Wavy fur, dark nails"],
+    ["MODEL1", "Dragon Rider", "Dragon", "Epic Fantasy", "Glowing blue eyes", "Riding dragon head", "Flaming broadsword", "Snowy moonlit peaks", "Cinematic Hyper-realism", "Dragon scales, fire"],
+    ["MODEL1", "Cyber Vixen", "Human (Cyber)", "Dark Electro Club", "Heavy dark makeup", "in the year 202010", "Red horizontal blinds", "bright modern interior", "Cinematic Film Photo", "High-gloss lips"],
+    ["MODEL1", "Gold Deity", "Mystical Being", "Ancient Futurism", "Gold-painted face", "Dynamic standing", "pink neck rings", "exciting summer sky", "Digital Concept Art", "Draped cloth, gold metal"],
+    ["MODEL1", "Pop Art Cowboy", "Human (Iconic)", "Retro Pop Art", "Rugged features", "Holding profession's tool", "Cowboy hat, neck scarf", "Poster frame", "Warhol Screenprint", "primary color blocks"],
+    ["MODEL1", "Butterfly Dog", "a species of Dog", "Peaceful Nature", "Calm eyes", "Sitting still", "Monarch butterfly", "Grass field, pine trees", "Naturalistic Photo", "Short copper coat"],
+    ["MODEL1", "Jagged Beast", "Stylized Beast", "Contemporary Pop", "happy blue eyes", "Portrait view", "Layered wood cutout", "Tropical exterior", "Contemporary Pop Art", "Matte painted wood"],
+    ["MODEL1", "Constructivist", "Abstract Cartoon Character", "Constructivism", "Abstract silhouette", "Playing instrument", "Red circular graphic", "Graphic design layout", "Constructivist Poster", "Distressed newsprint"],
+    ["MODEL1", "He-Man Parody", "80s Muscular Comic Toy", "1980s Retro Cartoon", "Square jaw, grimace", "Looking sideways", "artistic headband, fur collar", "Simple blue background", "2D Flat Animation", "Smooth cel-shaded skin"],
+    ["MODEL1", "Odd Deity Cat", "Cat", "Minimalist Odd", "Grumpy expression", "Playing guitar", "Black electric guitar", "Teal room, surfboards", "3D Stylized Render", "Matte plastic, metallic"],
+    ["MODEL1", "Circuit Face", "Cyber Humanoid", "Bio-Digital Cosmic", "Circuit-etched skin", "Serene upward tilt", "nostalgic", "Deep space, nebulae", "High-End Digital VFX", "Translucent nebula skin"],
+    ["MODEL1", "Antique Collage", "Star Wars creature", "Vintage Scrapbook", "Various subjects", "Posing formal", "Suitcase", "famous landmark", "Mixed Media Collage", "aged paper"],
+    ["MODEL1", "Palm Spacesuit", "Camel Hybrid", "Vaporwave Surreal", "Visor-covered faces", "Waving to family", "Retro teal sports car", "Pink/Purple sunset", "3D Surrealist Render", "Palm-patterned fabric"],
+    ["MODEL1", "Banjo Bot", "Basic Pedestrian Robot", "Desert Sci-Fi", "mechanical body part", "Playing banjo", "Banjo, satellite head", "Desert, purple galaxy", "3D Cinematic Render", "Weathered copper/brass"],
+    ["MODEL1", "Clown Mutant", "Alien Hybrid", "Dark Circus", "Tiny tusks, pink lips", "Portrait view", "Ruffled Victorian collar", "facinating interior", "3D Practical Effects", "Pebbled skin, ruffles"],
+    ["MODEL1", "Noir City", "Female (Stylized)", "Retro-Noir", "Shadowed profile", "Leaning on car", "Black luxury car", "Urban primary color buildings", "High-Contrast Comic", "Flat ink-blot shadows"],
+    ["MODEL1", "Suburban Group", "hybrid (Uncanny)", "1970s Domestic", "Vacant gazes", "Sitting at table", "Round wooden table", "70s-style kitchen", "Low-Res Analog Film", "Grainy tape-fuzz, cotton"],
+    ["MODEL1", "Gold Sentinel", "Bird Hybrid", "Urban Futurism", "elegant gold mask with horns", "Walking sidewalk", "Golden object", "Industrial green tile", "Street Photography", "Reflective gold spandex"],
+    ["MODEL1", "Kidcore Art", "Unexpected Object Character", "Playful Kidcore", "item to disgusting to eat", "suprised and happy", "Flashlight, Oreo-themed items", "Cluttered colorful tabletop", "2D Pop Illustration", "Matte plastic, flat color"],
+    ["MODEL1", "Island Woman", "Space Island Cheerleader", "Tropical Summer", "Sun-kissed skin, green eyes", "Wading in water", "Gold ornate shell earring", "Exotic beach with palm trees", "Cinematic Photography", "Wet skin, glistening water"],
+    ["MODEL1", "Beach Suit", "Humanoid Lizard", "Business Casual / Tropical", "Red glowing eyes, black face markings", "Profile portrait", "Black business suit and tie", "Serene ocean coastline", "3D Stylized Render", "teal scales, smooth fabric"],
+    ["MODEL1", "Pink Oreo", "Surreal Food Related Branding Package", "Surreal Food Branding", "N/A", "N/A", "unimaginable thing to eat-flavored Oreos", "Vibrant pink background", "Product Photography", "Crisp cookie texture, creamy filling"],
+    ["MODEL1", "Ghost Screamer", "Apparition", "Cartoon Horror but sweet", "wide pupils, jagged teeth, wide mouth", "Mid-scream gesture", "Glowing aura", "vibrant colorful screenprint", "2D Flat Animation", "Glowing green mist, smooth cel-shading"],
+    ["MODEL1", "Yellow Gaper", "Humanoid (Abstract)", "Minimalist Surreal", "Oversized open mouth, closed eyes", "Vocalizin", "Yellow cowl", "suprising backdrop", "Graphic Digital Art", "Grainy paper-like texture"],
+    ["MODEL1", "Gold Circuit Alien", "Cyborg Alien", "Ancient Astronaut / Sci-fi", "kids style drawing of an animal", "Stoic portrait", "Gold wireframe neck ruff", "Splattered gold/ochre backdrop", "Ink and Watercolor Hybrid", "Metallic gold leaf, rough ink"],
+    ["MODEL1", "Neon Skeleton", "Bioluminescent Skeleton", "Cyber-Goth", "glustered but friendly", "interesting and happy", "glowing object", "Monochrome desert dunes", "Art on Postal Stamp", "Vibrant neon tubes, matte black sand"],
+    ["MODEL2", "Electric Rodent", "Cyberpunk", "Implants", "Running", "Data shard", "Neon alley", "Cinematic Render", "Chrome"],
+    ["MODEL2", "Cyborg Vixen", "Dark Electro", "Mechanical jaw", "Hacking", "Neural link", "Server room", "Concept Art", "Carbon fiber"],
+    ["MODEL2", "Rusty Bot", "Desert Sci-Fi", "Ocular sensor", "Repairing", "Wrench", "Scrap yard", "Weathered 3D", "Rusted iron"],
+    ["MODEL2", "Axolotl Plushies", "Kawaii Arcade", "small smiles", "Cheering and reaching up", "Arcade claw, joystick and buttons", "Claw machine with colored balls", "Rubber Hose animation style", "Soft plush texture, grainy lines"],
+    ["MODEL2", "Buff Fish(specific fish type)", "Odd Fitness Hybrid", "small toothy mouth", "Flexing arms, power pose", "Muscle-defined chest and abs", "White studio tropical backdrop", "Surrealism", "Soft felt, stuffed plush"],
+    ["MODEL2", "Type of Bird taking a Bath", "Cozy Domestic", "extremely curious", "Floating in bathwater", "Wooden bath tray, green tiles", "brightly colored tiled bathroom with plants", "Lofi 2D Illustration", "Water ripples, smooth ceramic tiles"],
+    ["MODEL2", "specific type of animal Varieties", "Scientific Botanical", "N/A", "N/A", "Collection of diverse crab species", "Flat two-tone gradient background", "Scientific Illustration", "Hard shells, varied patterns and colors"],
+    ["MODEL2", "Type of Snack Cut Animal", "Surreal Dessert", "Closed peaceful eyes", "Snuggling between a snack", "Graham crackers, chocolate and marshmallow", "unique background", "Chiaroscuro", "Toasted marshmallow fur, crunchy cracker"],
+    ["MODEL2", "Fruit Cute Baby Animal", "Fruit Aesthetic", "Winking and blushing", "Snuggling with fruit", "Large sliced fruit", "colorful fruit pattern", "Hieroglyph", "Soft white fur, juicy fruit texture"],
+    ["MODEL2", "Sleeping cute animal", "Lazy Urban", "dream state", "Sleeping on pavement", "White chalk road icon", "Asphalt street with curb and leaves", "Real Photography", "Coarse brown fur, rough asphalt"],
+    ["MODEL3", "Starry Chibi", "Kawaii", "Star eyes", "Giggling", "Magic wand", "Candy clouds", "Vector Art", "Glitter"],
+    ["MODEL3", "Pastel Dragon", "Whimsical", "Floral horns", "Flying", "Crystal egg", "Crystal cave", "Watercolour", "Scales"],
+    ["MODEL3", "Plush Kitten", "Nursery", "Button eyes", "Napping", "Ball of yarn", "Moonlight room", "Soft 3D Sculpt", "Fleece"]
 ];
 
 const items = data.map(r => ({ mid: r[0], Species: r[1], Aesthetic: r[2], Facial: r[3], Action: r[4], Prop: r[5], Environment: r[6], Style: r[7], Texture: r[8] }));
@@ -178,7 +169,7 @@ function generate(isChaos) {
     });
 
     const lucky = allGenerated[Math.floor(Math.random() * allGenerated.length)];
-    if(lucky.val) {
+    if(lucky && lucky.val) {
         navigator.clipboard.writeText(lucky.val);
         document.getElementById(`tag-${lucky.id}`).innerText = "📋 RANDOM PICK COPIED!";
     }
@@ -196,11 +187,13 @@ function manualCopy(id) {
 }
 
 function buildPrompt(source) {
+    if (source.length === 0) return "No data found for this model.";
     let p = [];
     cats.forEach(c => {
         if(document.getElementById(`chk-${c}`).checked) {
             const pool = source.map(s => s[c]);
-            p.push(`${c}: ${pool[Math.floor(Math.random() * pool.length)]}`);
+            const randomVal = pool[Math.floor(Math.random() * pool.length)];
+            p.push(`${c}: ${randomVal}`);
         }
     });
     return p.join(", ");
