@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Unified Prompt Builder — All Filters</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --panel: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --stroke: #22304a;
+      --accent: #60a5fa;
+      --good: #34d399;
+      --field: #0f172a;
+      --chip: #0b1222;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #070a10, #0b0f17, #0f0518);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      min-height: 100vh;
+    }
+    /* ---- TABS ---- */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(11,15,23,0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 14px 18px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: .3px;
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- SHARED FIELD STYLES ---- */
+    select, textarea, input[type="text"] {
+      width: 100%;
+      background: var(--field);
+      color: var(--text);
+      border: 1px solid var(--stroke);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    select:focus, textarea:focus, input:focus {
+      border-color: rgba(96,165,250,.75);
+      box-shadow: 0 0 0 3px rgba(96,165,250,.12);
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .field { margin-bottom: 14px; }
+    .card {
+      background: rgba(17,24,39,.92);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .card h3 {
+      margin: 0 0 14px 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ---- OUTPUT ---- */
+    #unified-output {
+      background: #050b14;
+      color: #67e8f9;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 13px;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 120px;
+      width: 100%;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--stroke);
+      transition: all .15s;
+    }
+    .btn-primary { background: rgba(96,165,250,.15); border-color: rgba(96,165,250,.5); color: #93c5fd; }
+    .btn-primary:hover { background: rgba(96,165,250,.28); }
+    .btn-good { background: rgba(52,211,153,.15); border-color: rgba(52,211,153,.5); color: #6ee7b7; }
+    .btn-good:hover { background: rgba(52,211,153,.28); }
+    .btn-purple { background: rgba(167,139,250,.15); border-color: rgba(167,139,250,.5); color: #c4b5fd; }
+    .btn-purple:hover { background: rgba(167,139,250,.28); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* ---- CHIP BUTTONS (OddChar style) ---- */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-btn {
+      padding: 6px 12px;
+      background: var(--chip);
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .chip-btn.sel {
+      background: rgba(109,40,217,.35);
+      border-color: #7c3aed;
+      color: #c4b5fd;
+    }
+    .chip-btn:hover { border-color: #4f46e5; color: var(--text); }
+
+    /* ---- TOAST ---- */
+    #toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #0b1222;
+      border: 1px solid #22304a;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity .2s, transform .2s;
+      z-index: 9999;
+      max-width: 340px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    .page-wrap { max-width: 1300px; margin: 0 auto; padding: 20px; }
+    .two-col { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+    .sticky-side { position: sticky; top: 68px; height: fit-content; }
+
+    header {
+      background: rgba(11,15,23,0.96);
+      border-bottom: 1px solid var(--stroke);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header h1 { margin: 0; font-size: 20px; background: linear-gradient(90deg,#60a5fa,#a78bfa,#f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .badge { background: rgba(96,165,250,.18); color: #93c5fd; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="background:linear-gradient(135deg,#3b82f6,#8b5cf6,#ec4899);width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">⚡</div>
+  <div>
+    <h1>Unified Prompt Builder</h1>
+    <p>All filters from every tool — one powerful prompt engine</p>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
+    <span class="badge">Structured Builder</span>
+    <span class="badge" style="background:rgba(167,139,250,.18);color:#c4b5fd;">OddChar Atelier</span>
+    <span class="badge" style="background:rgba(52,211,153,.18);color:#6ee7b7;">Combined Output</span>
+  </div>
+</header>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('structured')">🎨 Structured Builder</button>
+  <button class="tab-btn" onclick="switchTab('oddchar')">🧬 OddChar Atelier</button>
+  <button class="tab-btn" onclick="switchTab('combined')">⚡ Combined Output</button>
+</div>
+
+<!-- ============ TAB 1: STRUCTURED BUILDER (from art19imgPlex) ============ -->
+<div class="tab-panel active" id="tab-structured">
+  <div class="page-wrap">
+    <div class="two-col">
+      <div id="structured-filters">
+
+        <div class="card">
+          <h3>🏛️ Archetype</h3>
+          <div class="field">
+            <label>High-level character / concept archetype</label>
+            <select id="s-archetype">
+              <option value="clockwork_sovereign">Clockwork Sovereign — steampunk god-emperor, cyborg priest of order</option>
+              <option value="cursed_gorgon">Cursed Gorgon — Medusa reimagined, tragic feminine monster</option>
+              <option value="minimalist_light_sculpture">Minimalist Light Sculpture — experiential architectural pavilion</option>
+              <option value="eccentric_fashion_outsider">Eccentric Fashion Outsider — surrealist dandy, Wes Anderson-style</option>
+              <option value="art_deco_android">Art Deco Android — luxury cyborg, 1920s-30s retro-futurist mannequin</option>
+              <option value="wasteland_scavenger">Wasteland Scavenger — post-apocalyptic survivor, dieselpunk spacefarer</option>
+              <option value="desert_wanderer">Desert Wanderer — rugged frontier icon, stylized vaquero</option>
+              <option value="swamp_thing">Swamp Thing — moss-covered nature-possessed cowboy, eco-horror</option>
+              <option value="tropical_ambassador">Tropical Ambassador — exotic island wildlife icon, blue iguana</option>
+              <option value="deep_sea_leviathan">Deep Sea Leviathan — Lovecraftian horror, vintage kraken</option>
+              <option value="sacred_ancestor">Sacred Ancestor — Easter Island Moai, painted indigenous monument</option>
+              <option value="ornithological_specimen">Ornithological Specimen — decorative wildlife portrait, blue-footed booby</option>
+              <option value="digital_consciousness">Digital Consciousness — futuristic AI identity, luxury data sculpture</option>
+              <option value="coastal_youth_icon">Coastal Youth Icon — athletic surfer boy, beach lifestyle adventurer</option>
+              <option value="liminal_urban_resident">Liminal Urban Resident — night wanderer, 24-hour urban laundromat</option>
+              <option value="visionary_totem">Visionary Totem — shamanic owl spirit, psychedelic Op Art icon</option>
+              <option value="tropical_goddess">Tropical Goddess — aspirational island dreamer, luxury beach paradise</option>
+              <option value="lone_romantic_cowboy">Lone Romantic Cowboy — vintage nocturnal campfire companion</option>
+              <option value="campfire_storyteller">Campfire Storyteller — storybook western range rider</option>
+              <option value="sacred_landscape_guardian">Sacred Landscape Guardian — contemporary Aboriginal fusion icon</option>
+              <option value="modern_minimalist_cowboy">Modern Minimalist Cowboy — solitary contemporary rancher</option>
+              <option value="nocturnal_diner_patron">Nocturnal Diner Patron — working-class night owl</option>
+              <option value="ironic_internet_icon">Ironic Internet Icon — chonky psychedelic meme unicorn</option>
+              <option value="modern_fashion_muse">Modern Fashion Muse — brooding, style-conscious male model</option>
+              <option value="sacred_feminine_matriarch">Sacred Feminine Matriarch — surreal Madonna and Child with mythical beasts</option>
+              <option value="third_eye_visionary">Third-Eye Visionary — surreal, bearded countercultural prophet</option>
+              <option value="tank_girl_adventurer">Post-Apocalyptic Desert Pilot — Tank Girl style sci-fi adventurer</option>
+              <option value="modern_rural_beauty">Modern Rural Beauty — wistful anime waifu in pastoral setting</option>
+              <option value="idealized_fitness_model">Idealized Fitness Model — aspirational beauty influencer</option>
+              <option value="carefree_genz_vacationer">Carefree Gen-Z Vacationer — viral influencer, luxury lifestyle</option>
+              <option value="quirky_alien_character">Quirky Alien Character — practical effects monster, cosplay showcase</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🧬 Species / Being Type</h3>
+          <div class="field">
+            <select id="s-species">
+              <option value="human_machine_hybrid_male">Human-machine hybrid / android (cybernetic male)</option>
+              <option value="mythological_gorgon_female">Mythological creature — female Gorgon, serpentine</option>
+              <option value="inanimate_installation_with_scale_figure">Inanimate architectural installation + scale figure</option>
+              <option value="maritime_couture_muse">Maritime Couture Muse — ocean goddess, sea queen</option>
+              <option value="folk_art_companion_dog">Folk Art Companion — decorative stylized sighthound</option>
+              <option value="biomech_tuna">Biomechanical Specimen — engineered organism</option>
+              <option value="architectural_sanctuary">Architectural Sanctuary — luxury tropical resort</option>
+              <option value="gentlemanly_satan">Gentlemanly Satan — Victorian-era devil figure</option>
+              <option value="human_female_refined">Human female — young adult, refined fashionable beauty</option>
+              <option value="domestic_dog_whippet">Domestic dog — folk art style</option>
+              <option value="demonic_victorian_male">Demonic entity in human form — Victorian gentleman</option>
+              <option value="human_male_androgynous">Human male — androgynous styling</option>
+              <option value="female_form_android">Female-form android</option>
+              <option value="pressure_suit_human">Human in pressure/environmental suit</option>
+              <option value="plant_human_chimera">Plant-human chimera — overgrown with moss and lichen</option>
+              <option value="blue_morph_iguana">Blue-morph iguana — tropical lizard</option>
+              <option value="kraken_squid">Giant squid / kraken</option>
+              <option value="stone_moai">Stone ancestral monument (Moai)</option>
+              <option value="blue_footed_booby">Blue-footed booby — tropical seabird</option>
+              <option value="digital_wireframe_avatar">Digital human-form avatar — wireframe mannequin</option>
+              <option value="human_male_athlete">Human male athlete</option>
+              <option value="human_female_urbanite">Human female urbanite</option>
+              <option value="owl_totem">Owl spirit totem</option>
+              <option value="human_female_athletic">Human female — athletic build</option>
+              <option value="cowboy_with_horse">Adult human cowboy with horse</option>
+              <option value="cowboy_horse_small_trio">Human cowboy, horse, and small dog/coyote trio</option>
+              <option value="rotund_fantasy_unicorn">Rotund fantasy unicorn — chonky character</option>
+              <option value="madonna_child_with_beasts">Human female + chimeras, demons, dragon, owl</option>
+              <option value="three_eyed_guru">Three-eyed human male guru</option>
+              <option value="female_adventurer_with_cat">Human female adventurer</option>
+              <option value="anime_stylized_female">Stylized human female (anime)</option>
+              <option value="athletic_female">Athletic human female</option>
+              <option value="goblin_alien_fx">Fantasy goblin-alien — humanoid in elaborate prosthetics</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🌍 Genre / World</h3>
+          <div class="field">
+            <select id="s-genre">
+              <option value="steampunk_clockpunk">Steampunk / Clockpunk mythology — Art Nouveau + Industrial</option>
+              <option value="dark_fantasy_greek">Dark fantasy & mythological realism — gothic horror, Greek antiquity</option>
+              <option value="contemporary_minimalist_art">Contemporary minimalist art — experiential urban design</option>
+              <option value="high_fashion_editorial">High-fashion editorial — fantasy realism, coastal luxury</option>
+              <option value="decorative_folk_art">Decorative arts — folk art, mid-century primitive modernism</option>
+              <option value="steampunk_dieselpunk_science">Steampunk / Dieselpunk technical fantasy — Jules Verne</option>
+              <option value="luxury_resort_architecture">Contemporary luxury architecture — tropical resort design</option>
+              <option value="gothic_victorian_demon">Gothic horror — Victorian dark fantasy, classic demon portraiture</option>
+              <option value="surrealist_photography">Surrealist photography — quirky indie film, art gallery whimsy</option>
+              <option value="art_deco_retrofuturism">Retro-futurism — Art Deco sci-fi, 1920s modernism</option>
+              <option value="post_apocalyptic_dieselpunk">Post-apocalyptic dieselpunk — Fallout / Borderlands aesthetic</option>
+              <option value="southwestern_americana">Southwestern Americana — 1960s-70s tourism poster art</option>
+              <option value="southern_gothic_ecohorror">Dark fantasy eco-horror — Southern Gothic supernatural western</option>
+              <option value="tropical_naturalist_art">Tropical naturalist art — contemporary wildlife illustration</option>
+              <option value="maritime_mythology">Maritime mythology — Victorian sea monster documentation</option>
+              <option value="polynesian_heritage">Archaeology + contemporary art — Polynesian cultural heritage</option>
+              <option value="modern_natural_history">Modern natural history — contemporary decorative wildlife</option>
+              <option value="cyberpunk_luxury">Cyberpunk luxury — digital consciousness, interface design</option>
+              <option value="surf_culture_illustration">Surf culture illustration — graphic novel beach lifestyle</option>
+              <option value="neo_noir_urban_realism">Neo-noir urban realism — nocturnal city life, liminal spaces</option>
+              <option value="visionary_psychedelic">Visionary psychedelic art — 1960s counterculture, Op Art</option>
+              <option value="lifestyle_vacation_portrait">Lifestyle fashion portraiture — tropical vacation, aspirational travel</option>
+              <option value="vintage_western_photo">Vintage western photography — nostalgic Old West Americana</option>
+              <option value="midcentury_western_illustration">Mid-century western illustration — children's book aesthetic</option>
+              <option value="aboriginal_fusion">Contemporary Aboriginal fine art — indigenous cultural fusion</option>
+              <option value="modern_vector_western">Modern vector western — commercial poster illustration</option>
+              <option value="urban_diner_realism">Urban nocturnal realism — cinematic diner culture</option>
+              <option value="internet_vaporwave">Internet vaporwave art — psychedelic meme aesthetic</option>
+              <option value="fashion_editorial">Contemporary fashion editorial — artistic portraiture</option>
+              <option value="surrealist_religious_collage">Surrealist religious collage — neo-medieval fantasy, magical realism</option>
+              <option value="psychedelic_comix">Psychedelic underground comix — spiritual surrealism, retro 70s</option>
+              <option value="post_apoc_scifi_concept">Post-apocalyptic sci-fi — desert punk concept art</option>
+              <option value="slice_of_life_anime">Slice-of-life anime — pastoral countryside aesthetic</option>
+              <option value="high_end_commercial_photo">High-end commercial photography — fitness and wellness</option>
+              <option value="viral_social_vlog">Viral social media vlog — aspirational travel/lifestyle</option>
+              <option value="creature_fx_showcase">Creature effects showcase — TikTok cosplay + practical FX</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🖼️ Art Medium / Rendering Mode</h3>
+          <div class="field">
+            <select id="s-medium">
+              <option value="3d_relief_physical">High-detail 3D render (relief metalwork) — photorealistic, sculptural</option>
+              <option value="cinematic_3d_vfx">Cinematic 3D render (creature VFX) — film-quality practical effects</option>
+              <option value="architectural_photo_or_viz">Architectural photography / 3D viz — clean, minimal fine-art</option>
+              <option value="fashion_photo">Photorealistic fashion render / photo — magazine-quality</option>
+              <option value="linocut_woodblock">Linocut / woodblock print — traditional printmaking + watercolor</option>
+              <option value="technical_illustration">Hand-drawn technical illustration — pen & ink, watercolor, blueprint</option>
+              <option value="hdr_archviz">Photorealistic 3D architectural visualization (HDR) — hyperreal</option>
+              <option value="red_ink_sketch">Pen & ink sketch (red ink) — loose gestural red ink on white paper</option>
+              <option value="vintage_film_composite">Photorealistic digital composite (vintage grade) — cinematic</option>
+              <option value="3d_art_deco_polish">High-end 3D render (chrome/porcelain) — polished chrome & porcelain</option>
+              <option value="cel_shaded_comic">Cel-shaded 3D / comic illustration — bold line work, flat fills</option>
+              <option value="screenprint_poster">Screen print / retro poster — limited palette, t-shirt graphic</option>
+              <option value="digital_painting">Digital painting — gestural brushwork, matte painting concept</option>
+              <option value="vibrant_ink_illustration">Digital illustration (ink line) — vibrant fills + strong ink lines</option>
+              <option value="engraving_woodcut">Engraving / woodcut — vintage scientific illustration, distressed paper</option>
+              <option value="photo_with_paint_overlay">Photo/3D with painted overlay — photoreal base + digital paint</option>
+              <option value="mixed_media_collage">Mixed media digital collage — gouache + patterned paper textures</option>
+              <option value="gold_lattice_wireframe">High-end 3D lattice wireframe — metallic wireframe, photoreal textures</option>
+              <option value="manga_celshade">Digital illustration (manga cel-shading) — clean cel-shading, manga lines</option>
+              <option value="analog_film_square">Analog film photography (square) — cinematic green-cyan grade</option>
+              <option value="op_art_hard_edge">Hard-edge Op Art painting — precise symmetrical Op Art patterns</option>
+              <option value="natural_light_lifestyle">Natural light lifestyle photography — shallow depth of field</option>
+              <option value="vintage_color_photo">Vintage color photography — hand-tinted 1950s film look</option>
+              <option value="expressionist_sketch">Expressionist watercolor/ink sketch — loose gestures</option>
+              <option value="dot_painting">Aboriginal dot painting — acrylic pointillism</option>
+              <option value="vector_geometric">Digital vector art — flat geometric shapes and gradients</option>
+              <option value="analog_film_grain">Analog film (heavy grain) — cinematic color grading</option>
+              <option value="lofi_glitch_halftone">Lo-fi illustration (halftone/glitch) — halftone screens, glitch effects</option>
+              <option value="gel_lit_photo">High-end digital photography (gels) — professional colored gel lighting</option>
+              <option value="watercolor_gouache_cutouts">Mixed media watercolor/gouache cutouts — paper cutout collage</option>
+              <option value="risograph_vector">Riso-style digital illustration — flat vector colors, slight grain</option>
+              <option value="clean_cel_shading">Digital cel-shading — clean ink outlines, flat comic-book coloring</option>
+              <option value="anime_cel">High-quality anime cel-shading — smooth edges, painterly background</option>
+              <option value="hyper_polished_studio">Photoreal studio photo/3D — hyper-polished studio quality</option>
+              <option value="vertical_smartphone_screenshot">Vertical smartphone video screenshot — vibrant, compressed</option>
+              <option value="vertical_practical_fx_video">Vertical smartphone practical FX video — practical makeup/prosthetics</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>😶 Face / Head Motif</h3>
+          <div class="field">
+            <select id="s-head">
+              <option value="stoic_masc_deco_crown">Stoic masculine face + Art Deco crown — intense gaze, geometric crown</option>
+              <option value="gorgon_eye_snakes">Reptilian eye — haunting yellow-green eye</option>
+              <option value="classic_beauty_filgree">Classic European beauty + filigree — porcelain skin, copper eyeshadow</option>
+              <option value="dog_geometric_muzzle">Simplified geometric head (sighthound) — narrow long muzzle</option>
+              <option value="tuna_porthole_eye">Mechanical head — large porthole-lens eye, visible machinery</option>
+              <option value="devil_horns_stare">Masculine face + horns — sharp features, intense stare</option>
+              <option value="bald_sunglasses">Bald head + amber sunglasses — expressionless, stoic</option>
+              <option value="porcelain_eyes_closed">Porcelain face — dramatic eyeliner, dark lips, contemplative</option>
+              <option value="helmet_cyclops">Dome helmet (Cyclops lens) — single glowing red lens</option>
+              <option value="sombrero_beard_profile">Bearded profile under sombrero — strong jaw, traditional sombrero</option>
+              <option value="moss_obscured">Obscured by moss/hat — hidden by weathered hat + Spanish moss</option>
+              <option value="iguana_profile">Reptilian profile — detailed iris, crown of dorsal scales</option>
+              <option value="kraken_eye_tentacles">Leviathan eye + tentacles — large focal eye, writhing tentacles</option>
+              <option value="moai_painted">Stylized Moai stone face — heavy brow, elongated nose, color-block paint</option>
+              <option value="gold_lattice_voids">Golden lattice skull voids — circular eye socket voids</option>
+              <option value="surfer_3q_smile">Surfer 3/4 profile — windswept hair, confident slight smile</option>
+              <option value="laundromat_anonymous">Anonymous (distant angle) — face obscured by distance</option>
+              <option value="owl_hypnotic">Hypnotic concentric eyes — radial patterns from central beak</option>
+              <option value="sun_kissed_gaze">Dreamy upward gaze — water droplets, gold hoop earrings</option>
+              <option value="shadowed_hat">Shadowed face under hat — anonymous silhouette under wide brim</option>
+              <option value="deadpan_unicorn">Deadpan cute unicorn face — black dot eyes, striped horn</option>
+              <option value="bearded_model_intense">Handsome bearded face — intense gaze, styled hair</option>
+              <option value="halo_madonna">Serene face + halo — pale European face, golden halo, beast masks</option>
+              <option value="third_eye_mystic">Bearded mystic + third eye — turquoise hair, prominent third eye</option>
+              <option value="goggles_adventurer">Adventurer with goggles — turquoise cap, determined expression</option>
+              <option value="anime_turquoise_eyes">Anime face (turquoise eyes) — coral lips, lime-yellow bob</option>
+              <option value="fitness_symmetry">Fitness beauty symmetry — pro makeup, high ponytail</option>
+              <option value="vacation_sunglasses_smile">Sunglasses smile — windblown hair, genuine joy</option>
+              <option value="alien_mask_grotesque">Grotesque alien mask — massive black eyes, turquoise skin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>👗 Outfit / Wardrobe</h3>
+          <div class="field">
+            <select id="s-outfit">
+              <option value="ceremonial_gear_armor">Ceremonial body-armor — weathered teal-patina collar, gear chest plate</option>
+              <option value="installation_coat_scale">Scale figure winter coat — dark, stark winter coat</option>
+              <option value="haute_couture_shells">Haute couture seashell bodice — cowries, pearls, turquoise, gold thread</option>
+              <option value="folk_dog_collar">Decorative neck collar — geometric folk patterns</option>
+              <option value="resort_arch_materials">Architectural materials — teak wood, turquoise glass, dark stone</option>
+              <option value="victorian_formal_devil">Victorian formal menswear — tailored jacket, waistcoat, cravat</option>
+              <option value="polkadot_robe_platforms">Polka-dot robe + platforms — golden-yellow robe, chunky platforms</option>
+              <option value="artdeco_vinyl_armor">Glossy vinyl armor — black vinyl with yellow-gold art deco panels</option>
+              <option value="pressure_suit_weathered">Weathered pressure suit — cream-tan suit with blue-grey armor panels</option>
+              <option value="vaquero_workshirt">Turquoise-teal western work shirt — yellow-gold highlights</option>
+              <option value="moss_consumed_cowboy">Cowboy remnants consumed by moss — leather and denim overtaken by moss</option>
+              <option value="business_formal_suit">Business formal — white collar, dark navy suit jacket</option>
+              <option value="surfer_boardshorts">Shirtless + board shorts — teal-blue board shorts, towel at waist</option>
+              <option value="hoodie_jeans">Casual hoodie + jeans — functional and nondescript</option>
+              <option value="energy_field_feathers">Feather energy field — decorative energy field covering entire form</option>
+              <option value="bikini_terracotta">Terracotta bikini — thin shoulder straps</option>
+              <option value="dusty_rose_suit_hat">Dusty rose suit + Stetson — romanticized western wear</option>
+              <option value="bold_red_poncho">Bold red poncho/serape — simplified forms</option>
+              <option value="burgundy_workshirt">Burgundy work shirt + denim — practical ranch wear</option>
+              <option value="utility_dark">Dark utility clothing — functional, nondescript</option>
+              <option value="unicorn_none">None (unicorn body) — pale yellow body with dark mane</option>
+              <option value="blue_blazer">Light blue blazer — white crisp shirt</option>
+              <option value="religious_robes">Traditional 80s clothes</option>
+              <option value="scavenger_gear_cat">Scavenger gear — leather harness, baggy turquoise pants, with cat</option>
+              <option value="summer_crop_denim">Casual summer wear — black crop top, high-waisted denim jeans</option>
+              <option value="black_bikini_gold">Minimal black bikini (gold hardware) — sleek and athletic</option>
+              <option value="white_polka_bikini">Retro white bikini (polka dots) — playful and revealing</option>
+              <option value="clown_collar">Bubblegum-pink collar — over textured multicolored garment</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🪨 Materials & Textures</h3>
+          <div class="field">
+            <select id="s-materials">
+              <option value="verdigris_metal">Aged copper/brass verdigris — Art Nouveau flowing engraved metal</option>
+              <option value="skin_scales_real">Realistic skin + wet serpent scales — subsurface scattering, glistening</option>
+              <option value="translucent_panels">Translucent backlit panels — acrylic/resin, seamless gradients</option>
+              <option value="nacre_pearls_turquoise">Nacre/pearls/turquoise — iridescent shell nacre, lustrous pearls</option>
+              <option value="paper_grain_ink">Paper grain + ink — visible grain, varied line weights, crosshatching</option>
+              <option value="chrome_porcelain">Chrome + porcelain — mirror metals, glossy lacquer, matte porcelain</option>
+              <option value="canvas_dirt_rust">Canvas + dirt + rust — heavy canvas, chipped paint, oxidized rust</option>
+              <option value="moss_vs_leather">Living vegetation vs leather/denim — moss/fronds vs tattered denim</option>
+              <option value="reptile_scales_petals">Reptilian scales + petals — scale detail, leaf veins, soft petals</option>
+              <option value="engraved_paper_distress">Engraved lines on aged paper — cross-hatching on distressed paper</option>
+              <option value="stone_vs_pigment">Volcanic stone + modern pigment — weathered stone vs matte paint</option>
+              <option value="wireframe_gold_vs_fabric">Gold lattice vs suit fabric — polished gold wireframe + matte suiting</option>
+              <option value="film_grain_fluorescent">Film grain + chrome + tiles — organic grain, chrome doors, glossy tiles</option>
+              <option value="op_art_smooth_fields">Smooth Op Art fields — no visible brushstroke or grain</option>
+              <option value="wet_skin_bokeh">Wet skin + water bokeh — water droplets, glossy hair, reflective ripples</option>
+              <option value="halftone_glitch">Halftone + noise + glitch — retro halftone, digital noise</option>
+              <option value="prosthetics_silicone_latex">Silicone/latex prosthetics — wet organic prosthetics vs dry fabric</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🤸 Action / Pose</h3>
+          <div class="field">
+            <select id="s-pose">
+              <option value="hieratic_frontal">Hieratic frontal — static statue-like authority, arms rigid at sides</option>
+              <option value="concealed_profile_snakes">Concealed profile + writhing serpents — one eye piercing</option>
+              <option value="serene_regal_profile">Serene regal profile — chin lifted, confident stance</option>
+              <option value="alert_seated_dog">Static seated dog — alert posture, facing left</option>
+              <option value="swimming_profile_tuna">Side-profile swimming — horizontal orientation for technical study</option>
+              <option value="devil_seated_commanding">Commanding seated — leaning back, frontal gaze, crossed legs</option>
+              <option value="waiting_dangling_legs">Passive waiting — seated, dangling legs, folded hands</option>
+              <option value="sculptural_head_tilted">Sculptural head tilted back — peaceful profile</option>
+              <option value="survivor_threeq_back">Active survivor stance — three-quarter back view walking</option>
+              <option value="stoic_desert_profile">Stoic profile gaze — looking toward distant horizon</option>
+              <option value="ominous_frontal">Ominous frontal stance — grounded and confronting</option>
+              <option value="basking_profile">Resting/basking — head turned, noble profile</option>
+              <option value="leviathan_vertical_float">Vertical float/swim — tentacles drifting in current</option>
+              <option value="guardian_moai">Monumental guardian stance — head tilted slightly upward</option>
+              <option value="booby_portrait">Graceful upright portrait — alert seabird at rest</option>
+              <option value="wireframe_contemplation">Elegant 3/4 tilt — mannequin-like contemplation</option>
+              <option value="surfer_relaxed">Relaxed athletic stance — looking off-frame toward ocean</option>
+              <option value="laundromat_still">Solitary contemplation — standing still in quiet laundromat</option>
+              <option value="op_art_confrontation">Frontal confrontation — direct eye contact, symmetrical vibration</option>
+              <option value="submerged_bliss">Partially submerged bliss — head tilted back, sun-worship gesture</option>
+              <option value="campfire_gazing">Seated by fire — gazing into the fire</option>
+              <option value="warming_hands">Warming hands — peaceful gathering by fire</option>
+              <option value="crosslegged_meditation">Cross-legged meditation — spiritual connection</option>
+              <option value="diner_eating">Active eating — candid enjoyment, eyes closed</option>
+              <option value="meme_ready_still">Meme-ready stillness — static 'waiting' pose</option>
+              <option value="brooding_threeq_turn">Brooding three-quarter turn — intense gaze off-camera</option>
+              <option value="throne_of_wisdom">Throne of Wisdom — seated, guardians alert</option>
+              <option value="hand_reaching">Hieratic frontal + reaching hand — foreground hand toward viewer</option>
+              <option value="power_stance_guitar">Power stance — wide-legged, guitar ready</option>
+              <option value="model_contrapposto">Contrapposto — relaxed, contemplative profile</option>
+              <option value="commercial_hand_on_hip">Commercial model pose — hand on hip, weight shifted</option>
+              <option value="woo_girl_stride">Celebration mid-stride — arms raised, woo-girl energy</option>
+              <option value="fx_showcase_frontal">Frontal showcase — static to show costume details</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📍 Setting / Location</h3>
+          <div class="field">
+            <select id="s-setting">
+              <option value="sacred_shrine_frame">Sacred altar/shrine — ornamental frame with columns/pilasters</option>
+              <option value="shadowy_forest_ruins">Shadowy forest ruins — overgrown, dapple-lit vines</option>
+              <option value="european_plaza_dusk">European plaza at dusk — neoclassical buildings, winter trees</option>
+              <option value="soft_focus_beach">Soft-focus beach — sandy beach, calm water, cloudy sky</option>
+              <option value="abstract_pattern_space">Abstract decorative background — pattern-filled like textile/wallpaper</option>
+              <option value="archival_paper_page">Archival paper page — naturalist sketchbook/manual page</option>
+              <option value="luxury_pool_corridor">Luxury infinity pool corridor — indoor-outdoor tropical, dark columns</option>
+              <option value="palatial_interior">Palatial interior — opulent drawing room/throne room</option>
+              <option value="abandoned_industrial">Abandoned industrial site — weathered tiles, water damage, decay</option>
+              <option value="minimal_studio_mint">Minimal studio gradient — pale mint with linear light streaks</option>
+              <option value="postapoc_tiled_plaza">Post-apocalyptic tiled plaza — cracked tiles, dust-filled sky</option>
+              <option value="sonoran_desert_sunset">Sonoran desert at pink sunset — mountains and saguaro</option>
+              <option value="isolated_swamp">Isolated swamp/bayou — neutral atmospheric background</option>
+              <option value="tropical_paradise_sunset">Tropical paradise at sunset — coastal water, distant islands</option>
+              <option value="deep_ocean_void">Deep ocean void — dark mystical gradient</option>
+              <option value="rapa_nui_storm">Easter Island storm sky — rocky platform, stormy navy sky</option>
+              <option value="grey_studio_void">Neutral grey studio void — minimal gradient background</option>
+              <option value="idealized_sun_disk">Idealized beach sun disk — massive golden sun with cloud lines</option>
+              <option value="laundromat_night">24-hour laundromat at night — city lights through windows</option>
+              <option value="black_inner_vision">Black inner-vision void — pure black for max intensity</option>
+              <option value="tropical_golden_hour">Tropical golden hour — crystal water, white sand, palms</option>
+              <option value="western_twilight">Western wilderness twilight — silhouetted mountains</option>
+              <option value="blue_night_storybook">Blue night storybook — illustrated nighttime scene</option>
+              <option value="aboriginal_dot_country">Aboriginal dot-country landscape — spiritual earth pattern</option>
+              <option value="urban_minimalist_backdrop">Urban minimalist backdrop — plain wall, city textures</option>
+              <option value="diner_fluorescent_night">Fluorescent diner interior at night — classic American diner</option>
+              <option value="psychedelic_color_field">Psychedelic color field — saturated flat-color surround</option>
+              <option value="fashion_studio_seamless">Fashion studio seamless — neutral paper or gradient sweep</option>
+              <option value="overgrown_medieval_ruin">Overgrown medieval ruin — gothic arches, trailing vines</option>
+              <option value="space_nebula_backdrop">Space nebula backdrop — cosmic purple and teal clouds</option>
+              <option value="industrial_warehouse">Industrial warehouse — raw concrete, dramatic shafts of light</option>
+              <option value="neon_city_rooftop">Neon-lit city rooftop — cyberpunk urban panorama at night</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📝 Extra Notes (Optional)</h3>
+          <div class="field">
+            <textarea id="s-notes" rows="3" placeholder="Add any one-off tweaks, extra detail, negative prompts, or special instructions..."></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="sticky-side">
+        <div class="card" style="border-color:rgba(96,165,250,.4);">
+          <h3 style="color:#67e8f9;">⚡ Structured Output</h3>
+          <textarea id="structured-output" rows="10" readonly style="background:#050b14;color:#67e8f9;font-family:monospace;font-size:12px;border:1px solid #22304a;border-radius:10px;padding:12px;width:100%;resize:vertical;"></textarea>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="buildStructured()"><i class="fas fa-sync-alt"></i> Build</button>
+            <button class="btn btn-good" onclick="copyStructured()"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn btn-purple" onclick="randomizeStructured()"><i class="fas fa-dice"></i> Randomize</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 2: ODDCHAR ATELIER (from art20cimgGrk) ============ -->
+<div class="tab-panel" id="tab-oddchar">
+  <div class="page-wrap">
+    <div class="two-col">
+      <div>
+
+        <div class="card">
+          <h3>🧬 Species / Origin</h3>
+          <div class="field">
+            <label>Core Essence</label>
+            <select id="o-species" style="font-size:13px;">
+              <option>Unthought of Being</option><option>Being</option><option>Teeth</option><option>Body part</option>
+              <option>Animal Character</option><option>Atomic Structure</option><option>Microbe</option>
+              <option>Art Installation</option><option>Desert Being</option><option>Kitchen Tool Character</option>
+              <option>Mushroom</option><option>Machinery Tool Being</option><option>Computer Hardware Being</option>
+              <option>Advanced Creature</option><option>Golem</option><option>Cat</option><option>Spirit</option>
+              <option>Iguana</option><option>Kraken</option><option>Symbiote</option><option>Sprite</option>
+              <option>Hybrid</option><option>Creature</option><option>Animal</option><option>Dog</option>
+              <option>Colossus</option><option>Sentinel</option><option>Medieval Character</option>
+              <option>Sentient Nebula</option><option>Liquid Mercury Entity</option><option>Living Shadow</option>
+              <option>Mechanism Creature</option><option>Geometric Fractal</option><option>Coral Reef Hivemind</option>
+              <option>Fungal Network</option><option>Static Electricity Cloud</option><option>Melting Candle Being</option>
+              <option>Woven Fabric Golem</option><option>Radio Wave Specter</option><option>Volcanic Glass Golem</option>
+              <option>Rust Parasite</option><option>Crystalline Growth</option><option>Root System Consciousness</option>
+              <option>Tectonic Plate Spirit</option><option>Old Growth Forest Heart</option><option>Ink Blot Figment</option>
+              <option>Subatomic Particle</option><option>Bio-Luminescent Deep Sea Entity</option>
+              <option>Shattered Mirror Being</option><option>Pressed Flower Spirit</option>
+              <option>Thawing Glacier Entity</option><option>Scrap Metal Amalgam</option>
+              <option>Paper Origami Lifeform</option><option>Vaporous Steam Construct</option>
+              <option>Desert Mirage</option><option>Tar Pit Dweller</option><option>Bioluminescent Moss</option>
+              <option>Celestial Constellation</option><option>Gnarled Driftwood Being</option>
+              <option>Magnetic Field Entity</option><option>Sandstorm Wraith</option><option>Obsidian Shard</option>
+              <option>Deep Space Vacuum</option><option>Burnt Ember Spirit</option><option>Coral Skeleton</option>
+              <option>Petrified Wood Entity</option><option>Tidal Wave Form</option><option>Echoing Soundwave</option>
+              <option>Ancient Parchment Character</option><option>Oil Slick Organism</option>
+              <option>Thorn Bush Entity</option><option>Graffiti Mural Being</option><option>Meteorite Shard</option>
+              <option>Neon Light Specter</option><option>Vine-Wrapped Monolith</option><option>Polished Marble Entity</option>
+              <option>Root-Bound Earth Being</option><option>Storm Cloud Consciousness</option>
+              <option>Solar Flare Entity</option><option>Forgotten Manuscript Being</option>
+              <option>Lichen-Covered Boulder</option><option>Wildfire Essence</option><option>Refracted Light Entity</option>
+              <option>Molten Glass Sculpt</option><option>Tectonic Plate Colossus</option>
+              <option>Liquid Mercury Humanoid</option><option>Atmospheric Gas Cloud</option>
+              <option>Crystallized Salt Golem</option><option>Volcanic Ash Wraith</option>
+              <option>Static Electricity Swarm</option><option>Deep Sea Vent Cluster</option>
+              <option>Radioactive Isotope Being</option><option>Rusted Gear Assembly</option>
+              <option>Circuit Board Hivemind</option><option>Hydraulic Press Golem</option>
+              <option>Neon Tube Skeleton</option><option>Vacuum Tube Intelligence</option>
+              <option>Scrapped Engine Hybrid</option><option>Fiber Optic Weaver</option>
+              <option>Abandoned Satellite Entity</option><option>Industrial Boiler Beast</option>
+              <option>Mycelial Network Consciousness</option><option>Bioluminescent Planktoid</option>
+              <option>Tardigrade Titan</option><option>Nerve Ending Bundle</option><option>Pollen Grain Sovereign</option>
+              <option>Petri Dish Colony</option><option>Coral Reef Guardian</option>
+              <option>Living Vascular System</option><option>Moss-Covered Monolith</option>
+              <option>Deep-Tissue Parasite</option><option>Mathematical Equation Manifest</option>
+              <option>Glitch-Art Apparition</option><option>Origami Folded Reality</option>
+              <option>Sound Wave Sculpture</option><option>Ink Blot Chimera</option>
+              <option>Topographic Map Entity</option><option>String Theory Weaving</option>
+              <option>Negative Space Silhouette</option><option>Fractal Geometry Beast</option>
+              <option>Paradoxical Geometry Being</option><option>Victorian Wallpaper Mimic</option>
+              <option>Attic Dust Elemental</option><option>Porcelain Tea Set Hybrid</option>
+              <option>Garden Tool Centaur</option><option>Thrift Store Fabric Amalgam</option>
+              <option>Library Book Chimera</option><option>Streetlight Sentinel</option>
+              <option>Pavement Crack Dweller</option><option>Stationary Supply Swarm</option>
+              <option>Ironing Board Automaton</option><option>Paradox Weaver</option>
+              <option>Floral Predator</option><option>Echoform Chimera</option><option>Sonic Flora</option>
+              <option>Cognitive Reef</option><option>Memory Shell</option><option>Glyphbound Homunculus</option>
+              <option>Anti-Prophet</option><option>Chronophage Larva</option><option>Geometric Predator</option>
+              <option>Bitumen Seraph</option><option>Absence Weaver</option><option>Foam Logic Golem</option>
+              <option>Fluid Archivist</option><option>Shadow Taxonomist</option><option>Synthetic Swarm</option>
+              <option>Rustborn Saint</option><option>Tension Elemental</option><option>Petal-Spined Aberrant</option>
+              <option>Urban Relic</option><option>Noise Orchid</option><option>Temporal Sporebearer</option>
+              <option>Mnemonic Husk</option><option>Almost-Human Guardian</option><option>Inverted Pilgrim</option>
+              <option>Architectural Entity</option><option>Lattice Beast</option><option>Living Annotation</option>
+              <option>Seamstress of Gaps</option><option>Fallen Construct</option><option>Mercury Librarian</option>
+              <option>Fragile Colossus</option><option>Plastic Tide Oracle</option><option>Hypnagogic Snake</option>
+              <option>Friction Djinn</option><option>Reflection Swarm</option><option>Neon Fossil</option>
+              <option>Bio-Digital Vine</option><option>Aeon Pollen Carrier</option><option>Liminal Observer</option>
+              <option>Uncanny Caretaker</option><option>Entity Collective</option><option>Null Cathedral</option>
+              <option>Funerary Flora</option><option>Inkbound Familiar</option><option>Ember Trickster</option>
+              <option>Broken Halo Automaton</option><option>Luminous Fragment</option><option>Glassbone Marauder</option>
+              <option>Layered Spirit</option><option>Dream-Shed Serpent</option><option>Bonebound Guardian</option>
+              <option>Specular Doppelherd</option><option>Grammatical Predator</option><option>Overgrown Algorithm</option>
+              <option>Seismic Wanderer</option><option>Candle-Headed Witness</option><option>Color-Split Entity</option>
+              <option>Gravemind Topiary</option><option>Replicated Shade</option><option>Cinder-Thread Jester</option>
+              <option>Bio-Geographic Titan</option><option>Errant Halo Swarm</option><option>Censored Mystic</option>
+              <option>Palimpsest Phantom</option><option>Depth-Fold Creature</option>
+              <option>Obsidian Marrow Warden</option><option>Borrowed-Body Agent</option>
+              <option>Feral Syntax Beast</option><option>Signal Herdsman</option><option>Foreshock Pilgrim</option>
+              <option>Threshold Relic</option><option>Kaleidos Voidling</option><option>Temporal Custodian</option>
+              <option>Carbon Copy Revenant</option><option>Fluid Colossus</option><option>Chimeric Atlas</option>
+              <option>Ruined Sovereign</option><option>Redacted Saint</option><option>Resonant Hunter</option>
+              <option>Abyssal Origamist</option><option>Sleep Citadel</option><option>Proxy Skin Courier</option>
+              <option>Decay Emissary</option><option>Static Veil Shepherd</option><option>Translucent Thief</option>
+              <option>Liminal Bone Lantern</option><option>Mind-Knot Angel</option><option>Dust-Clock Seraph</option>
+              <option>Paradox Emissary</option><option>Inkstorm Leviathan</option><option>Borderline Spirit</option>
+              <option>Splintered Crown Wight</option><option>Fungal Collective</option><option>Cobalt Echo Stalker</option>
+              <option>Autonomous Construct</option><option>Porous Dream Bastion</option><option>Shadow Ecosystem</option>
+              <option>Rusted Halo Herald</option><option>Glassroot Pilferer</option>
+              <option>Mnemonic Tangle Seraph</option><option>Contradiction Herald</option>
+              <option>Hinterland Eidolon</option><option>Shiftspore Myriad</option>
+              <option>Puppetless Marionette</option><option>Silhouette Orchard</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🎭 Character Type</h3>
+          <div class="grid-2">
+            <div class="field">
+              <label>Style / Aesthetic</label>
+              <select id="o-type">
+                <option value="">Perfectly as imagined</option>
+                <option value="(anime)">(anime)</option><option value="Athletic">Athletic</option>
+                <option value="Aesthetic">Aesthetic</option><option value="Avatar">Avatar</option>
+                <option value="Being">Being</option><option value="Blendwalker">Blendwalker</option>
+                <option value="Character">Character</option><option value="Doppelgänger">Doppelgänger</option>
+                <option value="Fashionista">Fashionista</option><option value="Figure">Figure</option>
+                <option value="Guru">Guru</option><option value="Icon">Icon</option>
+                <option value="Made of dots">Made of dots</option><option value="Mechanic">Mechanic</option>
+                <option value="Monolith">Monolith</option><option value="Monument">Monument</option>
+                <option value="Oracle">Oracle</option><option value="Phantom">Phantom</option>
+                <option value="Prophet">Prophet</option><option value="Queen">Queen</option>
+                <option value="Rebel">Rebel</option><option value="Resonator">Resonator</option>
+                <option value="Shapeshifter">Shapeshifter</option><option value="Sovereign">Sovereign</option>
+                <option value="Survivor">Survivor</option><option value="Visionary">Visionary</option>
+                <option value="Wanderer">Wanderer</option>
+                <option value="Disrupts rigid realities through playful contradictions">Disrupts rigid realities through playful contradictions</option>
+                <option value="Mirrors others' fears and hopes as shifting anatomy">Mirrors others' fears as shifting anatomy</option>
+                <option value="Consumes obsolete timelines to prevent paradox">Consumes obsolete timelines to prevent paradox</option>
+                <option value="Guards liminal urban spaces like alleys and overpasses">Guards liminal urban spaces</option>
+                <option value="Classifies creatures that exist only in contradictions">Classifies creatures that exist in contradictions</option>
+                <option value="Hunts in higher dimensions, seen only as outlines">Hunts in higher dimensions</option>
+                <option value="Stitches holes in reality using missing moments">Stitches holes in reality</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Material / Composition</label>
+              <select id="o-material">
+                <option value="">Perfectly as imagined</option>
+                <option value="made of translucent crystal">Translucent Crystal</option>
+                <option value="made of liquid mercury">Liquid Mercury</option>
+                <option value="made of obsidian glass">Obsidian Glass</option>
+                <option value="made of holographic light">Holographic Light</option>
+                <option value="made of smoked velvet">Smoked Velvet</option>
+                <option value="made of living marble">Living Marble</option>
+                <option value="made of aurora threads">Aurora Threads</option>
+                <option value="made of black hole fragments">Black Hole Fragments</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>💼 Role / Profession</h3>
+          <label style="margin-bottom:10px;">Calling</label>
+          <div class="chip-group" id="o-role-group">
+            <button class="chip-btn sel" data-v="Architect">Architect</button>
+            <button class="chip-btn" data-v="Adventurer">Adventurer</button>
+            <button class="chip-btn" data-v="Alchemist">Alchemist</button>
+            <button class="chip-btn" data-v="Archivist">Archivist</button>
+            <button class="chip-btn" data-v="Astronomer">Astronomer</button>
+            <button class="chip-btn" data-v="Baker">Baker</button>
+            <button class="chip-btn" data-v="Beekeeper">Beekeeper</button>
+            <button class="chip-btn" data-v="Blacksmith">Blacksmith</button>
+            <button class="chip-btn" data-v="Cartographer">Cartographer</button>
+            <button class="chip-btn" data-v="Chef">Chef</button>
+            <button class="chip-btn" data-v="Chronicler">Chronicler</button>
+            <button class="chip-btn" data-v="Curator">Curator</button>
+            <button class="chip-btn" data-v="Dancer">Dancer</button>
+            <button class="chip-btn" data-v="Dreamer">Dreamer</button>
+            <button class="chip-btn" data-v="Elder">Elder</button>
+            <button class="chip-btn" data-v="Engineer">Engineer</button>
+            <button class="chip-btn" data-v="Gardener">Gardener</button>
+            <button class="chip-btn" data-v="Guardian">Guardian</button>
+            <button class="chip-btn" data-v="Guide">Guide</button>
+            <button class="chip-btn" data-v="Librarian">Librarian</button>
+            <button class="chip-btn" data-v="Mystic">Mystic</button>
+            <button class="chip-btn" data-v="Navigator">Navigator</button>
+            <button class="chip-btn" data-v="Nomad">Nomad</button>
+            <button class="chip-btn" data-v="Oracle">Oracle</button>
+            <button class="chip-btn" data-v="Philosopher">Philosopher</button>
+            <button class="chip-btn" data-v="Poet">Poet</button>
+            <button class="chip-btn" data-v="Ranger">Ranger</button>
+            <button class="chip-btn" data-v="Samurai">Samurai</button>
+            <button class="chip-btn" data-v="Scholar">Scholar</button>
+            <button class="chip-btn" data-v="Storyteller">Storyteller</button>
+            <button class="chip-btn" data-v="Surfer">Surfer</button>
+            <button class="chip-btn" data-v="Weaver">Weaver</button>
+            <button class="chip-btn" data-v="Content Creator">Content Creator</button>
+            <button class="chip-btn" data-v="Fitness Trainer">Fitness Trainer</button>
+            <button class="chip-btn" data-v="Entrepreneur">Entrepreneur</button>
+            <button class="chip-btn" data-v="Game Streamer">Game Streamer</button>
+            <button class="chip-btn" data-v="Hunter">Hunter</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>✨ Aura & Presence</h3>
+          <div class="grid-3">
+            <div class="field">
+              <label>Personality</label>
+              <select id="o-mood">
+                <option value="">Perfectly captivating</option>
+                <option value="enigmatic and magnetic">Enigmatic & Magnetic</option>
+                <option value="serene yet intense">Serene Yet Intense</option>
+                <option value="playfully dangerous">Playfully Dangerous</option>
+                <option value="melancholically beautiful">Melancholically Beautiful</option>
+                <option value="quietly omnipotent">Quietly Omnipotent</option>
+                <option value="elegantly chaotic">Elegantly Chaotic</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Color Palette</label>
+              <select id="o-palette">
+                <option value="">Any striking colors</option>
+                <option value="deep cosmic gradients">Cosmic Gradients</option>
+                <option value="iridescent oil slick">Oil Slick Iridescence</option>
+                <option value="monochrome with neon accents">Monochrome + Neon</option>
+                <option value="twilight prism">Twilight Prism</option>
+                <option value="molten gold and obsidian">Molten Gold & Obsidian</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Visual Signature</label>
+              <select id="o-trait">
+                <option value="">Perfectly mesmerizing</option>
+                <option value="surrounded by floating geometric shards">Floating Geometric Shards</option>
+                <option value="trails liquid light behind movement">Liquid Light Trails</option>
+                <option value="body partially fractured into crystal">Fractured Crystal Body</option>
+                <option value="emits soft particle haze">Soft Particle Haze</option>
+                <option value="eyes glow with inner nebula">Nebula Eyes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🎁 Secret Power</h3>
+          <div class="field">
+            <select id="o-power">
+              <option value="">Hidden for now...</option>
+              <option value="can phase through mirrors">Phases through mirrors</option>
+              <option value="controls gravity in a 3-meter radius">Controls local gravity</option>
+              <option value="leaves echoes of past emotions">Leaves emotional echoes</option>
+              <option value="breathes soft nebula clouds">Breathes nebula clouds</option>
+              <option value="eyes reflect alternate realities">Eyes show alternate realities</option>
+              <option value="touch turns objects momentarily transparent">Makes objects transparent</option>
+              <option value="casts shadows that move independently">Independent shadows</option>
+              <option value="voice creates visible sound waves">Visible sound waves</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🖌️ Artistic Vision</h3>
+          <label style="margin-bottom:8px;">Style</label>
+          <div class="chip-group" id="o-style-group" style="margin-bottom:14px;">
+            <button class="chip-btn sel" data-v="surreal digital art">Surreal Digital</button>
+            <button class="chip-btn" data-v="hyper-detailed cinematic">Cinematic</button>
+            <button class="chip-btn" data-v="glossy sci-fi concept art">Sci-Fi Concept</button>
+            <button class="chip-btn" data-v="dark fantasy illustration">Dark Fantasy</button>
+            <button class="chip-btn" data-v="iridescent cyber-baroque">Cyber-Baroque</button>
+            <button class="chip-btn" data-v="volumetric lighting masterpiece">Volumetric</button>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Pose</label>
+              <select id="o-pose">
+                <option value="full body, dramatic pose">Dramatic Full Body</option>
+                <option value="elegant floating pose">Elegant Floating</option>
+                <option value="dynamic action stance">Dynamic Action</option>
+                <option value="levitating gracefully">Levitating Gracefully</option>
+                <option value="standing with quiet intensity">Quiet Intensity</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Environment</label>
+              <select id="o-env">
+                <option value="void with soft particles">Cosmic Void</option>
+                <option value="abandoned crystal cathedral">Crystal Cathedral</option>
+                <option value="neon-lit infinite corridor">Neon Corridor</option>
+                <option value="floating in zero gravity">Zero Gravity</option>
+                <option value="surrounded by fractured mirrors">Fractured Mirrors</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- OddChar Right Panel -->
+      <div class="sticky-side">
+        <div class="card" style="border-color:rgba(167,139,250,.4);">
+          <h3 style="color:#c4b5fd;">🧬 OddChar Output</h3>
+          <textarea id="oddchar-output" rows="10" readonly style="background:#050b14;color:#a78bfa;font-family:monospace;font-size:12px;border:1px solid #22304a;border-radius:10px;padding:12px;width:100%;resize:vertical;"></textarea>
+          <div class="btn-row">
+            <button class="btn btn-purple" onclick="buildOddChar()"><i class="fas fa-sync-alt"></i> Build</button>
+            <button class="btn btn-good" onclick="copyOddChar()"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn btn-primary" onclick="randomizeOddChar()"><i class="fas fa-dice"></i> Surprise Me!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 3: COMBINED OUTPUT ============ -->
+<div class="tab-panel" id="tab-combined">
+  <div class="page-wrap">
+    <div class="card" style="border-color:rgba(52,211,153,.4);">
+      <h3 style="color:#6ee7b7;">⚡ Combined Mega Prompt</h3>
+      <p style="color:var(--muted);font-size:12px;margin-bottom:14px;">Merges both the Structured Builder and OddChar Atelier into one ultra-detailed prompt. Build each tab first, then generate here.</p>
+      <textarea id="combined-output" rows="14" readonly style="background:#050b14;color:#6ee7b7;font-family:monospace;font-size:13px;border:1px solid #22304a;border-radius:12px;padding:16px;width:100%;resize:vertical;line-height:1.7;"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-good" style="font-size:14px;padding:12px 24px;" onclick="buildCombined()"><i class="fas fa-bolt"></i> Generate Combined Prompt</button>
+        <button class="btn btn-primary" onclick="copyCombined()"><i class="fas fa-copy"></i> Copy Prompt</button>
+        <button class="btn btn-purple" onclick="randomizeAll()"><i class="fas fa-random"></i> Randomize Everything</button>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px;">
+      <div class="card">
+        <h3 style="color:#67e8f9;">Structured Component</h3>
+        <div id="combined-structured-preview" style="font-size:12px;color:var(--muted);line-height:1.8;">Click "Generate Combined Prompt" above to populate.</div>
+      </div>
+      <div class="card">
+        <h3 style="color:#c4b5fd;">OddChar Component</h3>
+        <div id="combined-oddchar-preview" style="font-size:12px;color:var(--muted);line-height:1.8;">Click "Generate Combined Prompt" above to populate.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script>
+// ---- TAB LOGIC ----
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ---- TOAST ----
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ---- COPY ----
+function copyText(text) {
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+}
+
+// ---- STRUCTURED BUILDER ----
+function getSelectText(id) {
+  const el = document.getElementById(id);
+  const opt = el.options[el.selectedIndex];
+  return opt ? opt.text.split(' — ')[0].trim() : '';
+}
+function getSelectVal(id) {
+  return document.getElementById(id).value;
+}
+
+function buildStructured(autoCopy) {
+  const archetype = getSelectText('s-archetype');
+  const species = getSelectText('s-species');
+  const genre = getSelectText('s-genre');
+  const medium = getSelectText('s-medium');
+  const head = getSelectText('s-head');
+  const outfit = getSelectText('s-outfit');
+  const materials = getSelectText('s-materials');
+  const pose = getSelectText('s-pose');
+  const setting = getSelectText('s-setting');
+  const notes = document.getElementById('s-notes').value.trim();
+
+  let parts = [
+    archetype, species,
+    genre + ' style',
+    medium,
+    head,
+    outfit,
+    materials,
+    pose,
+    'set in ' + setting
+  ];
+  if (notes) parts.push(notes);
+  parts.push('masterpiece, highly detailed, best quality, sharp focus, intricate, 8k');
+
+  const result = parts.filter(Boolean).join(', ');
+  document.getElementById('structured-output').value = result;
+  if (autoCopy) { copyText(result); toast('✅ Structured prompt copied!'); }
+  return result;
+}
+
+function copyStructured() {
+  const val = document.getElementById('structured-output').value || buildStructured(false);
+  copyText(val); toast('✅ Copied!');
+}
+
+function randomizeStructured() {
+  ['s-archetype','s-species','s-genre','s-medium','s-head','s-outfit','s-materials','s-pose','s-setting'].forEach(id => {
+    const el = document.getElementById(id);
+    el.selectedIndex = Math.floor(Math.random() * el.options.length);
+  });
+  buildStructured(false);
+  toast('🎲 Randomized!');
+}
+
+// ---- ODDCHAR BUILDER ----
+let oddRole = 'Architect';
+let oddStyle = 'surreal digital art';
+
+document.querySelectorAll('#o-role-group .chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#o-role-group .chip-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    oddRole = btn.dataset.v;
+    buildOddChar();
+  });
+});
+document.querySelectorAll('#o-style-group .chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#o-style-group .chip-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    oddStyle = btn.dataset.v;
+    buildOddChar();
+  });
+});
+
+function buildOddChar(autoCopy) {
+  const species = document.getElementById('o-species').value;
+  const type = document.getElementById('o-type').value;
+  const material = document.getElementById('o-material').value;
+  const mood = document.getElementById('o-mood').value;
+  const palette = document.getElementById('o-palette').value;
+  const trait = document.getElementById('o-trait').value;
+  const power = document.getElementById('o-power').value;
+  const pose = document.getElementById('o-pose').value;
+  const env = document.getElementById('o-env').value;
+
+  let parts = [];
+  if (species) parts.push('Species: ' + species);
+  let typeCombo = [type, material].filter(Boolean).join(' ');
+  if (typeCombo) parts.push('Character Type: ' + typeCombo);
+  if (oddRole) parts.push('Role: ' + oddRole);
+  if (mood) parts.push(mood);
+  if (palette) parts.push(palette);
+  if (trait) parts.push(trait);
+  if (power) parts.push(power);
+  parts.push(pose, env, oddStyle);
+  parts.push('full body, masterpiece, ultra-detailed, best quality, cinematic lighting, sharp focus, intricate, artstation trending, 8k');
+
+  const result = parts.filter(Boolean).join(', ');
+  document.getElementById('oddchar-output').value = result;
+  if (autoCopy) { copyText(result); toast('✅ OddChar prompt copied!'); }
+  return result;
+}
+
+function copyOddChar() {
+  const val = document.getElementById('oddchar-output').value || buildOddChar(false);
+  copyText(val); toast('✅ Copied!');
+}
+
+function randomizeOddChar() {
+  ['o-species','o-type','o-material','o-mood','o-palette','o-trait','o-power','o-pose','o-env'].forEach(id => {
+    const el = document.getElementById(id);
+    el.selectedIndex = Math.floor(Math.random() * el.options.length);
+  });
+  const roleBtns = document.querySelectorAll('#o-role-group .chip-btn');
+  const rr = roleBtns[Math.floor(Math.random() * roleBtns.length)];
+  document.querySelectorAll('#o-role-group .chip-btn').forEach(b => b.classList.remove('sel'));
+  rr.classList.add('sel'); oddRole = rr.dataset.v;
+  const styleBtns = document.querySelectorAll('#o-style-group .chip-btn');
+  const rs = styleBtns[Math.floor(Math.random() * styleBtns.length)];
+  document.querySelectorAll('#o-style-group .chip-btn').forEach(b => b.classList.remove('sel'));
+  rs.classList.add('sel'); oddStyle = rs.dataset.v;
+  buildOddChar(false);
+  confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#a78bfa','#f472b6','#60a5fa'] });
+  toast('✨ Surprise generated!');
+}
+
+// ---- COMBINED ----
+function buildCombined() {
+  const s = buildStructured(false);
+  const o = buildOddChar(false);
+
+  // Create mega prompt merging both
+  const combined = [
+    '=== COMBINED MEGA PROMPT ===',
+    '',
+    '[STRUCTURED VISUAL FRAMEWORK]',
+    s,
+    '',
+    '[ODDCHAR CHARACTER CORE]',
+    o,
+    '',
+    '[UNIFIED PROMPT — PASTE THIS]',
+    s + ', ' + o
+  ].join('\n');
+
+  document.getElementById('combined-output').value = [
+    s.replace('masterpiece, highly detailed, best quality, sharp focus, intricate, 8k', ''),
+    o.replace('full body, masterpiece, ultra-detailed, best quality, cinematic lighting, sharp focus, intricate, artstation trending, 8k', '')
+  ].filter(Boolean).join(', ') + ', full body, masterpiece, ultra-detailed, cinematic lighting, sharp focus, intricate, highly detailed, artstation trending, 8k';
+
+  document.getElementById('combined-structured-preview').textContent = s;
+  document.getElementById('combined-oddchar-preview').textContent = o;
+  toast('⚡ Combined prompt built!');
+}
+
+function copyCombined() {
+  const val = document.getElementById('combined-output').value;
+  if (!val) { buildCombined(); }
+  copyText(document.getElementById('combined-output').value);
+  confetti({ particleCount: 180, spread: 90, origin: { y: 0.5 }, colors: ['#34d399','#60a5fa','#a78bfa','#f472b6'] });
+  toast('🚀 Combined prompt copied to clipboard!');
+}
+
+function randomizeAll() {
+  randomizeStructured();
+  randomizeOddChar();
+  buildCombined();
+  confetti({ particleCount: 300, spread: 120, origin: { y: 0.45 }, colors: ['#34d399','#60a5fa','#a78bfa','#f472b6','#fbbf24'] });
+  toast('🌪️ Everything randomized!');
+}
+
+// ---- LIVE UPDATE ----
+document.querySelectorAll('#structured-filters select, #structured-filters textarea').forEach(el => {
+  el.addEventListener('change', () => buildStructured(false));
+  el.addEventListener('input', () => buildStructured(false));
+});
+document.querySelectorAll('#tab-oddchar select').forEach(el => {
+  el.addEventListener('change', () => buildOddChar(false));
+});
+
+// Init
+buildStructured(false);
+buildOddChar(false);
+</script>
+</body>
+</html>
