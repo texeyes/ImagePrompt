@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ Dreamforge — AI Image Prompt Studio</title>
+<style>
+:root{
+  --bg:#06080f;
+  --surface:#0d1117;
+  --surface2:#111827;
+  --border:#1e2d45;
+  --muted:#64748b;
+  --text:#e2e8f0;
+  --text2:#cbd5e1;
+  --amber:#f59e0b;
+  --cyan:#22d3ee;
+  --violet:#8b5cf6;
+  --rose:#f43f5e;
+  --emerald:#10b981;
+  --orange:#f97316;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',ui-sans-serif,system-ui,sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* STARFIELD */
+#stars{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;overflow:hidden;
+}
+.star{
+  position:absolute;border-radius:50%;
+  background:#fff;
+  animation:twinkle var(--dur) ease-in-out infinite alternate;
+}
+@keyframes twinkle{from{opacity:.1;transform:scale(.8);}to{opacity:.9;transform:scale(1.2);}}
+
+/* HEADER */
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(180deg,rgba(6,8,15,0.98),rgba(6,8,15,0.85));
+  border-bottom:1px solid var(--border);
+  padding:20px 28px;
+  display:flex;align-items:center;gap:16px;
+  backdrop-filter:blur(20px);
+}
+.logo-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,#7c3aed,#db2777,#f59e0b);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+  box-shadow:0 0 30px rgba(139,92,246,.4);
+}
+header h1{
+  font-size:22px;font-weight:800;
+  background:linear-gradient(90deg,#8b5cf6,#ec4899,#f59e0b);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+header p{font-size:12px;color:var(--muted);margin-top:2px;}
+.header-badges{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
+.hbadge{
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;
+  border:1px solid;
+}
+
+/* LAYOUT */
+.main-wrap{
+  position:relative;z-index:5;
+  max-width:1400px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 400px;
+  gap:24px;padding:24px;
+}
+@media(max-width:1000px){.main-wrap{grid-template-columns:1fr;}}
+
+/* SECTION HEADERS */
+.section-label{
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--muted);
+  margin-bottom:10px;
+}
+.section-label .dot{
+  width:8px;height:8px;border-radius:50%;
+  flex-shrink:0;
+}
+
+/* FILTER CARDS */
+.fcard{
+  background:rgba(13,17,23,0.9);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px 20px;
+  margin-bottom:16px;
+  backdrop-filter:blur(10px);
+  transition:border-color .2s;
+}
+.fcard:hover{border-color:rgba(139,92,246,.3);}
+.fcard-title{
+  font-size:13px;font-weight:700;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.fcard-title .icon{font-size:16px;}
+
+/* PILL SELECTORS */
+.pill-grid{
+  display:flex;flex-wrap:wrap;gap:6px;
+}
+.pill{
+  padding:6px 13px;
+  border-radius:999px;
+  font-size:12px;font-weight:500;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  cursor:pointer;
+  transition:all .18s;
+  user-select:none;
+}
+.pill:hover{color:var(--text);border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.08);}
+.pill.active{
+  color:#fff;
+  border-color:transparent;
+  font-weight:700;
+}
+
+/* COLOR VARIANTS for active pills */
+.pill.v-violet.active{background:linear-gradient(135deg,#6d28d9,#7c3aed);box-shadow:0 0 14px rgba(109,40,217,.4);}
+.pill.v-cyan.active{background:linear-gradient(135deg,#0e7490,#06b6d4);box-shadow:0 0 14px rgba(6,182,212,.4);}
+.pill.v-rose.active{background:linear-gradient(135deg,#be123c,#f43f5e);box-shadow:0 0 14px rgba(244,63,94,.4);}
+.pill.v-amber.active{background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 0 14px rgba(245,158,11,.4);}
+.pill.v-emerald.active{background:linear-gradient(135deg,#065f46,#10b981);box-shadow:0 0 14px rgba(16,185,129,.4);}
+.pill.v-orange.active{background:linear-gradient(135deg,#c2410c,#f97316);box-shadow:0 0 14px rgba(249,115,22,.4);}
+
+/* SLIDERS */
+.slider-row{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:10px;
+}
+.slider-label{font-size:12px;color:var(--muted);min-width:110px;}
+.slider-val{
+  font-size:12px;font-weight:700;
+  min-width:34px;text-align:right;
+  color:var(--cyan);
+}
+input[type=range]{
+  flex:1;height:4px;
+  -webkit-appearance:none;
+  background:var(--border);border-radius:2px;
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#22d3ee);
+  box-shadow:0 0 10px rgba(139,92,246,.5);
+}
+
+/* SELECT DROPDOWNS */
+select{
+  width:100%;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 12px;
+  font-size:13px;
+  outline:none;
+  cursor:pointer;
+  margin-bottom:12px;
+}
+select:focus{border-color:rgba(139,92,246,.6);box-shadow:0 0 0 3px rgba(139,92,246,.1);}
+
+/* COLOR SWATCH PICKER */
+.swatch-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+  margin-top:6px;
+}
+.swatch{
+  aspect-ratio:1;border-radius:8px;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:transform .15s,border-color .15s;
+}
+.swatch:hover{transform:scale(1.12);}
+.swatch.active{border-color:#fff;transform:scale(1.12);box-shadow:0 0 12px rgba(255,255,255,.3);}
+
+/* TEXT INPUTS */
+textarea,input[type=text]{
+  width:100%;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:13px;
+  outline:none;
+  resize:vertical;
+}
+textarea:focus,input[type=text]:focus{
+  border-color:rgba(139,92,246,.6);
+  box-shadow:0 0 0 3px rgba(139,92,246,.1);
+}
+
+/* RIGHT PANEL */
+.right-panel{position:sticky;top:24px;height:fit-content;}
+.output-card{
+  background:rgba(13,17,23,0.97);
+  border:1px solid rgba(139,92,246,.35);
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 0 60px rgba(109,40,217,.12);
+}
+.output-card h2{
+  font-size:14px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.6px;margin-bottom:14px;
+  background:linear-gradient(90deg,#8b5cf6,#22d3ee);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+#output-box{
+  background:#030609;
+  border:1px solid #1e2d45;
+  border-radius:12px;
+  padding:14px;
+  font-family:'Courier New',monospace;
+  font-size:12px;
+  line-height:1.7;
+  color:#67e8f9;
+  min-height:160px;
+  max-height:320px;
+  overflow-y:auto;
+  white-space:pre-wrap;
+  word-break:break-word;
+  margin-bottom:14px;
+}
+
+/* PROMPT PARTS DISPLAY */
+.prompt-parts{
+  display:flex;flex-wrap:wrap;gap:5px;
+  margin-bottom:14px;
+}
+.ptag{
+  padding:3px 9px;
+  border-radius:6px;
+  font-size:11px;font-weight:600;
+  background:rgba(139,92,246,.15);
+  border:1px solid rgba(139,92,246,.3);
+  color:#c4b5fd;
+}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:11px 18px;border-radius:12px;
+  font-size:13px;font-weight:700;
+  cursor:pointer;border:1px solid;
+  transition:all .15s;
+  width:100%;justify-content:center;
+  margin-bottom:8px;
+}
+.btn-generate{
+  background:linear-gradient(135deg,#6d28d9,#db2777);
+  border-color:transparent;color:#fff;
+  box-shadow:0 4px 24px rgba(109,40,217,.35);
+}
+.btn-generate:hover{box-shadow:0 4px 32px rgba(109,40,217,.6);transform:translateY(-1px);}
+.btn-copy{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.4);color:#67e8f9;}
+.btn-copy:hover{background:rgba(34,211,238,.22);}
+.btn-random{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:#fcd34d;}
+.btn-random:hover{background:rgba(245,158,11,.22);}
+.btn-clear{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.3);color:#fda4af;}
+.btn-clear:hover{background:rgba(244,63,94,.2);}
+
+/* MOOD RING VISUAL */
+.mood-ring{
+  width:100%;height:6px;border-radius:3px;
+  margin:12px 0;
+  background:linear-gradient(90deg,#6d28d9,#db2777,#f59e0b,#10b981,#22d3ee);
+  transition:all .3s;
+}
+
+/* STATS */
+.stats-row{
+  display:flex;gap:10px;margin-bottom:14px;
+}
+.stat-box{
+  flex:1;background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:10px;padding:10px;
+  text-align:center;
+}
+.stat-val{font-size:18px;font-weight:800;color:var(--cyan);}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:22px;right:22px;
+  background:#0d1117;border:1px solid #1e2d45;
+  color:var(--text);padding:11px 16px;
+  border-radius:14px;font-size:12px;font-weight:600;
+  opacity:0;transform:translateY(8px);
+  pointer-events:none;transition:.2s ease;
+  z-index:9999;max-width:320px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:4px 0 16px 0;}
+
+/* HISTORY */
+.history-item{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:10px;padding:10px 12px;
+  font-size:11px;color:var(--muted);
+  margin-bottom:6px;cursor:pointer;
+  transition:.15s;line-height:1.5;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.history-item:hover{border-color:rgba(139,92,246,.4);color:var(--text);}
+
+/* TOGGLE SWITCH */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.toggle-label{font-size:12px;color:var(--muted);}
+.toggle{
+  position:relative;width:36px;height:20px;
+  cursor:pointer;
+}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{
+  position:absolute;inset:0;
+  background:#1e2d45;border-radius:999px;
+  transition:.2s;
+}
+.toggle input:checked + .toggle-track{background:linear-gradient(90deg,#6d28d9,#22d3ee);}
+.toggle-thumb{
+  position:absolute;top:3px;left:3px;
+  width:14px;height:14px;
+  background:#fff;border-radius:50%;
+  transition:.2s;pointer-events:none;
+}
+.toggle input:checked ~ .toggle-thumb{left:19px;}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<header>
+  <div class="logo-icon">✦</div>
+  <div>
+    <h1>Dreamforge</h1>
+    <p>Cinematic AI Image Prompt Studio — craft layered, atmospheric prompts with precision</p>
+  </div>
+  <div class="header-badges">
+    <span class="hbadge" style="border-color:rgba(139,92,246,.5);color:#c4b5fd;background:rgba(139,92,246,.1);">✦ v2.0</span>
+    <span class="hbadge" style="border-color:rgba(34,211,238,.5);color:#67e8f9;background:rgba(34,211,238,.1);">500+ Options</span>
+    <span class="hbadge" style="border-color:rgba(245,158,11,.5);color:#fcd34d;background:rgba(245,158,11,.1);">Live Preview</span>
+  </div>
+</header>
+
+<div class="main-wrap">
+<!-- ===== LEFT FILTERS ===== -->
+<div id="filters">
+
+<!-- 1. CINEMATIC UNIVERSE -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🎬</span> Cinematic Universe
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">The world/genre this image inhabits</span>
+  </div>
+  <div class="pill-grid" id="universe">
+    <span class="pill v-violet" data-cat="universe" data-v="solarpunk utopia">🌿 Solarpunk</span>
+    <span class="pill v-violet" data-cat="universe" data-v="dark academic gothic">📚 Dark Academic</span>
+    <span class="pill v-violet" data-cat="universe" data-v="dieselpunk noir">⚙️ Dieselpunk Noir</span>
+    <span class="pill v-violet" data-cat="universe" data-v="cottagecore fairytale">🍄 Cottagecore</span>
+    <span class="pill v-violet" data-cat="universe" data-v="deep space opera">🚀 Space Opera</span>
+    <span class="pill v-violet" data-cat="universe" data-v="feudal japan myth">⛩️ Feudal Japan</span>
+    <span class="pill v-violet" data-cat="universe" data-v="art nouveau dream">🌸 Art Nouveau</span>
+    <span class="pill v-violet" data-cat="universe" data-v="underwater bioluminescent realm">🪼 Bioluminescent Deep</span>
+    <span class="pill v-violet" data-cat="universe" data-v="haunted victorian manor">🕯️ Victorian Gothic</span>
+    <span class="pill v-violet" data-cat="universe" data-v="aztec solar mythology">☀️ Aztec Solar</span>
+    <span class="pill v-violet" data-cat="universe" data-v="retrofuturistic 1960s space age">🛸 Retro Space Age</span>
+    <span class="pill v-violet" data-cat="universe" data-v="ancient egyptian underworld">𓂀 Egyptian Myth</span>
+    <span class="pill v-violet" data-cat="universe" data-v="neon-soaked cyberpunk megacity">🌆 Cyberpunk City</span>
+    <span class="pill v-violet" data-cat="universe" data-v="surreal dreamscape logic">💭 Surreal Dream</span>
+    <span class="pill v-violet" data-cat="universe" data-v="post-war americana diner culture">🍔 Americana Noir</span>
+    <span class="pill v-violet" data-cat="universe" data-v="arctic tundra spirit world">🧊 Arctic Spirit</span>
+    <span class="pill v-violet" data-cat="universe" data-v="baroque celestial heaven">✨ Baroque Heaven</span>
+    <span class="pill v-violet" data-cat="universe" data-v="mushroom forest spirit realm">🍄 Mycelium World</span>
+  </div>
+</div>
+
+<!-- 2. SUBJECT ENERGY -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">⚡</span> Subject Energy
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">The soul of whoever/whatever is in the frame</span>
+  </div>
+  <div class="pill-grid" id="energy">
+    <span class="pill v-cyan" data-cat="energy" data-v="ancient warrior queen, commanding presence">👑 Warrior Queen</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="lone wanderer at the edge of the world">🚶 Lone Wanderer</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="celestial deity made of starlight">⭐ Star Deity</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="trickster spirit of mischief and fire">🔥 Trickster Spirit</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="grieving witch of the marshland">🌿 Marsh Witch</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="cyborg poet transmitting encoded verse">📡 Cyborg Poet</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="child prodigy conductor of time">🎼 Time Conductor</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="retired assassin seeking redemption">🗡️ Retired Blade</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="transcendent monk beyond duality">🧘 Beyond Monk</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="punk archivist preserving dying cultures">📼 Culture Punk</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="sentient storm personified as woman">🌩️ Storm Woman</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="dreaming sea creature ancient as the ocean">🌊 Dreaming Leviathan</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="disco vampire in eternal 1977">🪩 Disco Vampire</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="oracle reading futures in shattered glass">🔮 Glass Oracle</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="ghost bride between worlds">👰 Ghost Bride</span>
+    <span class="pill v-cyan" data-cat="energy" data-v="teenage rebel saint with neon halo">😇 Rebel Saint</span>
+  </div>
+</div>
+
+<!-- 3. LIGHTING SORCERY -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">💡</span> Lighting Sorcery
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">The quality and source of light defining the mood</span>
+  </div>
+  <div class="pill-grid" id="lighting">
+    <span class="pill v-amber" data-cat="lighting" data-v="golden hour backlight, rim lighting, lens flare">🌅 Golden Hour</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="harsh single tungsten lamp, deep noir shadows">🕯️ Noir Lamp</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="bioluminescent blue-green self-illumination">🪼 Bioluminescent</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="overcast diffused daylight, flat painterly">☁️ Overcast Flat</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="volumetric god rays through fog">✨ God Rays</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="neon sign spill, magenta and cyan gel lighting">🌆 Neon Gel</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="candlelight warm flicker, chiaroscuro">🕯️ Candlelight</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="moonlight silver, cold spectral glow">🌕 Moonlight</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="aurora borealis, shifting curtains of color">🌌 Aurora</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="studio strobe, harsh fashion editorial light">⚡ Studio Strobe</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="fire and ember glow, orange underlighting">🔥 Ember Glow</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="submerged light, caustic water refractions">🌊 Caustic Water</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="stained glass color cast through tall windows">🌈 Stained Glass</span>
+    <span class="pill v-amber" data-cat="lighting" data-v="radioactive green phosphor glow, laboratory light">☢️ Phosphor Lab</span>
+  </div>
+</div>
+
+<!-- 4. TEXTURE & MATERIAL SOUL -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🪨</span> Texture & Material Soul
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">The physical language of the surface</span>
+  </div>
+  <div class="pill-grid" id="texture">
+    <span class="pill v-rose" data-cat="texture" data-v="cracked ancient porcelain, gold kintsugi veins">🏺 Kintsugi Porcelain</span>
+    <span class="pill v-rose" data-cat="texture" data-v="wet black obsidian and molten amber resin">🖤 Obsidian Resin</span>
+    <span class="pill v-rose" data-cat="texture" data-v="iridescent holographic foil and silk organza">✨ Holo Silk</span>
+    <span class="pill v-rose" data-cat="texture" data-v="hand-embroidered silk, fine thread and seed pearls">🧵 Embroidered Silk</span>
+    <span class="pill v-rose" data-cat="texture" data-v="rusted iron and lichen, industrial decay">⚙️ Rusted Iron</span>
+    <span class="pill v-rose" data-cat="texture" data-v="living bark, moss, fern tendrils, forest matter">🌿 Living Bark</span>
+    <span class="pill v-rose" data-cat="texture" data-v="polished mirror chrome and smoked glass">🪞 Mirror Chrome</span>
+    <span class="pill v-rose" data-cat="texture" data-v="aged vellum, wax seal, illuminated manuscript">📜 Aged Vellum</span>
+    <span class="pill v-rose" data-cat="texture" data-v="volcanic basalt, cooling lava cracks, glowing fissures">🌋 Volcanic Stone</span>
+    <span class="pill v-rose" data-cat="texture" data-v="beeswax and pressed dried flowers and leaves">🌸 Pressed Flora</span>
+    <span class="pill v-rose" data-cat="texture" data-v="dense oil paint impasto, visible thick brushstrokes">🎨 Oil Impasto</span>
+    <span class="pill v-rose" data-cat="texture" data-v="liquid mercury and black velvet">💧 Mercury Velvet</span>
+    <span class="pill v-rose" data-cat="texture" data-v="translucent skin over glowing anatomy">💜 Glowing Anatomy</span>
+    <span class="pill v-rose" data-cat="texture" data-v="hammered gold leaf, Byzantine tesserae mosaic">✴️ Gold Mosaic</span>
+  </div>
+</div>
+
+<!-- 5. EMOTIONAL FREQUENCY -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🎵</span> Emotional Frequency
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">The feeling the image should resonate at</span>
+  </div>
+  <div class="pill-grid" id="emotion">
+    <span class="pill v-emerald" data-cat="emotion" data-v="profound melancholy and quiet beauty">😔 Quiet Melancholy</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="electric joy and euphoric color">🎉 Electric Joy</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="foreboding dread and creeping horror">😨 Foreboding Dread</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="awe and sacred reverence">🙏 Sacred Awe</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="fierce uncontained rage and power">🔥 Fierce Rage</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="tender intimacy and longing">💗 Tender Longing</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="eerie unsettling uncanny valley">👁️ Eerie Uncanny</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="dreamlike floating serenity">🌙 Floating Serenity</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="desperate wild survival energy">⚡ Wild Survival</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="cold calculating intelligence">🧊 Cold Intellect</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="warm nostalgic golden memory">☀️ Golden Memory</span>
+    <span class="pill v-emerald" data-cat="emotion" data-v="cosmic loneliness and wonder">🌌 Cosmic Lonely</span>
+  </div>
+</div>
+
+<!-- 6. COMPOSITION LENS -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">📷</span> Composition & Lens
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">How the camera sees it</span>
+  </div>
+  <div class="pill-grid" id="composition">
+    <span class="pill v-orange" data-cat="composition" data-v="extreme close-up, macro, every pore visible">🔬 Extreme Close-Up</span>
+    <span class="pill v-orange" data-cat="composition" data-v="wide angle epic establishing shot">🏔️ Epic Wide</span>
+    <span class="pill v-orange" data-cat="composition" data-v="low angle hero shot, dramatic upward perspective">⬆️ Low Angle Hero</span>
+    <span class="pill v-orange" data-cat="composition" data-v="dutch angle tilt, psychological tension">↗️ Dutch Angle</span>
+    <span class="pill v-orange" data-cat="composition" data-v="aerial bird's eye overhead shot">🦅 Bird's Eye</span>
+    <span class="pill v-orange" data-cat="composition" data-v="rule of thirds, subject left, negative space right">▦ Rule of Thirds</span>
+    <span class="pill v-orange" data-cat="composition" data-v="centered symmetrical, bilateral mirror composition">⊞ Symmetrical</span>
+    <span class="pill v-orange" data-cat="composition" data-v="portrait 85mm f/1.4, creamy bokeh background">📸 Portrait Bokeh</span>
+    <span class="pill v-orange" data-cat="composition" data-v="frame within frame, doorway arch foreground">🚪 Frame in Frame</span>
+    <span class="pill v-orange" data-cat="composition" data-v="silhouette against blown-out sky">🌇 Silhouette Sky</span>
+    <span class="pill v-orange" data-cat="composition" data-v="worm's eye view, looking straight up">⬇️ Worm's Eye</span>
+    <span class="pill v-orange" data-cat="composition" data-v="environmental portrait, subject within vast setting">🌍 Environmental</span>
+  </div>
+</div>
+
+<!-- 7. COLOR PALETTE -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🎨</span> Color Story</div>
+  <div class="swatch-grid" id="palette">
+    <div class="swatch active" data-v="deep violet and gold color palette" style="background:linear-gradient(135deg,#4c1d95,#d97706)" title="Violet & Gold"></div>
+    <div class="swatch" data-v="crimson red and midnight black palette" style="background:linear-gradient(135deg,#991b1b,#0f0f0f)" title="Crimson & Black"></div>
+    <div class="swatch" data-v="electric cyan and neon pink palette" style="background:linear-gradient(135deg,#0891b2,#be185d)" title="Cyan & Pink"></div>
+    <div class="swatch" data-v="sage green and warm cream palette" style="background:linear-gradient(135deg,#4d7c52,#fef3c7)" title="Sage & Cream"></div>
+    <div class="swatch" data-v="burnt orange and deep teal palette" style="background:linear-gradient(135deg,#c2410c,#0f766e)" title="Orange & Teal"></div>
+    <div class="swatch" data-v="pearl white and rose gold palette" style="background:linear-gradient(135deg,#f8fafc,#e879a0)" title="Pearl & Rose Gold"></div>
+    <div class="swatch" data-v="monochromatic silver and charcoal palette" style="background:linear-gradient(135deg,#94a3b8,#1e293b)" title="Silver & Charcoal"></div>
+    <div class="swatch" data-v="molten bronze and forest green palette" style="background:linear-gradient(135deg,#92400e,#14532d)" title="Bronze & Forest"></div>
+    <div class="swatch" data-v="lavender and dusty mauve palette" style="background:linear-gradient(135deg,#a78bfa,#9d6f8a)" title="Lavender & Mauve"></div>
+    <div class="swatch" data-v="acid yellow and deep purple palette" style="background:linear-gradient(135deg,#eab308,#581c87)" title="Acid Yellow & Purple"></div>
+    <div class="swatch" data-v="ice blue and arctic white palette" style="background:linear-gradient(135deg,#bfdbfe,#f0f9ff)" title="Ice Blue & White"></div>
+    <div class="swatch" data-v="blood orange and deep indigo palette" style="background:linear-gradient(135deg,#ea580c,#312e81)" title="Blood Orange & Indigo"></div>
+  </div>
+</div>
+
+<!-- 8. TIME OF DAY / ATMOSPHERE -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🕰️</span> Time & Atmosphere</div>
+  <div class="pill-grid" id="time">
+    <span class="pill v-violet" data-cat="time" data-v="magic hour 20 minutes before sunset, warm haze">🌇 Magic Hour</span>
+    <span class="pill v-violet" data-cat="time" data-v="3am darkness, only neon and streetlights">🌃 3am City</span>
+    <span class="pill v-violet" data-cat="time" data-v="foggy dawn blue hour, mist rising off water">🌫️ Foggy Dawn</span>
+    <span class="pill v-violet" data-cat="time" data-v="scorching midday desert heat shimmer">☀️ Desert Noon</span>
+    <span class="pill v-violet" data-cat="time" data-v="stormy afternoon, electric sky, dark clouds">⛈️ Storm Afternoon</span>
+    <span class="pill v-violet" data-cat="time" data-v="winter solstice midnight, frozen silence">❄️ Winter Midnight</span>
+    <span class="pill v-violet" data-cat="time" data-v="twilight purple hour, stars just appearing">🌆 Twilight Purple</span>
+    <span class="pill v-violet" data-cat="time" data-v="autumn afternoon golden light through leaves">🍂 Autumn Gold</span>
+    <span class="pill v-violet" data-cat="time" data-v="timeless, no time, pure void atmosphere">∞ Void Timeless</span>
+  </div>
+</div>
+
+<!-- 9. RENDER ENGINE -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🖥️</span> Render Engine & Style
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">How the final image is processed</span>
+  </div>
+  <select id="render">
+    <option value="photorealistic Unreal Engine 5 render, hyperreal ray-traced">📷 Photorealistic — Unreal Engine 5 / Ray-Traced</option>
+    <option value="painterly oil on canvas, museum quality fine art">🖌️ Fine Art — Painterly Oil on Canvas</option>
+    <option value="hand-drawn ink illustration, cross-hatching, pen and ink">✒️ Ink Illustration — Pen & Ink Cross-Hatching</option>
+    <option value="Studio Ghibli inspired anime watercolor">🌸 Anime — Studio Ghibli Watercolor</option>
+    <option value="3D Pixar-style render, subsurface scattering, appealing proportions">🎭 3D Animation — Pixar Style</option>
+    <option value="Soviet propaganda poster flat graphic design">📌 Flat Graphic — Soviet Propaganda Poster</option>
+    <option value="daguerreotype photograph, antique film grain, sepia">📻 Daguerreotype — Antique Sepia</option>
+    <option value="risograph print, two-tone limited color, paper grain">🗞️ Risograph — Two-Tone Print</option>
+    <option value="concept art for AAA video game, Artstation trending">🎮 Game Concept Art — Artstation</option>
+    <option value="analog 35mm film, visible grain, light leaks, Kodak Portra">🎞️ Analog Film — 35mm Kodak Portra</option>
+    <option value="ceramic sculpture render, matte glaze, museum installation">🏺 Sculpture — Ceramic Matte Glaze</option>
+    <option value="architectural visualization, clean modernist render">🏛️ ArchViz — Clean Modernist</option>
+    <option value="tarot card illustration, ornate border, symbolic art">🃏 Tarot Card Illustration</option>
+    <option value="glitch art, RGB split, pixel corruption, digital noise">📟 Glitch Art — RGB Corruption</option>
+    <option value="watercolor and ink, loose gestural, editorial illustration">💧 Editorial — Watercolor & Ink</option>
+  </select>
+</div>
+
+<!-- 10. INTENSITY DIALS -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🎛️</span> Intensity Dials</div>
+  <div class="slider-row">
+    <span class="slider-label">Detail Level</span>
+    <input type="range" id="s-detail" min="1" max="5" value="4" oninput="updateSlider(this,'sl-detail');buildPrompt()">
+    <span class="slider-val" id="sl-detail">4</span>
+  </div>
+  <div class="slider-row">
+    <span class="slider-label">Surrealism</span>
+    <input type="range" id="s-surreal" min="1" max="5" value="2" oninput="updateSlider(this,'sl-surreal');buildPrompt()">
+    <span class="slider-val" id="sl-surreal">2</span>
+  </div>
+  <div class="slider-row">
+    <span class="slider-label">Darkness</span>
+    <input type="range" id="s-dark" min="1" max="5" value="2" oninput="updateSlider(this,'sl-dark');buildPrompt()">
+    <span class="slider-val" id="sl-dark">2</span>
+  </div>
+  <div class="slider-row">
+    <span class="slider-label">Abstraction</span>
+    <input type="range" id="s-abstract" min="1" max="5" value="1" oninput="updateSlider(this,'sl-abstract');buildPrompt()">
+    <span class="slider-val" id="sl-abstract">1</span>
+  </div>
+  <div class="slider-row">
+    <span class="slider-label">Cinematic Scale</span>
+    <input type="range" id="s-cinematic" min="1" max="5" value="3" oninput="updateSlider(this,'sl-cinematic');buildPrompt()">
+    <span class="slider-val" id="sl-cinematic">3</span>
+  </div>
+</div>
+
+<!-- 11. SECRET INGREDIENT -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">🧪</span> Secret Ingredient
+    <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;">One unexpected twist that elevates everything</span>
+  </div>
+  <select id="secret">
+    <option value="">— None —</option>
+    <option value="impossible architecture in background, Escher-like stairs">🏗️ Impossible Architecture</option>
+    <option value="thousands of butterflies or moths swarming in background">🦋 Butterfly Swarm</option>
+    <option value="reflections show a different reality than the scene">🪞 Wrong Reflections</option>
+    <option value="giant moon 10x normal size dominates the sky">🌕 Giant Moon</option>
+    <option value="the subject is partially made of flowers blooming in real-time">🌺 Blooming Body</option>
+    <option value="tears made of liquid gold dripping from eyes">✨ Golden Tears</option>
+    <option value="hands reach from the ground toward the subject">👐 Reaching Hands</option>
+    <option value="everything slightly floats off the ground">🪄 Anti-Gravity Float</option>
+    <option value="a portal or doorway visible in the background to another dimension">🌀 Dimension Portal</option>
+    <option value="small figures of people inside the subject's clothing or hair">🔭 Micro Worlds</option>
+    <option value="the sky and ground are swapped, reflected">🙃 Inverted World</option>
+    <option value="storm of playing cards or pages swirling around subject">🃏 Paper Storm</option>
+    <option value="subject casts shadow of a completely different creature">👥 Wrong Shadow</option>
+    <option value="the entire scene enclosed inside a giant glass terrarium or snow globe">🌍 Terrarium World</option>
+  </select>
+</div>
+
+<!-- 12. CUSTOM NOTES -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">✍️</span> Your Vision (Custom Text)</div>
+  <textarea id="custom" rows="3" placeholder="Add your own specific details, characters, objects, or instructions... e.g. 'she holds a lantern shaped like a moon' or 'negative space: no text'"></textarea>
+</div>
+
+<!-- 13. MODIFIERS -->
+<div class="fcard">
+  <div class="fcard-title"><span class="icon">⚙️</span> Quality Boosters</div>
+  <div class="toggle-row">
+    <span class="toggle-label">🏆 Masterpiece quality tags</span>
+    <label class="toggle"><input type="checkbox" id="t-masterpiece" checked onchange="buildPrompt()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">🎞️ Cinematic composition tags</span>
+    <label class="toggle"><input type="checkbox" id="t-cinematic" checked onchange="buildPrompt()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">🔬 Hyper-detail tags</span>
+    <label class="toggle"><input type="checkbox" id="t-detail" onchange="buildPrompt()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">🎭 Negative: no text, no watermarks</span>
+    <label class="toggle"><input type="checkbox" id="t-negative" checked onchange="buildPrompt()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+  </div>
+</div>
+
+</div><!-- end filters -->
+
+<!-- ===== RIGHT PANEL ===== -->
+<div class="right-panel">
+  <div class="output-card">
+    <h2>✦ Your Dreamforged Prompt</h2>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" id="stat-tokens">0</div>
+        <div class="stat-lbl">Words</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="stat-filters">0</div>
+        <div class="stat-lbl">Filters Active</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="stat-power">0%</div>
+        <div class="stat-lbl">Prompt Power</div>
+      </div>
+    </div>
+
+    <div class="mood-ring" id="mood-ring"></div>
+
+    <div class="prompt-parts" id="prompt-tags"></div>
+
+    <div id="output-box">Your prompt will appear here as you select filters above...</div>
+
+    <button class="btn btn-generate" onclick="buildPrompt(true)">✦ Generate &amp; Copy Prompt</button>
+    <button class="btn btn-copy" onclick="copyPrompt()">📋 Copy to Clipboard</button>
+    <button class="btn btn-random" onclick="randomizeAll()">🎲 Randomize Everything</button>
+    <button class="btn btn-clear" onclick="clearAll()">✕ Clear All</button>
+
+    <div class="divider"></div>
+
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">📜 Recent Prompts</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+</div><!-- end main-wrap -->
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script>
+// ---- STARFIELD ----
+(function(){
+  const c = document.getElementById('stars');
+  for(let i=0;i<120;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const sz = Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;opacity:${Math.random()*.6+.1};`;
+    c.appendChild(s);
+  }
+})();
+
+// ---- STATE ----
+const state = {
+  universe:'', energy:'', lighting:'', texture:'', emotion:'',
+  composition:'', palette:'deep violet and gold color palette',
+  time:'', render:'', secret:''
+};
+
+const history = [];
+
+// ---- PILL CLICKS ----
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const cat = pill.dataset.cat;
+    // Deselect siblings
+    document.querySelectorAll(`.pill[data-cat="${cat}"]`).forEach(p => p.classList.remove('active'));
+    if(state[cat] === pill.dataset.v){
+      state[cat] = '';
+    } else {
+      pill.classList.add('active');
+      state[cat] = pill.dataset.v;
+    }
+    buildPrompt();
+  });
+});
+
+// ---- SWATCH CLICKS ----
+document.querySelectorAll('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    state.palette = sw.dataset.v;
+    buildPrompt();
+  });
+});
+
+// ---- SELECT CHANGES ----
+document.getElementById('render').addEventListener('change', () => buildPrompt());
+document.getElementById('secret').addEventListener('change', () => buildPrompt());
+document.getElementById('custom').addEventListener('input', () => buildPrompt());
+
+// ---- SLIDER UPDATE ----
+function updateSlider(el, labelId){
+  document.getElementById(labelId).textContent = el.value;
+}
+
+// ---- BUILD PROMPT ----
+function buildPrompt(autoCopy){
+  const parts = [];
+  const tags = [];
+
+  // Collect selections
+  if(state.universe){ parts.push(state.universe); tags.push(state.universe.split(',')[0].trim()); }
+  if(state.energy){ parts.push(state.energy); tags.push(state.energy.split(',')[0].trim()); }
+  if(state.lighting){ parts.push(state.lighting); tags.push(state.lighting.split(',')[0].trim()); }
+  if(state.texture){ parts.push(state.texture); tags.push(state.texture.split(',')[0].trim()); }
+  if(state.emotion){ parts.push(state.emotion); tags.push(state.emotion.split(',')[0].trim()); }
+  if(state.composition){ parts.push(state.composition); tags.push(state.composition.split(',')[0].trim()); }
+  if(state.palette){ parts.push(state.palette); tags.push(state.palette.split(' palette')[0].trim()); }
+  if(state.time){ parts.push(state.time); tags.push(state.time.split(',')[0].trim()); }
+
+  // Render
+  const render = document.getElementById('render').value;
+  if(render){ parts.push(render); tags.push(render.split(',')[0].trim()); }
+
+  // Secret
+  const secret = document.getElementById('secret').value;
+  if(secret){ parts.push(secret); tags.push('✦ Secret Twist'); }
+
+  // Sliders
+  const detail = parseInt(document.getElementById('s-detail').value);
+  const surreal = parseInt(document.getElementById('s-surreal').value);
+  const dark = parseInt(document.getElementById('s-dark').value);
+  const abstract = parseInt(document.getElementById('s-abstract').value);
+  const cinematic = parseInt(document.getElementById('s-cinematic').value);
+
+  const detailWords = ['','loosely detailed','detailed','highly detailed','ultra-detailed','insanely intricate, hyper-detailed, every pore visible'];
+  const surrealWords = ['','subtle surrealism','mildly surreal elements','dreamlike surrealism','strong hallucinogenic surrealism','full Dalí-level impossible surrealism'];
+  const darkWords = ['','light and airy tone','slightly dark undertones','moody and dark atmosphere','brooding gothic darkness','pitch-black nihilistic darkness'];
+  const abstractWords = ['','figurative with hints of abstraction','semi-abstract','clearly abstract forms','strongly abstract','pure abstract non-representational'];
+  const cinematicWords = ['','intimate personal scale','moderate cinematic feel','cinematic quality','epic blockbuster scale','IMAX EPIC world-shattering scale'];
+
+  if(detailWords[detail]) parts.push(detailWords[detail]);
+  if(surrealWords[surreal] && surreal > 1) parts.push(surrealWords[surreal]);
+  if(darkWords[dark] && dark > 1) parts.push(darkWords[dark]);
+  if(abstractWords[abstract] && abstract > 1) parts.push(abstractWords[abstract]);
+  if(cinematicWords[cinematic]) parts.push(cinematicWords[cinematic]);
+
+  // Custom
+  const custom = document.getElementById('custom').value.trim();
+  if(custom) parts.push(custom);
+
+  // Quality toggles
+  if(document.getElementById('t-masterpiece').checked)
+    parts.push('masterpiece, best quality, award-winning');
+  if(document.getElementById('t-cinematic').checked)
+    parts.push('cinematic composition, dramatic framing, sharp focus');
+  if(document.getElementById('t-detail').checked)
+    parts.push('8K resolution, ultra-sharp, professional photography');
+  if(document.getElementById('t-negative').checked)
+    parts.push('no text, no watermarks, no signatures, no borders');
+
+  const prompt = parts.filter(Boolean).join(', ');
+  const box = document.getElementById('output-box');
+  box.textContent = prompt || 'Your prompt will appear here as you select filters above...';
+
+  // Tags
+  const tagEl = document.getElementById('prompt-tags');
+  tagEl.innerHTML = tags.map(t => `<span class="ptag">${t}</span>`).join('');
+
+  // Stats
+  const words = prompt.split(/\s+/).filter(Boolean).length;
+  const activeFilters = tags.length;
+  const power = Math.min(100, Math.round((activeFilters / 10) * 100));
+  document.getElementById('stat-tokens').textContent = words;
+  document.getElementById('stat-filters').textContent = activeFilters;
+  document.getElementById('stat-power').textContent = power + '%';
+
+  // Mood ring color based on emotion
+  const moodColors = {
+    'profound melancholy': 'linear-gradient(90deg,#4338ca,#7c3aed,#6b7280)',
+    'electric joy': 'linear-gradient(90deg,#f59e0b,#ec4899,#22d3ee)',
+    'foreboding dread': 'linear-gradient(90deg,#1e293b,#4c1d95,#1e1e1e)',
+    'awe and sacred': 'linear-gradient(90deg,#d97706,#f59e0b,#fef3c7)',
+    'fierce uncontained': 'linear-gradient(90deg,#991b1b,#dc2626,#f97316)',
+    'tender intimacy': 'linear-gradient(90deg,#be185d,#f472b6,#fda4af)',
+    'eerie unsettling': 'linear-gradient(90deg,#064e3b,#065f46,#6b7280)',
+    'dreamlike floating': 'linear-gradient(90deg,#7c3aed,#a78bfa,#c4b5fd)',
+    'desperate wild': 'linear-gradient(90deg,#92400e,#d97706,#dc2626)',
+    'cold calculating': 'linear-gradient(90deg,#0f172a,#1e293b,#64748b)',
+    'warm nostalgic': 'linear-gradient(90deg,#d97706,#f59e0b,#fde68a)',
+    'cosmic loneliness': 'linear-gradient(90deg,#0f0c29,#302b63,#24243e)',
+  };
+  let ringColor = 'linear-gradient(90deg,#6d28d9,#db2777,#f59e0b,#10b981,#22d3ee)';
+  for(const [key, val] of Object.entries(moodColors)){
+    if(state.emotion && state.emotion.includes(key.split(' ')[0])){
+      ringColor = val; break;
+    }
+  }
+  document.getElementById('mood-ring').style.background = ringColor;
+
+  if(autoCopy && prompt){
+    copyText(prompt);
+    toast('✦ Prompt generated & copied! Paste into your AI image generator.');
+    confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#8b5cf6','#ec4899','#f59e0b'] });
+    if(prompt && (history.length === 0 || history[0] !== prompt)){
+      history.unshift(prompt);
+      if(history.length > 5) history.pop();
+      renderHistory();
+    }
+  }
+  return prompt;
+}
+
+// ---- HISTORY ----
+function renderHistory(){
+  const el = document.getElementById('history-list');
+  el.innerHTML = history.map((h,i) =>
+    `<div class="history-item" onclick="loadHistory(${i})" title="${h}">${i+1}. ${h}</div>`
+  ).join('');
+}
+function loadHistory(i){
+  document.getElementById('output-box').textContent = history[i];
+  copyText(history[i]);
+  toast('📋 Prompt loaded & copied!');
+}
+
+// ---- COPY ----
+function copyText(txt){
+  navigator.clipboard.writeText(txt).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+function copyPrompt(){
+  const val = document.getElementById('output-box').textContent;
+  if(val && val !== 'Your prompt will appear here as you select filters above...'){
+    copyText(val);
+    toast('📋 Copied to clipboard!');
+  } else { toast('⚠️ Build a prompt first!'); }
+}
+
+// ---- TOAST ----
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ---- RANDOMIZE ----
+const randomPills = {
+  universe: [...document.querySelectorAll('.pill[data-cat="universe"]')],
+  energy:   [...document.querySelectorAll('.pill[data-cat="energy"]')],
+  lighting: [...document.querySelectorAll('.pill[data-cat="lighting"]')],
+  texture:  [...document.querySelectorAll('.pill[data-cat="texture"]')],
+  emotion:  [...document.querySelectorAll('.pill[data-cat="emotion"]')],
+  composition:[...document.querySelectorAll('.pill[data-cat="composition"]')],
+  time:     [...document.querySelectorAll('.pill[data-cat="time"]')],
+};
+
+function randomizeAll(){
+  // Clear all pills
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+
+  // Pick one random from each category
+  for(const [cat, pills] of Object.entries(randomPills)){
+    if(Math.random() > 0.15){ // 85% chance of picking each category
+      const pick = pills[Math.floor(Math.random()*pills.length)];
+      pick.classList.add('active');
+      state[cat] = pick.dataset.v;
+    } else {
+      state[cat] = '';
+    }
+  }
+
+  // Random swatch
+  const swatches = document.querySelectorAll('.swatch');
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  const rs = swatches[Math.floor(Math.random()*swatches.length)];
+  rs.classList.add('active');
+  state.palette = rs.dataset.v;
+
+  // Random render
+  const renderEl = document.getElementById('render');
+  renderEl.selectedIndex = Math.floor(Math.random()*renderEl.options.length);
+
+  // Random secret (50% chance)
+  const secretEl = document.getElementById('secret');
+  if(Math.random() > 0.5){
+    secretEl.selectedIndex = Math.floor(Math.random()*(secretEl.options.length-1))+1;
+  } else {
+    secretEl.selectedIndex = 0;
+  }
+
+  // Random sliders
+  ['s-detail','s-surreal','s-dark','s-abstract','s-cinematic'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = Math.floor(Math.random()*5)+1;
+    updateSlider(el, 'sl-' + id.replace('s-',''));
+  });
+
+  buildPrompt(false);
+  confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors: ['#8b5cf6','#22d3ee','#f59e0b','#ec4899','#10b981'] });
+  toast('🎲 Randomized! ✦ Building your unique prompt...');
+}
+
+// ---- CLEAR ----
+function clearAll(){
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  const firstSwatch = document.querySelector('.swatch');
+  if(firstSwatch){ firstSwatch.classList.add('active'); state.palette = firstSwatch.dataset.v; }
+  for(const k of Object.keys(state)){ state[k] = ''; }
+  state.palette = document.querySelector('.swatch.active')?.dataset.v || '';
+  document.getElementById('render').selectedIndex = 0;
+  document.getElementById('secret').selectedIndex = 0;
+  document.getElementById('custom').value = '';
+  ['s-detail','s-surreal','s-dark','s-abstract','s-cinematic'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.value = [4,2,2,1,3][i];
+    updateSlider(el, 'sl-' + id.replace('s-',''));
+  });
+  buildPrompt(false);
+  document.getElementById('output-box').textContent = 'Your prompt will appear here as you select filters above...';
+  toast('✕ Cleared!');
+}
+
+// Init
+buildPrompt(false);
+</script>
+</body>
+</html>
