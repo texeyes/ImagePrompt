@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg: #151411;
-      --bg-soft: #1d1b17;
+      --bg-soft: #1d1b17; 
       --card: rgba(255,255,255,0.05);
       --card-strong: rgba(255,255,255,0.08);
       --text: #efe9dc;
