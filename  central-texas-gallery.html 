@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Central Texas, Up Close</title>
+  <style>
+    :root {
+      --bg: #151411;
+      --bg-soft: #1d1b17;
+      --card: rgba(255,255,255,0.05);
+      --card-strong: rgba(255,255,255,0.08);
+      --text: #efe9dc;
+      --muted: #c0b7a4;
+      --line: rgba(255,255,255,0.12);
+      --accent: #c99b49;
+      --accent-2: #7aa68f;
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
+      --radius: 22px;
+      --radius-sm: 16px;
+      --content: 1240px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(201,155,73,0.16), transparent 28%),
+        radial-gradient(circle at 80% 10%, rgba(122,166,143,0.12), transparent 25%),
+        linear-gradient(180deg, #191712 0%, #12110f 100%);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: auto; }
+
+    .container {
+      width: min(calc(100% - 32px), var(--content));
+      margin: 0 auto;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 16px;
+      top: -48px;
+      padding: 10px 14px;
+      background: #fff;
+      color: #111;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+
+    .skip-link:focus { top: 16px; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(21,20,17,0.68);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(201,155,73,0.95), rgba(201,155,73,0.15) 55%, transparent 56%),
+        radial-gradient(circle at 70% 70%, rgba(122,166,143,0.8), rgba(122,166,143,0.08) 50%, transparent 51%),
+        rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid transparent;
+      transition: 180ms ease;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text);
+      border-color: var(--line);
+      background: rgba(255,255,255,0.06);
+      outline: none;
+    }
+
+    .hero {
+      padding: 72px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-copy {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 100%;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(201,155,73,0.12);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.6rem, 5vw, 5.8rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.03rem;
+      max-width: 58ch;
+    }
+
+    .hero-notes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .note {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .note strong {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .note span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .hero-image {
+      min-height: 560px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-image img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 38%;
+      filter: saturate(0.95) contrast(1.02);
+      transform: scale(1.04);
+    }
+
+    .hero-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.42)),
+        linear-gradient(120deg, rgba(0,0,0,0.00) 42%, rgba(0,0,0,0.45) 100%);
+    }
+
+    .hero-caption {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1;
+      padding: 18px 18px 16px;
+      border-radius: 18px;
+      background: rgba(10,10,10,0.46);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-caption strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .hero-caption span {
+      color: #ddd2bf;
+      font-size: 0.95rem;
+    }
+
+    section {
+      padding: 28px 0 44px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      grid-column: span 4;
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.03));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+      content-visibility: auto;
+      contain-intrinsic-size: 800px;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(201,155,73,0.35);
+      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+    }
+
+    .card.tall { grid-column: span 4; }
+    .card.wide { grid-column: span 8; }
+
+    .image-wrap {
+      position: relative;
+      aspect-ratio: var(--ratio, 4 / 5);
+      overflow: hidden;
+      background: #111;
+      cursor: zoom-in;
+    }
+
+    .image-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.18) 100%);
+      pointer-events: none;
+    }
+
+    .image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--pos, center center);
+      transition: transform 800ms cubic-bezier(.16,1,.3,1), filter 220ms ease;
+      filter: saturate(1.02) contrast(1.03);
+    }
+
+    .card:hover .image-wrap img {
+      transform: scale(1.05);
+    }
+
+    .content {
+      padding: 20px 20px 22px;
+    }
+
+    .kicker {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 0.74rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .desc {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .meta {
+      display: grid;
+      gap: 10px;
+    }
+
+    .meta div {
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .meta strong {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e9d9bb;
+      margin-bottom: 5px;
+    }
+
+    .meta span {
+      display: block;
+      color: #d7cfbf;
+      font-size: 0.95rem;
+    }
+
+    .closing {
+      padding: 18px 22px 70px;
+    }
+
+    .closing-box {
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+        radial-gradient(circle at top right, rgba(201,155,73,0.18), transparent 24%);
+      box-shadow: var(--shadow);
+    }
+
+    .closing-box h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 2vw, 2.2rem);
+      letter-spacing: -0.03em;
+    }
+
+    .closing-box p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 72ch;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.82);
+      z-index: 100;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox img {
+      max-width: min(94vw, 1400px);
+      max-height: 86vh;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.15);
+      background: #111;
+    }
+
+    .lightbox button {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      min-width: 44px;
+      min-height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-image { min-height: 420px; }
+      .card, .card.wide, .card.tall { grid-column: span 6; }
+    }
+
+    @media (max-width: 720px) {
+      .nav { align-items: flex-start; padding-block: 14px; flex-direction: column; }
+      .nav-links { width: 100%; }
+      .nav-links a { flex: 1 1 auto; justify-content: center; }
+      .hero { padding-top: 34px; }
+      .hero-copy { padding: 22px; }
+      .hero-notes { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+      .card, .card.wide, .card.tall { grid-column: span 12; }
+      .closing { padding-bottom: 44px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#gallery">Skip to gallery</a>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-label="Central Texas logo">
+            <path d="M5 16c2.4-3.8 4.9-6 7-6s4.6 2.2 7 6" />
+            <path d="M4 18h16" />
+            <path d="M12 5v8" />
+          </svg>
+        </div>
+        <span>Central Texas, Up Close</span>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#intro">Intro</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#closing">Closing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="intro">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="panel hero-copy">
+          <div>
+            <div class="eyebrow"><span class="dot"></span> Nature portfolio</div>
+            <h1>Austin seen at trail speed</h1>
+          </div>
+
+          <p>
+            This gallery is built like a dusk walk through the Hill Country: limestone first,
+            then creek light, then the small things that reward attention. The crops lean into
+            intimacy, texture, and scale shifts, so each frame feels less like a record shot and
+            more like a field note from Central Texas.
+          </p>
+
+          <div class="hero-notes">
+            <div class="note">
+              <strong>Art direction</strong>
+              <span>Warm stone, low light, dark creek greens, and close studies of native detail.</span>
+            </div>
+            <div class="note">
+              <strong>Through-line</strong>
+              <span>Every image ties back to the limestone ecology, drought rhythm, and creek culture of Austin.</span>
+            </div>
+            <div class="note">
+              <strong>Viewing tip</strong>
+              <span>Click any image to open it larger.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel hero-image">
+          <img src="IMG_9951.jpeg" alt="Small deer standing under stacked limestone ledges at dusk" loading="eager" width="896" height="1344" />
+          <div class="hero-caption">
+            <strong>The first scene sets the tone.</strong>
+            <span>A deer, shadow, and limestone overhang turn the whole collection into an Austin twilight story.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery">
+      <div class="container">
+        <div class="section-head">
+          <h2>Photo studies</h2>
+          <p>
+            Each card includes a short description, the main focal point, why it feels specifically Central Texas,
+            and an Austin story that gives the image a local pulse.
+          </p>
+        </div>
+
+        <div class="grid">
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 50% 34%;">
+              <img src="IMG_9951.jpeg" alt="Deer standing beneath a limestone overhang" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">01 · Mammal and stone</span>
+              <h3>Deer Under the Ledge</h3>
+              <p class="desc">The crop turns the deer into a quiet witness inside a natural amphitheater of fractured limestone and dusk shadow.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The deer is the emotional center, but the limestone shelf gives it drama and scale.</span></div>
+                <div><strong>Central Texas tie</strong><span>This is classic Hill Country habitat: broken limestone, cedar shade, and wildlife moving most confidently at day’s edge.</span></div>
+                <div><strong>Austin story</strong><span>Anyone who has walked Barton Creek or Bull Creek late in the evening knows this moment—the city feels far away, and suddenly you are sharing the trail with something older than Austin itself.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 42% 48%;">
+              <img src="IMG_9946.jpeg" alt="Shallow creek water moving over smooth limestone at dusk" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">02 · Water and shelf rock</span>
+              <h3>Creek Shelf at Dusk</h3>
+              <p class="desc">This image works because the tilt makes the water feel like it is slipping over the frame, as if the creek is pulling the viewer downstream.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The main subject is the limestone creek bed itself—smooth, pale, and still holding a skin of moving water.</span></div>
+                <div><strong>Central Texas tie</strong><span>Those shelves are part of the region’s visual language; they shape swimming holes, flash-flood channels, and the entire look of local creeks.</span></div>
+                <div><strong>Austin story</strong><span>In Austin, creek rock is social architecture: kids climb it, runners cut across it, and after good rain the whole city seems to migrate back to stone and water.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card wide">
+            <div class="image-wrap" style="--ratio: 16/9; --pos: 26% 42%;">
+              <img src="IMG_9961.jpeg" alt="Limestone overhang beside a reflective creek pool at sunset" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">03 · Overhang study</span>
+              <h3>Stone Face, Quiet Water</h3>
+              <p class="desc">The crop emphasizes the ledge on the left until it almost reads like a profile, giving the formation a watchful presence over the pool.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The limestone overhang is the anchor, with the reflective water acting like a second, softer mirror of the same scene.</span></div>
+                <div><strong>Central Texas tie</strong><span>Shaded ledges and creek pockets are where the Hill Country feels most sculptural; the land here is less rolling postcard and more carved geology.</span></div>
+                <div><strong>Austin story</strong><span>Austin hikers love the obvious overlooks, but the best memories often come from these side-angle pockets where the creek quiets down and the stone starts to feel inhabited.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card wide">
+            <div class="image-wrap" style="--ratio: 16/9; --pos: 34% 52%;">
+              <img src="IMG_9955.jpeg" alt="Green fern growing out of a limestone seam" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">04 · Seep ecology</span>
+              <h3>Fern in the Limestone Seam</h3>
+              <p class="desc">The crop makes the fern read like a miniature oasis, a small burst of softness against a canyon of hard stone.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The fern cluster is the star, especially because it appears to be surviving from almost no soil at all.</span></div>
+                <div><strong>Central Texas tie</strong><span>Shaded seeps and damp fractures in limestone are some of the few places where delicate greenery can persist through heat and exposure.</span></div>
+                <div><strong>Austin story</strong><span>After rain on the Greenbelt, people talk about waterfalls, but the real secret is how the walls wake up—tiny ferns, moss, and seep plants make the rock look newly alive.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 50% 40%;">
+              <img src="IMG_9968.jpeg" alt="Close-up of pale winged seed clusters" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">05 · Seed architecture</span>
+              <h3>Winged Seeds in Evening Light</h3>
+              <p class="desc">This crop leans into the elegant tangle of the seed cluster, letting it feel almost drawn rather than photographed.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The subject is the hanging seed whorl—thin, pale, and delicate against the dark background.</span></div>
+                <div><strong>Central Texas tie</strong><span>Late spring and summer in Austin are full of these transitional details: flowers giving way to seed, heat turning abundance into survival strategy.</span></div>
+                <div><strong>Austin story</strong><span>There is a very local pleasure in noticing the in-between stage of a plant, because Austin nature culture is not only about bloom season; it is about watching the whole cycle happen in real time.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 55% 45%;">
+              <img src="IMG_9930.jpeg" alt="Creekside plant with dark seed spikes and palmate leaves" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">06 · Creekside ornamental gone local</span>
+              <h3>Vitex by the Water</h3>
+              <p class="desc">The frame uses shallow depth and sunset haze to make the plant feel like a silhouette of memory rather than a catalog specimen.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The main subject is the dark seed spike rising in front of the glowing creek background.</span></div>
+                <div><strong>Central Texas tie</strong><span>Vitex shows up all over Austin as a heat-tolerant favorite; once you know its leaf shape and bloom spikes, you start seeing it at trail edges, medians, and old neighborhoods.</span></div>
+                <div><strong>Austin story</strong><span>This feels like the Austin habit of blending planted and wild landscapes—garden species do not stay politely in gardens here, and the city’s ecology is full of overlap.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/5; --pos: 50% 42%;">
+              <img src="IMG_9938.jpeg" alt="Tiny white flowers with dark red bracts in grasses" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">07 · Ground-level detail</span>
+              <h3>Crimson-Bracted Creek Bloom</h3>
+              <p class="desc">This is one of those photographs that rewards kneeling down; the crop gives a tiny plant the visual dignity of a portrait.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The eye goes straight to the little cluster of white blossoms held by deep wine-colored bracts.</span></div>
+                <div><strong>Central Texas tie</strong><span>Trailside flora here often lives at ankle height, hidden in grass, rock litter, and cedar duff—small enough to miss unless you slow all the way down.</span></div>
+                <div><strong>Austin story</strong><span>Austin’s best nature walks often turn into scavenger hunts, because someone always stops the group with, “Wait, look at this tiny thing,” and the whole pace of the walk changes.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 58% 45%;">
+              <img src="IMG_9936.jpeg" alt="Purple bloom spike with soft green background" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">08 · Pollinator color</span>
+              <h3>Purple Spray Against the Creek</h3>
+              <p class="desc">The crop gives the bloom room to breathe, so the plant feels suspended in air with the creek fading into a soft green wash behind it.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The purple flower cluster is the main attraction, bright enough to pull the entire image toward it.</span></div>
+                <div><strong>Central Texas tie</strong><span>Purple flowering spikes feel especially Austin because they bridge ornamental planting and pollinator habitat in one gesture.</span></div>
+                <div><strong>Austin story</strong><span>In many Austin yards and parks, purple blooms are summer traffic signs for bees and butterflies; even in heavy heat, they keep the landscape feeling active.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 52% 48%;">
+              <img src="IMG_9931.jpeg" alt="Orange yellow black-eyed Susan wildflower" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">09 · Native brightness</span>
+              <h3>Black-Eyed Susan, Solitary</h3>
+              <p class="desc">The crop isolates a single bloom in a field of green tangle, giving it the punch of a trail-side exclamation mark.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The flower head is unmistakably the center—bright petals around a dark eye.</span></div>
+                <div><strong>Central Texas tie</strong><span>These warm yellow-orange daisies read immediately as roadside and creekside Texas, cheerful without ever feeling precious.</span></div>
+                <div><strong>Austin story</strong><span>Every spring and summer, Austin drivers and walkers get used to wildflower color appearing where it has no business looking so good—ditch edges, fence lines, and trail margins suddenly become curated.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 50% 55%;">
+              <img src="IMG_9934.jpeg" alt="Cluster of small yellow flowers with dark centers" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">10 · Repetition and rhythm</span>
+              <h3>Yellow Wildflowers in Scatter</h3>
+              <p class="desc">The crop resists centering one bloom too strongly, which lets the image feel like a small constellation across the understory.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The repeated yellow flowers with dark centers create the visual subject as a group rather than as a single specimen.</span></div>
+                <div><strong>Central Texas tie</strong><span>That scattered abundance is deeply local; Central Texas often looks best when plants arrive in loose, accidental-looking communities.</span></div>
+                <div><strong>Austin story</strong><span>This recalls those Austin walks where the trail edge turns into a miniature wildflower show and nobody can agree which one deserves the photo.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 50% 40%;">
+              <img src="IMG_9927.jpeg" alt="White flowering spike in front of creek at sunset" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">11 · Vertical accent</span>
+              <h3>White Spire by the Water</h3>
+              <p class="desc">The image is strongest as a vertical poem: one pale flowering stem holding its own against the large softness of creek and sky.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The central white bloom spike is the axis of the frame.</span></div>
+                <div><strong>Central Texas tie</strong><span>Creek margins in Austin are full of these unexpected candles of bloom, rising out of grass and silt after moisture lingers.</span></div>
+                <div><strong>Austin story</strong><span>It feels like the quieter side of Barton Springs culture—the stretch before or after the crowds, when attention shifts from people in water to the plants standing watch beside it.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/5; --pos: 52% 36%;">
+              <img src="IMG_9917.jpeg" alt="Pastel lantana cluster with pink yellow and cream flowers" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">12 · Color cluster</span>
+              <h3>Lantana in Pastel Fire</h3>
+              <p class="desc">The crop lets the lantana feel almost confectionary, with its tiny warm centers and pink edges floating over a dark woodland background.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The flower cluster itself is the subject, especially the mix of cream, yellow, and pink tones.</span></div>
+                <div><strong>Central Texas tie</strong><span>Lantana is one of the most Austin-coded plants there is—heat tolerant, pollinator friendly, and somehow always a little unruly.</span></div>
+                <div><strong>Austin story</strong><span>Drive through older Austin neighborhoods in summer and lantana spills everywhere, softening rock beds, fences, porches, and xeriscape edges with the same cheerful stubbornness.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 50% 58%;">
+              <img src="IMG_9914.jpeg" alt="Single yellow flower on dry leaf litter" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">13 · Resilience frame</span>
+              <h3>Lone Yellow Daisy on the Floor</h3>
+              <p class="desc">This crop is beautifully unsentimental; it lets the tiny bloom stay small inside a field of dry leaves and dirt, which is exactly why it feels moving.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The single yellow flower is the obvious center, almost like a dropped coin of color.</span></div>
+                <div><strong>Central Texas tie</strong><span>Central Texas beauty often comes with abrasion—flowers rise through cedar litter, stone fragments, and hard-packed trail soil instead of manicured beds.</span></div>
+                <div><strong>Austin story</strong><span>This could be an Austin mood all by itself: something bright and living holding on in a season when the ground already looks tired.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card wide">
+            <div class="image-wrap" style="--ratio: 16/9; --pos: 50% 42%;">
+              <img src="IMG_9913.jpeg" alt="Shrub with clusters of blue berries" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">14 · Fruit and thicket</span>
+              <h3>Blue Berries in the Brush</h3>
+              <p class="desc">The crop keeps the tangle intact instead of simplifying it, which makes the berries feel discovered rather than displayed.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The clusters of matte blue berries are the visual hook, spaced through the branches like beads.</span></div>
+                <div><strong>Central Texas tie</strong><span>Berrying shrubs are part of the food web that gives creek edges their life, feeding birds and marking seasonal change even when flowers are gone.</span></div>
+                <div><strong>Austin story</strong><span>There is a specific Austin pleasure in learning to read shrubs the way birders read trees—once you notice berries, you start looking for who else is paying attention to them.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 52% 47%;">
+              <img src="IMG_9920.jpeg" alt="Colorful daisy-like flower beneath orange lantana" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">15 · Layered bloom</span>
+              <h3>Hidden Flower Beneath Lantana</h3>
+              <p class="desc">The artistic crop is especially good here because the soft orange blur becomes a curtain, allowing the sharper bloom below to feel revealed.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The crisp daisy-like flower in the middle is the subject, made stronger by the blurred lantana in front.</span></div>
+                <div><strong>Central Texas tie</strong><span>This layered planting style feels very Austin—color piled over color, with native and adapted species mingling in the same pocket of shade and heat.</span></div>
+                <div><strong>Austin story</strong><span>It echoes the city’s front-yard gardening culture, where informal plantings often look best when they feel a little crowded and a little accidental.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card wide">
+            <div class="image-wrap" style="--ratio: 16/9; --pos: 50% 42%;">
+              <img src="IMG_9902.jpeg" alt="Red flowers beside prickly pear cactus on dry ground" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">16 · Heat-country pairing</span>
+              <h3>Scarlet Sage and Prickly Pear</h3>
+              <p class="desc">The crop leaves a lot of ground visible, which helps the red flowers feel earned rather than decorative—a burst of color in dry, thorned country.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The red flowers are the immediate draw, but the prickly pear gives the scene its unmistakable Texas signature.</span></div>
+                <div><strong>Central Texas tie</strong><span>Cactus, leaf litter, stone, and a shock of bloom are about as Central Texas as a plant study can get.</span></div>
+                <div><strong>Austin story</strong><span>Austin landscaping culture has long embraced this combination of toughness and color: you earn the flower by understanding the heat.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 54% 46%;">
+              <img src="IMG_9907.jpeg" alt="Orange flower rendered softly with motion blur" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">17 · Abstract field note</span>
+              <h3>Motion Study in Orange</h3>
+              <p class="desc">Instead of fighting the blur, this crop treats it as the point—the flower becomes a brushstroke, and the image starts behaving like memory.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The orange bloom is still the subject, but here shape and movement matter more than botanical precision.</span></div>
+                <div><strong>Central Texas tie</strong><span>Heat shimmer, walking speed, and quick trail photos are part of the real experience of Austin nature; not every field note has to be clinical.</span></div>
+                <div><strong>Austin story</strong><span>This feels like trying to photograph something on a family walk while everyone else keeps moving—a very Austin blend of beauty, distraction, and momentum.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card wide">
+            <div class="image-wrap" style="--ratio: 16/9; --pos: 50% 44%;">
+              <img src="IMG_9900.jpeg" alt="Airy pink wildflower stems over leaf litter" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">18 · Meadow texture</span>
+              <h3>Pink Prairie Lace</h3>
+              <p class="desc">The image reads almost like handwriting in the air—thin stems, tiny leaves, and scattered pink notes crossing the whole frame.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The main focus is the airy network itself rather than any one flower head.</span></div>
+                <div><strong>Central Texas tie</strong><span>Plenty of local wildflowers are modest until you really look; the charm comes from delicacy and number, not from a single oversized bloom.</span></div>
+                <div><strong>Austin story</strong><span>This is the kind of plant that turns an ordinary Austin shortcut into a slower walk, because once somebody notices it the whole group starts searching for more.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card wide">
+            <div class="image-wrap" style="--ratio: 16/9; --pos: 52% 42%;">
+              <img src="IMG_9911.jpeg" alt="White fuzzy wildflower clusters among green leaves" loading="lazy" width="1240" height="930" />
+            </div>
+            <div class="content">
+              <span class="kicker">19 · Soft bloom cloud</span>
+              <h3>White Mistflower Cluster</h3>
+              <p class="desc">The crop lets the white heads gather like small puffs of smoke inside a darker green field, giving the image a quiet, airy lift.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The fuzzy white flower cluster is the center, balanced by repeated buds around it.</span></div>
+                <div><strong>Central Texas tie</strong><span>These softer composite blooms fit the creekside edge well, where moisture allows a gentler texture than the harsher upland plants nearby.</span></div>
+                <div><strong>Austin story</strong><span>Austin trails are full of plant transitions like this—walk a few yards from exposed rock into shade, and the texture of the landscape changes completely.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 50% 54%;">
+              <img src="IMG_9906.jpeg" alt="Small blue wildflower above leaf litter" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">20 · Fleeting blue</span>
+              <h3>Small Blue Wildflower</h3>
+              <p class="desc">This crop keeps the flower tiny in the frame, which makes the blue feel rarer and more surprising against the muted forest floor.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The blue bloom is the key note, even though the surrounding leaves and leaf litter hold most of the frame.</span></div>
+                <div><strong>Central Texas tie</strong><span>Blue flowers always feel especially charged in Texas because they instantly tap into the state’s long visual memory of spring bloom seasons.</span></div>
+                <div><strong>Austin story</strong><span>Even outside bluebonnet season, Austinites are trained to react to blue on the ground; it still triggers that reflex to stop, crouch, and take the picture.</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card tall">
+            <div class="image-wrap" style="--ratio: 4/6; --pos: 58% 42%;">
+              <img src="IMG_9894.jpeg" alt="Orange-yellow wildflowers with one bloom prominent in foreground" loading="lazy" width="896" height="1344" />
+            </div>
+            <div class="content">
+              <span class="kicker">21 · Colony and blur</span>
+              <h3>Golden Wildflower Colony</h3>
+              <p class="desc">The soft foreground bloom keeps the photo from becoming too literal; it feels more like stepping into a patch of flowers than documenting one.</p>
+              <div class="meta">
+                <div><strong>Focal point</strong><span>The subject is the stand of yellow-orange flowers as a living cluster, not a single perfect head.</span></div>
+                <div><strong>Central Texas tie</strong><span>That dense, slightly unruly growth is pure local texture—wildflowers weaving into brush, shade, and volunteer stems instead of neat borders.</span></div>
+                <div><strong>Austin story</strong><span>This looks like the edges of many Austin trails in late spring, where the best flowers are often half-hidden and therefore somehow more beloved.</span></div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="closing" class="closing">
+      <div class="container">
+        <div class="closing-box">
+          <h2>Closing note</h2>
+          <p>
+            The story running through these images is not just “nature near Austin.” It is a more specific story:
+            water held in limestone, life adapted to heat, and beauty that often hides at the edge of the trail instead
+            of in the center of the view. That is one of the most Central Texas things of all.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" aria-label="Close image viewer">✕</button>
+    <img src="" alt="" />
+  </div>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox.querySelector('img');
+    const closeBtn = lightbox.querySelector('button');
+
+    document.querySelectorAll('.image-wrap img').forEach((img) => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      lightboxImg.src = '';
+    });
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightboxImg.src = '';
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightboxImg.src = '';
+      }
+    });
+  </script>
+</body>
+</html>
